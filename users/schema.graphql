@@ -1,0 +1,103 @@
+type Klimate @entity {
+  id: ID!
+  bondDeposits: [Deposit!]! @derivedFrom(field: "klimate")
+  bondRedemptions: [Redemption!]! @derivedFrom(field: "klimate")
+  stakeTransactions: [Stake!]! @derivedFrom(field: "klimate")
+  unstakeTransactions: [Unstake!]! @derivedFrom(field: "klimate")
+  historicBalance: [KlimateBalance!]! @derivedFrom(field: "klimate")
+  lastBalance: KlimateBalance
+  active: Boolean!
+  totalKlimaBonded: BigDecimal!
+  totalCarbonCustodied: BigDecimal!
+}
+
+type KlimateBalance @entity {
+  id: ID!
+  klimate: Klimate!
+  sklimaBalance: BigDecimal!
+  klimaBalance: BigDecimal!
+  bondBalance: BigDecimal!
+  dollarBalance: BigDecimal!
+  stakes: [ContractInfo!]
+  bonds: [ContractInfo!]
+  timestamp: BigInt!
+}
+
+type Stake @entity {
+  id: ID!
+  transaction: Transaction!
+  klimate: Klimate!
+  amount: BigDecimal!
+  timestamp: BigInt!
+}
+
+type Unstake @entity {
+  id: ID!
+  transaction: Transaction!
+  klimate: Klimate!
+  amount: BigDecimal!
+  timestamp: BigInt!
+}
+
+type Deposit @entity {
+  id: ID!
+  token: String!
+  transaction: Transaction!
+  klimate: Klimate!
+  payout: BigDecimal!
+  bondPrice: BigDecimal!
+  marketPrice: BigDecimal!
+  discount: BigDecimal!
+  tokenValue: BigDecimal!
+  carbonCustodied: BigDecimal!
+  timestamp: BigInt!
+}
+
+type Redemption @entity {
+  id: ID!
+  transaction: Transaction
+  klimate: Klimate!
+  token: String
+  payout: BigDecimal!
+  payoutRemaining: BigDecimal!
+  timestamp: BigInt!
+}
+
+type Rebase @entity {
+  id: ID!
+  transaction: String!
+  amount: BigDecimal!
+  stakedKlimas: BigDecimal!
+  percentage: BigDecimal!
+  contract: String!
+  timestamp: BigInt!
+  value: BigDecimal!
+}
+
+type Transaction @entity {
+  id: ID!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  from: Bytes!
+  to: Bytes
+  value: BigInt!
+  gasUsed: BigInt!
+  gasPrice: BigInt!
+}
+
+type Token @entity {
+  id: ID!
+}
+
+type ContractInfo @entity {
+  id: ID!
+  name: String
+  contract: String
+  amount: BigDecimal!
+}
+
+type Aux @entity {
+  id: ID!
+  value: BigInt!
+}

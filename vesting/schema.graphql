@@ -1,0 +1,19 @@
+type Vesting @entity {
+  id: ID!
+  token: String!
+  contractAddress: Bytes!
+  stakerAddress: Bytes!
+  startedAt: BigInt!
+  maturityDate: BigInt!
+  lockedInSeconds: BigInt!
+  lockedAmount: BigInt!
+}
+
+type AggregatedVestingInfo @entity {
+  id: ID!
+  token: String!
+  maturityDate: String!
+  totalUnlocks: BigInt!
+  totalAmount: BigInt!
+}
+

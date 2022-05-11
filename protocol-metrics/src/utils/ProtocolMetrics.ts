@@ -9,7 +9,7 @@ import { ProtocolMetric, Transaction, TreasuryAsset } from '../../generated/sche
 import { dayFromTimestamp } from '../../../lib/utils/Dates';
 import { toDecimal } from '../../../lib/utils/Decimals';
 import {
-    getKLIMAUSDRate, getDiscountedPairCO2, getKlimaPairUSD, getBCTUSDRate, getKLIMAMCO2Rate,
+    getKLIMAUSDRate, getDiscountedPairCO2, getKLIMAMCO2Rate, getKLIMABCTRate,
     getKLIMAUBORate, getKLIMANBORate, getNCTUSDRate
 } from './Price';
 import { getHolderAux } from './Aux';
@@ -176,7 +176,7 @@ function updateTreasuryAssets(transaction: Transaction): string[] {
 
     // Get market value if pools are deployed
     if (transaction.blockNumber.gt(BigInt.fromString(BCT_USDC_PAIR_BLOCK))) {
-        treasuryBCT.marketValue = treasuryBCT.tokenBalance.times(getBCTUSDRate())
+        treasuryBCT.marketValue = treasuryBCT.tokenBalance.times(getKLIMABCTRate()).times(getKLIMAUSDRate())
     }
 
     if (transaction.blockNumber.gt(BigInt.fromString(NCT_USDC_PAIR_BLOCK))) {
@@ -221,7 +221,7 @@ function updateTreasuryAssets(transaction: Transaction): string[] {
 
         // Percent of Carbon in LP owned by the treasury
         treasuryKLIMABCT.carbonBalance = toDecimal(klimabctUNIV2.getReserves().value0, 18).times(ownedLP)
-        treasuryKLIMABCT.marketValue = treasuryKLIMABCT.carbonBalance.times(getBCTUSDRate())
+        treasuryKLIMABCT.marketValue = treasuryKLIMABCT.carbonBalance.times(getKLIMABCTRate()).times(getKLIMAUSDRate())
 
     }
 
@@ -311,7 +311,7 @@ function updateTreasuryAssets(transaction: Transaction): string[] {
 
         // Percent of Carbon in LP owned by the treasury
         treasuryBCTUSDC.carbonBalance = toDecimal(bctusdcUNIV2.getReserves().value1, 18).times(ownedLP)
-        treasuryBCTUSDC.marketValue = treasuryBCTUSDC.carbonBalance.times(getBCTUSDRate())
+        treasuryBCTUSDC.marketValue = treasuryBCTUSDC.carbonBalance.times(getKLIMABCTRate()).times(getKLIMAUSDRate())
 
     }
 

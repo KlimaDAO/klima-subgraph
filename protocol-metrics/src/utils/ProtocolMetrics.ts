@@ -221,7 +221,7 @@ function updateTreasuryAssets(transaction: Transaction): string[] {
 
         // Percent of Carbon in LP owned by the treasury
         treasuryKLIMABCT.carbonBalance = toDecimal(klimabctUNIV2.getReserves().value0, 18).times(ownedLP)
-        treasuryKLIMABCT.marketValue = treasuryKLIMABCT.carbonBalance.times(getBCTUSDRate())
+        treasuryKLIMABCT.marketValue = treasuryKLIMABCT.carbonBalance.times(getBCTUSDRate()).times(BigDecimal.fromString('2'))
 
     }
 
@@ -244,7 +244,7 @@ function updateTreasuryAssets(transaction: Transaction): string[] {
 
         // Percent of Carbon in LP owned by the treasury
         treasuryKLIMAMCO2.carbonBalance = toDecimal(klimamco2UNIV2.getReserves().value1, 18).times(ownedLP)
-        treasuryKLIMAMCO2.marketValue = treasuryKLIMAMCO2.carbonBalance.times(getKLIMAMCO2Rate()).times(getKLIMAUSDRate())
+        treasuryKLIMAMCO2.marketValue = treasuryKLIMAMCO2.carbonBalance.times(getKLIMAMCO2Rate()).times(getKLIMAUSDRate()).times(BigDecimal.fromString('2'))
     }
 
     treasuryKLIMAMCO2.save()
@@ -311,7 +311,7 @@ function updateTreasuryAssets(transaction: Transaction): string[] {
 
         // Percent of Carbon in LP owned by the treasury
         treasuryBCTUSDC.carbonBalance = toDecimal(bctusdcUNIV2.getReserves().value1, 18).times(ownedLP)
-        treasuryBCTUSDC.marketValue = treasuryBCTUSDC.carbonBalance.times(getBCTUSDRate())
+        treasuryBCTUSDC.marketValue = treasuryBCTUSDC.carbonBalance.times(getBCTUSDRate()).times(BigDecimal.fromString('2'))
 
     }
 
@@ -332,7 +332,7 @@ function updateTreasuryAssets(transaction: Transaction): string[] {
         let total_lp = toDecimal(klimausdcUNIV2.totalSupply(), 18)
         let ownedLP = treasuryKLIMAUSDC.tokenBalance.div(total_lp)
         treasuryKLIMAUSDC.POL = ownedLP
-        treasuryKLIMAUSDC.marketValue = toDecimal(klimausdcUNIV2.getReserves().value1, 9).times(getKLIMAUSDRate()).times(ownedLP)
+        treasuryKLIMAUSDC.marketValue = toDecimal(klimausdcUNIV2.getReserves().value1, 9).times(getKLIMAUSDRate()).times(ownedLP).times(BigDecimal.fromString('2'))
     }
 
     treasuryKLIMAUSDC.save()

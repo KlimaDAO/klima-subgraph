@@ -8,6 +8,7 @@ export function loadOrCreateBonder(addr: Address): Bonder {
         bonder = new Bonder(addr.toHexString())
         bonder.totalKlimaBonded = BigDecimal.fromString('0')
         bonder.totalCarbonCustodied = BigDecimal.fromString('0')
+        bonder.totalKlimaMintedForDao = BigDecimal.fromString('0')
         bonder.save()
     }
 

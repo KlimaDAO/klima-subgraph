@@ -2,10 +2,11 @@ import { BondCreated, BondRedeemed, ControlVariableAdjustment } from '../generat
 import { Deposit } from '../generated/schema'
 import { loadOrCreateTransaction } from "./utils/Transactions"
 import { toDecimal } from "../../lib/utils/Decimals"
-import { KLIMAUSDC_LPBOND_TOKEN } from '../../lib/utils/Constants'
+import { KLIMA_USDC_BOND_V1, KLIMAUSDC_LPBOND_TOKEN } from '../../lib/utils/Constants'
 import { loadOrCreateRedemption } from './utils/Redemption'
 import { createDailyBondRecord, updateBondBCV } from './utils/DailyBond'
 import { getKLIMABCTRate } from './utils/Price'
+import { getDaoIncome } from './utils/DaoIncome'
 import { loadOrCreateBonder } from './utils/Bonder'
 
 
@@ -18,6 +19,7 @@ export function handleDeposit(event: BondCreated): void {
     deposit.transaction = transaction.id
     deposit.bonder = bonder.id
     deposit.payout = toDecimal(event.params.payout, 9)
+    deposit.daoIncome = getDaoIncome(KLIMA_USDC_BOND_V1, deposit.payout)
     deposit.bondPrice = toDecimal(event.params.priceInUSD, 18)
     deposit.marketPrice = getKLIMABCTRate()
     deposit.discount = (deposit.marketPrice.minus(deposit.bondPrice)).div(deposit.marketPrice)
@@ -28,9 +30,10 @@ export function handleDeposit(event: BondCreated): void {
 
     bonder.totalCarbonCustodied = bonder.totalCarbonCustodied.plus(deposit.carbonCustodied)
     bonder.totalKlimaBonded = bonder.totalKlimaBonded.plus(deposit.payout)
+    bonder.totalKlimaMintedForDao = bonder.totalKlimaMintedForDao.plus(deposit.daoIncome)
     bonder.save()
 
-    createDailyBondRecord(deposit.timestamp, deposit.token, deposit.payout, deposit.tokenValue, deposit.carbonCustodied)
+    createDailyBondRecord(deposit.timestamp, deposit.token, deposit.payout, deposit.daoIncome, deposit.tokenValue, deposit.carbonCustodied)
 }
 
 export function handleRedeem(event: BondRedeemed): void {

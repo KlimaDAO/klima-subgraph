@@ -12,6 +12,7 @@ export function loadOrCreateDailyBond(timestamp: BigInt, token: string): DailyBo
         dailyBond.timestamp = BigInt.fromString(day_timestamp)
         dailyBond.token = token
         dailyBond.payout = BigDecimal.fromString('0')
+        dailyBond.daoIncome = BigDecimal.fromString('0')
         dailyBond.tokenValue = BigDecimal.fromString('0')
         dailyBond.carbonCustodied = BigDecimal.fromString('0')
         dailyBond.BCV = BigInt.fromString('0')
@@ -21,9 +22,10 @@ export function loadOrCreateDailyBond(timestamp: BigInt, token: string): DailyBo
 }
 
 export function createDailyBondRecord(timestamp: BigInt, token: string, payout: BigDecimal,
-    tokenValue: BigDecimal, carbonCustodied: BigDecimal): void {
+    daoIncome: BigDecimal, tokenValue: BigDecimal, carbonCustodied: BigDecimal): void {
     let dailyBond = loadOrCreateDailyBond(timestamp, token)
     dailyBond.payout = dailyBond.payout.plus(payout)
+    dailyBond.daoIncome = dailyBond.daoIncome.plus(daoIncome)
     dailyBond.tokenValue = dailyBond.tokenValue.plus(tokenValue)
     dailyBond.carbonCustodied = dailyBond.carbonCustodied.plus(carbonCustodied)
     dailyBond.save()

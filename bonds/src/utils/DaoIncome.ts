@@ -8,12 +8,12 @@ export function getDaoIncome(bondAddress: string, payout : BigDecimal): BigDecim
     let daoIncome = BigDecimal.fromString("0")
     if (terms_call.reverted === false) {
 
-        const feePercentage = terms_call.value.value4.toBigDecimal().div(BigDecimal.fromString("100"))
-        const feeDecimal = feePercentage.div(BigDecimal.fromString("100"))
+        const feeRaw = terms_call.value.value4
+        const feeDecimal = feeRaw.toBigDecimal().div(BigDecimal.fromString("10000"))
         daoIncome = feeDecimal.times(payout)
     
-        log.debug("Payout {} - Dao Income {} - Fee Percentage {}%",
-        [payout.toString(), daoIncome.toString(), feePercentage.toString()])
+        log.debug("Payout {} - Dao Income {} - Fee {}",
+        [payout.toString(), daoIncome.toString(), feeDecimal.toString()])
     }
 
 

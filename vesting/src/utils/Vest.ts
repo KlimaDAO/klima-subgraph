@@ -1,4 +1,4 @@
-import { BigInt, Bytes, ethereum} from "@graphprotocol/graph-ts"
+import { BigInt, BigDecimal, Bytes, ethereum} from "@graphprotocol/graph-ts"
 import { AggregatedVestingInfo, Vesting } from "../../generated/schema"
 
 
@@ -9,9 +9,10 @@ export function loadOrCreateAggregateVestingInfo(id: string): AggregatedVestingI
     if (aggregatedVestingInfo == null) {
         aggregatedVestingInfo = new AggregatedVestingInfo(id)
         aggregatedVestingInfo.token = ""
+        aggregatedVestingInfo.platform = ""
         aggregatedVestingInfo.maturityDate = ""
         aggregatedVestingInfo.totalUnlocks = BigInt.fromString('0')
-        aggregatedVestingInfo.totalAmount = BigInt.fromString('0')
+        aggregatedVestingInfo.totalAmount = BigDecimal.fromString('0')
         
         aggregatedVestingInfo.save()
     }
@@ -26,12 +27,13 @@ export function loadOrCreateVesting(transaction: ethereum.Transaction) : Vesting
     if (vesting == null) {
         vesting = new Vesting(transaction.hash.toHexString())
         vesting.token = ""
+        vesting.platform = ""
         vesting.contractAddress = Bytes.empty()
         vesting.stakerAddress = Bytes.empty()
         vesting.startedAt = BigInt.fromString('0')
         vesting.maturityDate = BigInt.fromString('0')
         vesting.lockedInSeconds = BigInt.fromString('0')
-        vesting.lockedAmount = BigInt.fromString('0')
+        vesting.lockedAmount = BigDecimal.fromString('0')
 
         vesting.save()
     }

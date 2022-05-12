@@ -51,6 +51,15 @@ export class Vesting extends Entity {
     this.set("token", Value.fromString(value));
   }
 
+  get platform(): string {
+    let value = this.get("platform");
+    return value!.toString();
+  }
+
+  set platform(value: string) {
+    this.set("platform", Value.fromString(value));
+  }
+
   get contractAddress(): Bytes {
     let value = this.get("contractAddress");
     return value!.toBytes();
@@ -96,13 +105,13 @@ export class Vesting extends Entity {
     this.set("lockedInSeconds", Value.fromBigInt(value));
   }
 
-  get lockedAmount(): BigInt {
+  get lockedAmount(): BigDecimal {
     let value = this.get("lockedAmount");
-    return value!.toBigInt();
+    return value!.toBigDecimal();
   }
 
-  set lockedAmount(value: BigInt) {
-    this.set("lockedAmount", Value.fromBigInt(value));
+  set lockedAmount(value: BigDecimal) {
+    this.set("lockedAmount", Value.fromBigDecimal(value));
   }
 }
 
@@ -142,6 +151,15 @@ export class AggregatedVestingInfo extends Entity {
     this.set("id", Value.fromString(value));
   }
 
+  get platform(): string {
+    let value = this.get("platform");
+    return value!.toString();
+  }
+
+  set platform(value: string) {
+    this.set("platform", Value.fromString(value));
+  }
+
   get token(): string {
     let value = this.get("token");
     return value!.toString();
@@ -169,12 +187,12 @@ export class AggregatedVestingInfo extends Entity {
     this.set("totalUnlocks", Value.fromBigInt(value));
   }
 
-  get totalAmount(): BigInt {
+  get totalAmount(): BigDecimal {
     let value = this.get("totalAmount");
-    return value!.toBigInt();
+    return value!.toBigDecimal();
   }
 
-  set totalAmount(value: BigInt) {
-    this.set("totalAmount", Value.fromBigInt(value));
+  set totalAmount(value: BigDecimal) {
+    this.set("totalAmount", Value.fromBigDecimal(value));
   }
 }

@@ -28,18 +28,70 @@ export class MCO2 implements IToken {
   }
 
   getMarketPrice(): BigDecimal {
+    
     let BIG_DECIMAL_1E9 = BigDecimal.fromString('1e9')
     let pair = UniswapV2Pair.bind(Address.fromString(constants.KLIMA_MCO2_PAIR))
 
-    let reserves = pair.getReserves()
-    let reserve0 = reserves.value0.toBigDecimal()
-    let reserve1 = reserves.value1.toBigDecimal()
+    let reserveCall = pair.try_getReserves()
+    if (reserveCall.reverted) {
+      return this.getMarketPriceViaUsdc()
+    }
+
+    let reserve0 = reserveCall.value.value0.toBigDecimal()
+    let reserve1 = reserveCall.value.value1.toBigDecimal()
 
     let klimaRate = reserve0.div(reserve1).div(BIG_DECIMAL_1E9)
     log.debug("KLIMA MCO2 rate {}", [klimaRate.toString()])
 
     return klimaRate
   }
+
+  private getMarketPriceViaUsdc(): BigDecimal {
+    let BIG_DECIMAL_1E12 = BigDecimal.fromString('1e12')
+
+    let mco2UsdcPair = UniswapV2Pair.bind(Address.fromString(constants.MCO2_USDC_PAIR))
+    let mco2UsdcReserves = mco2UsdcPair.getReserves()
+
+    let mco2UsdcReserve1 = mco2UsdcReserves.value0.toBigDecimal()
+    let mco2UsdcReserve2 = mco2UsdcReserves.value1.toBigDecimal()
+    let mco2UsdcRate = (mco2UsdcReserve1.times(BIG_DECIMAL_1E12)).div(mco2UsdcReserve2)
+
+    let klimaUsdcRate = this.getKLIMAUSDRate()
+
+    return klimaUsdcRate.div(mco2UsdcRate);
+  }
+
+  private getKLIMAUSDRate(): BigDecimal {
+    let pair = UniswapV2Pair.bind(Address.fromString(constants.KLIMA_BCT_PAIR))
+    let BIG_DECIMAL_1E9 = BigDecimal.fromString('1e9')
+
+    let reserves = pair.getReserves()
+    let reserve0 = reserves.value0.toBigDecimal()
+    let reserve1 = reserves.value1.toBigDecimal()
+
+    let bctRate = this.getBCTUSDRate()
+
+    let klimaRate = reserve0.div(reserve1).div(BIG_DECIMAL_1E9).times(bctRate)
+    log.debug("KLIMA rate {}", [klimaRate.toString()])
+
+    return klimaRate
+  }
+
+  private getBCTUSDRate(): BigDecimal {
+
+    let pair = UniswapV2Pair.bind(Address.fromString(constants.BCT_USDC_PAIR))
+    let BIG_DECIMAL_1E12 = BigDecimal.fromString('1e12')
+
+    let reserves = pair.getReserves()
+    let reserve0 = reserves.value0.toBigDecimal()
+    let reserve1 = reserves.value1.toBigDecimal()
+
+    let bctRate = reserve0.div(reserve1).times(BIG_DECIMAL_1E12)
+    log.debug("BCT rate {}", [bctRate.toString()])
+
+    return bctRate
+}
+
 
   getTotalSupply(): BigDecimal {
    let ercContract = ERC20.bind(Address.fromString(this.contractAddress))

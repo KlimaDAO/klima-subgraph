@@ -18,7 +18,7 @@ export class MCO2Bond implements IBondable {
   }
 
   getToken(): IToken {
-    return new MCO2();
+    return this.mco2Token
   }
 
   getBondName(): string {

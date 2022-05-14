@@ -11,13 +11,15 @@ import { NBO } from "../../tokens/impl/NBO";
 export class NBOBond implements IBondable {
   
   contractAddress: Address;
+  nboToken: IToken
 
   constructor(constractAddress: Address) {
     this.contractAddress = constractAddress;
+    this.nboToken = new NBO()
   }
 
   getToken(): IToken {
-    return new NBO();
+    return this.nboToken
   }
 
   getBondName(): string {

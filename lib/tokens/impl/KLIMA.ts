@@ -9,7 +9,7 @@ import { toDecimal } from "../../utils/Decimals"
 export class KLIMA implements IToken {
 
     contractAddress: string = constants.KLIMA_ERC20_V1_CONTRACT
-    static DECIMALS: number = 18
+    static DECIMALS: number = 9
 
     getERC20ContractAddress(): string {
         return this.contractAddress

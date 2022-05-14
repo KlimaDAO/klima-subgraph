@@ -11,13 +11,15 @@ import { BCT } from "../../tokens/impl/BCT";
 export class BCTBond implements IBondable {
   
   contractAddress: Address;
+  bctToken: IToken
 
   constructor(constractAddress: Address) {
     this.contractAddress = constractAddress;
+    this.bctToken = new BCT()
   }
 
   getToken(): IToken {
-    return new BCT();
+    return this.bctToken
   }
 
   getBondName(): string {

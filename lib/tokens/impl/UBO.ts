@@ -45,7 +45,11 @@ export class UBO implements IToken {
     const klimaUsdPrice = this.klimaToken.getUSDPrice()
     const uboMarketPrice = this.getMarketPrice()
 
-    return klimaUsdPrice.times(uboMarketPrice)
+    if (uboMarketPrice.equals(BigDecimal.zero())) {
+      return BigDecimal.zero()
+    }
+
+    return klimaUsdPrice.div(uboMarketPrice)
   }
 
   getTotalSupply(): BigDecimal {

@@ -50,11 +50,11 @@ export class MCO2 implements IToken {
   private getMarketPriceViaUsdc(): BigDecimal {
 
     let mco2UsdcRate = this.getMco2USDRate()
-    let klimaUsdcRate = this.klimaToken.getMarketPrice()
+    let klimaUsdcRate = this.klimaToken.getUSDPrice()
 
     log.debug("[MCO2] Getting market price via USDC - MCO2-USDC Rate: {} ; KLIMA-USDC Rate: {}",
      [mco2UsdcRate.toString(), klimaUsdcRate.toString()])
-     
+
     return klimaUsdcRate.div(mco2UsdcRate);
   }
 
@@ -69,9 +69,13 @@ export class MCO2 implements IToken {
 
     let mco2UsdcReserve1 = mco2UsdcReserves.value0.toBigDecimal()
     let mco2UsdcReserve2 = mco2UsdcReserves.value1.toBigDecimal()
+    if (mco2UsdcReserve2.equals(BigDecimal.zero())) {
+      return BigDecimal.zero()
+    }
+
     let mco2UsdcRate = (mco2UsdcReserve1.times(BIG_DECIMAL_1E12)).div(mco2UsdcReserve2)
 
-  return mco2UsdcRate
+    return mco2UsdcRate
 }
 
   getTotalSupply(): BigDecimal {

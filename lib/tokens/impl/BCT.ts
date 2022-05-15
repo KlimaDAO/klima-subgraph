@@ -4,12 +4,14 @@ import { ERC20 } from '../../../bonds/generated/BCTBondV1/ERC20'
 import { IToken } from "../IToken";
 
 import * as constants from '../../utils/Constants'
-import { toDecimal } from "../../utils/Decimals"
+import { toDecimal, BIG_DECIMAL_1E9 } from "../../utils/Decimals"
+import { KLIMA } from "./KLIMA";
 
 
 export class BCT implements IToken {
 
-  contractAddress: string = constants.BCT_ERC20_CONTRACT
+  private contractAddress: string = constants.BCT_ERC20_CONTRACT
+  private klimaToken: KLIMA = new KLIMA()
 
   getERC20ContractAddress(): string {
     return this.contractAddress
@@ -27,7 +29,6 @@ export class BCT implements IToken {
   }
 
   getMarketPrice(): BigDecimal {
-    let BIG_DECIMAL_1E9 = BigDecimal.fromString('1e9')
     let pair = UniswapV2Pair.bind(Address.fromString(constants.KLIMA_BCT_PAIR))
 
     let reserves = pair.getReserves()
@@ -38,6 +39,13 @@ export class BCT implements IToken {
     log.debug("KLIMA BCT rate {}", [klimaRate.toString()])
 
     return klimaRate
+  }
+
+  getUSDPrice(): BigDecimal {
+    const klimaUsdPrice = this.klimaToken.getUSDPrice()
+    const bctMarketPrice = this.getMarketPrice()
+
+    return klimaUsdPrice.times(bctMarketPrice)
   }
 
   getTotalSupply(): BigDecimal {

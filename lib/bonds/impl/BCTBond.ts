@@ -10,8 +10,8 @@ import { BCT } from "../../tokens/impl/BCT";
 
 export class BCTBond implements IBondable {
   
-  contractAddress: Address;
-  bctToken: IToken
+  private contractAddress: Address;
+  private bctToken: IToken
 
   constructor(constractAddress: Address) {
     this.contractAddress = constractAddress;
@@ -38,6 +38,10 @@ export class BCTBond implements IBondable {
 
   getBondPrice(priceInUSD: BigInt): BigDecimal {
     return toDecimal(priceInUSD, 18);
+  }
+
+  getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
+    return this.getToken().getFormattedPrice(rawPrice)
   }
 
   getCarbonCustodied(depositAmount: BigInt): BigDecimal {

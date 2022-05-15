@@ -75,3 +75,6 @@ export const C3_WSKLIMA_TOKEN = "WSKLIMA"
 
 // Assumed epochs per day (until we have dynamic)
 export const EPOCHS_PER_DAY = 3.4256
+
+//Used for calculating whether Pool is liquid or not
+export const LIQUIDITY_TRESHOLD = '100000'

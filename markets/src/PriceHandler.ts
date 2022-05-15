@@ -1,5 +1,5 @@
-import { BigInt, log } from '@graphprotocol/graph-ts';
-import { ERC20, Transfer } from '../generated/BCTPrice/ERC20'
+import { BigInt } from '@graphprotocol/graph-ts';
+import { Transfer } from '../generated/BCTPrice/ERC20'
 import { TokenFactory } from '../../lib/tokens/TokenFactory'
 import { dayFromTimestamp, hourFromTimestamp } from '../../lib/utils/Dates'
 

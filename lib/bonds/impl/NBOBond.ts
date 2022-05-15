@@ -23,7 +23,7 @@ export class NBOBond implements IBondable {
   }
 
   getBondName(): string {
-    return constants.UBO_BOND_TOKEN;
+    return constants.NBO_BOND_TOKEN;
   }
 
   getBondFee(): BigDecimal {

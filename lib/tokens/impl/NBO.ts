@@ -45,7 +45,11 @@ export class NBO implements IToken {
     const klimaUsdPrice = this.klimaToken.getUSDPrice()
     const nboMarketPrice = this.getMarketPrice()
 
-    return klimaUsdPrice.times(nboMarketPrice)
+    if (nboMarketPrice.equals(BigDecimal.zero())) {
+      return BigDecimal.zero()
+    }
+
+    return klimaUsdPrice.div(nboMarketPrice)
   }
 
 

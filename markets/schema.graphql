@@ -1,0 +1,15 @@
+type DailyPrice @entity {
+  id: ID!
+  timestamp: BigInt!
+  token: String!
+  marketPrice: BigDecimal!
+  usdPrice: BigDecimal!
+}
+
+type HourlyPrice @entity {
+  id: ID!
+  timestamp: BigInt!
+  token: String!
+  marketPrice: BigDecimal!
+  usdPrice: BigDecimal!
+}

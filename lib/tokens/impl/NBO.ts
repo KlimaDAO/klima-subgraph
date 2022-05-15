@@ -35,7 +35,7 @@ export class NBO implements IToken {
     let reserve0 = reserves.value0.toBigDecimal()
     let reserve1 = reserves.value1.toBigDecimal()
 
-    let klimaRate = reserve0.div(reserve1).div(BIG_DECIMAL_1E9)
+    let klimaRate = reserve1.div((reserve0).times(BIG_DECIMAL_1E9))
     log.debug("KLIMA NBO rate {}", [klimaRate.toString()])
 
     return klimaRate

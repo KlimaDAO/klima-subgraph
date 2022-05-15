@@ -10,8 +10,8 @@ import { UBO } from "../../tokens/impl/UBO";
 
 export class UBOBond implements IBondable {
   
-  contractAddress: Address;
-  uboToken: IToken
+  private contractAddress: Address;
+  private uboToken: IToken
 
   constructor(constractAddress: Address) {
     this.contractAddress = constractAddress;
@@ -38,6 +38,10 @@ export class UBOBond implements IBondable {
 
   getBondPrice(priceInUSD: BigInt): BigDecimal {
     return toDecimal(priceInUSD, 18);
+  }
+
+  getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
+    return this.getToken().getFormattedPrice(rawPrice)
   }
 
   getCarbonCustodied(depositAmount: BigInt): BigDecimal {

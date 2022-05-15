@@ -7,6 +7,7 @@ export interface IBondable {
     getBondName(): string
     getBondFee(): BigDecimal
     getBondPrice(priceInUSD: BigInt): BigDecimal
+    getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal
     getCarbonCustodied(depositAmount: BigInt): BigDecimal
     getTreasuredAmount(): BigDecimal
   }

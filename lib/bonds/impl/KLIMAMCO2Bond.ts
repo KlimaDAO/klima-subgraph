@@ -11,10 +11,10 @@ import { MCO2 } from "../../tokens/impl/MCO2";
 
 export class KLIMAMCO2Bond implements IBondable {
   
-  contractAddress: Address;
+  private contractAddress: Address;
 
-  klimaToken: IToken
-  mco2Token: IToken
+  private klimaToken: IToken
+  private mco2Token: IToken
 
   constructor(constractAddress: Address) {
     this.contractAddress = constractAddress;
@@ -42,6 +42,10 @@ export class KLIMAMCO2Bond implements IBondable {
 
   getBondPrice(priceInUSD: BigInt): BigDecimal {
     return toDecimal(priceInUSD, 18);
+  }
+
+  getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
+    return toDecimal(rawPrice, 18)
   }
 
   getCarbonCustodied(depositAmount: BigInt): BigDecimal {

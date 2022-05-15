@@ -1,12 +1,10 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { IToken } from "../IToken";
 
-import { toDecimal } from "../../utils/Decimals"
-
+import { getKLIMAUSDRate } from "../../../bonds/src/utils/Price";
+import { toDecimal } from "../../utils/Decimals";
 
 export class USDC implements IToken {
-
-    static DECIMALS: number = 12
 
     getERC20ContractAddress(): string {
         throw new Error("Method not implemented.");
@@ -16,14 +14,20 @@ export class USDC implements IToken {
         return "USDC"
     }
     getDecimals(): number {
-        return USDC.DECIMALS
+        return 12
     }
     getFormattedPrice(rawPrice: BigInt): BigDecimal {
         return toDecimal(rawPrice, this.getDecimals())
     }
+    
     getMarketPrice(): BigDecimal {
-        throw new Error("Method not implemented.");
+        return getKLIMAUSDRate()
     }
+    
+    getUSDPrice(): BigDecimal {
+        return BigDecimal.fromString("1")
+    }
+
     getTotalSupply(): BigDecimal {
         throw new Error("Method not implemented.");
     }

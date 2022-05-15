@@ -11,10 +11,10 @@ import { KLIMA } from "../../tokens/impl/KLIMA";
 
 export class KLIMABCTBond implements IBondable {
   
-  contractAddress: Address;
+  private contractAddress: Address;
 
-  klimaToken: IToken
-  bctToken: IToken
+  private klimaToken: IToken
+  private bctToken: IToken
 
   constructor(constractAddress: Address) {
     this.contractAddress = constractAddress;
@@ -42,6 +42,10 @@ export class KLIMABCTBond implements IBondable {
 
   getBondPrice(priceInUSD: BigInt): BigDecimal {
     return toDecimal(priceInUSD, 18);
+  }
+
+  getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
+    return toDecimal(rawPrice, 18)
   }
 
   getCarbonCustodied(depositAmount: BigInt): BigDecimal {

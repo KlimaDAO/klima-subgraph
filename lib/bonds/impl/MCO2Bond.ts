@@ -9,8 +9,8 @@ import { toDecimal } from "../../utils/Decimals";
 import { MCO2 } from "../../tokens/impl/MCO2";
 
 export class MCO2Bond implements IBondable {
-  contractAddress: Address;
-  mco2Token: IToken
+  private contractAddress: Address;
+  private mco2Token: IToken
 
   constructor(constractAddress: Address) {
     this.contractAddress = constractAddress;
@@ -37,6 +37,10 @@ export class MCO2Bond implements IBondable {
 
   getBondPrice(priceInUSD: BigInt): BigDecimal {
     return toDecimal(priceInUSD, 18);
+  }
+
+  getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
+    return this.getToken().getFormattedPrice(rawPrice)
   }
 
   getCarbonCustodied(depositAmount: BigInt): BigDecimal {

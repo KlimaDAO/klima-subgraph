@@ -70,3 +70,6 @@ export const BONDING_CALCULATOR = '0x0b8d6D6611Ed7cCe01BbcC57826548C6107B0478';
 
 // Assumed epochs per day (until we have dynamic)
 export const EPOCHS_PER_DAY = 3.4256
+
+//Used for calculating whether Pool is liquid or not
+export const LIQUIDITY_TRESHOLD = '100000'

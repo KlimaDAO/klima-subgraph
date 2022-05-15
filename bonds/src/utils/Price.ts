@@ -1,14 +1,33 @@
 import {
     KLIMA_BCT_PAIR, BCT_USDC_PAIR,
-    KLIMA_MCO2_PAIR, KLIMA_ERC20_V1_CONTRACT
+    KLIMA_MCO2_PAIR, LIQUIDITY_TRESHOLD
 } from '../../../lib/utils/Constants'
-import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
-import { UniswapV2Pair } from '../../generated/BCTBondV1/UniswapV2Pair'
-import { toDecimal } from '../../../lib/utils/Decimals'
+import { Address, BigDecimal, BigInt, log, ethereum } from '@graphprotocol/graph-ts'
+import { UniswapV2Pair, UniswapV2Pair__getReservesResult } from '../../generated/BCTBondV1/UniswapV2Pair'
+import { toDecimal, BIG_DECIMAL_1E9, BIG_DECIMAL_1E12 } from '../../../lib/utils/Decimals'
+import { IToken } from '../../../lib/tokens/IToken'
 
+export function isLiquidReserves(
+  reserveCall: ethereum.CallResult<UniswapV2Pair__getReservesResult>,
+  reserveToken1: IToken,
+  reserveToken2: IToken
+): boolean {
 
-let BIG_DECIMAL_1E9 = BigDecimal.fromString('1e9')
-let BIG_DECIMAL_1E12 = BigDecimal.fromString('1e12')
+    if (reserveCall.reverted) {
+        return false
+    }
+    const reserveToken1UsdPrice = reserveToken1.getUSDPrice()
+    const reserve1 = toDecimal(reserveCall.value.value0, reserveToken1.getDecimals())
+
+    const reserveToken2UsdPrice = reserveToken2.getUSDPrice()
+    const reserve2 = toDecimal(reserveCall.value.value1, reserveToken2.getDecimals())
+
+    const pair = reserveToken1.getTokenName().concat("-").concat(reserveToken2.getTokenName())
+    const totalLiquidityInUsd = (reserveToken1UsdPrice.times(reserve1)).plus((reserveToken2UsdPrice).times(reserve2))
+
+    log.debug("[Liquidity check] Liquidity for {} is {}$", [pair, totalLiquidityInUsd.toString()])
+    return totalLiquidityInUsd.gt(BigDecimal.fromString(LIQUIDITY_TRESHOLD))
+}
 
 export function getBCTUSDRate(): BigDecimal {
 

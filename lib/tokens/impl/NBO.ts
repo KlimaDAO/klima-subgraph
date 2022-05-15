@@ -4,12 +4,14 @@ import { ERC20 } from '../../../bonds/generated/BCTBondV1/ERC20'
 import { IToken } from "../IToken";
 
 import * as constants from '../../utils/Constants'
-import { toDecimal } from "../../utils/Decimals"
+import { toDecimal, BIG_DECIMAL_1E9 } from "../../utils/Decimals"
+import { KLIMA } from "./KLIMA";
 
 
 export class NBO implements IToken {
 
-  contractAddress: string = constants.NBO_ERC20_CONTRACT
+  private contractAddress: string = constants.NBO_ERC20_CONTRACT
+  private klimaToken: KLIMA = new KLIMA()
 
   getERC20ContractAddress(): string {
     return this.contractAddress
@@ -27,7 +29,6 @@ export class NBO implements IToken {
   }
 
   getMarketPrice(): BigDecimal {
-    let BIG_DECIMAL_1E9 = BigDecimal.fromString('1e9')
     let pair = UniswapV2Pair.bind(Address.fromString(constants.KLIMA_NBO_PAIR))
 
     let reserves = pair.getReserves()
@@ -39,6 +40,14 @@ export class NBO implements IToken {
 
     return klimaRate
   }
+   
+  getUSDPrice(): BigDecimal {
+    const klimaUsdPrice = this.klimaToken.getUSDPrice()
+    const nboMarketPrice = this.getMarketPrice()
+
+    return klimaUsdPrice.times(nboMarketPrice)
+  }
+
 
   getTotalSupply(): BigDecimal {
    let ercContract = ERC20.bind(Address.fromString(this.contractAddress))

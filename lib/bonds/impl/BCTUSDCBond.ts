@@ -13,8 +13,8 @@ export class BCTUSDCBond implements IBondable {
   
   contractAddress: Address;
 
-  bctToken: IToken
-  usdcToken: IToken
+  private bctToken: IToken
+  private usdcToken: IToken
 
   constructor(constractAddress: Address) {
     this.contractAddress = constractAddress;
@@ -42,6 +42,10 @@ export class BCTUSDCBond implements IBondable {
 
   getBondPrice(priceInUSD: BigInt): BigDecimal {
     return toDecimal(priceInUSD, 18);
+  }
+
+  getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
+    return toDecimal(rawPrice, 18)
   }
 
   getCarbonCustodied(depositAmount: BigInt): BigDecimal {

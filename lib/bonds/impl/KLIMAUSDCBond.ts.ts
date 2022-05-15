@@ -10,14 +10,11 @@ import { USDC } from "../../tokens/impl/USDC";
 
 export class KLIMAUSDCBond implements IBondable {
   
-  contractAddress: Address;
-
-  klimaToken: IToken
-  usdcToken: IToken
+  private contractAddress: Address;
+  private usdcToken: IToken
 
   constructor(constractAddress: Address) {
     this.contractAddress = constractAddress;
-    this.klimaToken = new KLIMA()
     this.usdcToken = new USDC()
   }
 
@@ -40,7 +37,11 @@ export class KLIMAUSDCBond implements IBondable {
   }
 
   getBondPrice(priceInUSD: BigInt): BigDecimal {
-    return toDecimal(priceInUSD, 18);
+    return toDecimal(priceInUSD, 6);
+  }
+
+  getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
+    return toDecimal(rawPrice, 18)
   }
 
   getCarbonCustodied(depositAmount: BigInt): BigDecimal {

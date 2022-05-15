@@ -10,8 +10,8 @@ import { NBO } from "../../tokens/impl/NBO";
 
 export class NBOBond implements IBondable {
   
-  contractAddress: Address;
-  nboToken: IToken
+  private contractAddress: Address;
+  private nboToken: IToken
 
   constructor(constractAddress: Address) {
     this.contractAddress = constractAddress;
@@ -38,6 +38,10 @@ export class NBOBond implements IBondable {
 
   getBondPrice(priceInUSD: BigInt): BigDecimal {
     return toDecimal(priceInUSD, 18);
+  }
+
+  getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
+    return this.getToken().getFormattedPrice(rawPrice)
   }
 
   getCarbonCustodied(depositAmount: BigInt): BigDecimal {

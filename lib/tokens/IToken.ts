@@ -6,5 +6,6 @@ export interface IToken {
     getDecimals() : number
     getFormattedPrice(rawPrice: BigInt) : BigDecimal
     getMarketPrice() : BigDecimal
+    getUSDPrice() : BigDecimal
     getTotalSupply() : BigDecimal
   }

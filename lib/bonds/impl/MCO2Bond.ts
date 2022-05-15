@@ -1,6 +1,7 @@
 import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 import { BondV1 } from "../../../bonds/generated/BCTBondV1/BondV1";
 import { ERC20 } from "../../../bonds/generated/BCTBondV1/ERC20";
+import { getDaoIncome } from "../../../bonds/src/utils/DaoIncome";
 import { IBondable } from "../IBondable";
 import { IToken } from "../../tokens/IToken";
 
@@ -25,14 +26,8 @@ export class MCO2Bond implements IBondable {
     return constants.MCO2_BOND_TOKEN;
   }
 
-  getBondFee(): BigDecimal {
-    let bondContract = BondV1.bind(this.contractAddress);
-    let feeRaw = bondContract.terms().value4;
-    const feeDecimal = feeRaw
-      .toBigDecimal()
-      .div(BigDecimal.fromString("10000"));
-
-    return feeDecimal;
+  getDaoIncomeForBondPayout(payout: BigDecimal): BigDecimal {
+    return getDaoIncome(this.contractAddress, payout)
   }
 
   getBondPrice(priceInUSD: BigInt): BigDecimal {

@@ -5,7 +5,7 @@ import { IToken } from '../tokens/IToken'
 export interface IBondable {
     getToken(): IToken
     getBondName(): string
-    getBondFee(): BigDecimal
+    getDaoIncomeForBondPayout(payout: BigDecimal): BigDecimal
     getBondPrice(priceInUSD: BigInt): BigDecimal
     getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal
     getCarbonCustodied(depositAmount: BigInt): BigDecimal

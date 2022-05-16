@@ -1,5 +1,6 @@
 import { BigDecimal, BigInt, Address, log } from "@graphprotocol/graph-ts";
 import { UniswapV2Pair } from '../../../bonds/generated/BCTBondV1/UniswapV2Pair'
+import { isLiquidReserves } from '../../../bonds/src/utils/Price'
 import { ERC20 } from '../../../bonds/generated/BCTBondV1/ERC20'
 import { IToken } from "../IToken";
 
@@ -33,7 +34,7 @@ export class MCO2 implements IToken {
     let pair = UniswapV2Pair.bind(Address.fromString(constants.KLIMA_MCO2_PAIR))
     let reserveCall = pair.try_getReserves()
 
-    if (reserveCall.reverted) {
+    if (!isLiquidReserves(reserveCall, this.klimaToken, this)) {
       return this.getMarketPriceViaUsdc()
     }
 
@@ -68,15 +69,15 @@ export class MCO2 implements IToken {
 
     let mco2UsdcReserve1 = mco2UsdcReserves.value0.toBigDecimal()
     let mco2UsdcReserve2 = mco2UsdcReserves.value1.toBigDecimal()
+    if (mco2UsdcReserve2.equals(BigDecimal.zero())) {
+      return BigDecimal.zero()
+    }
 
     let mco2UsdcRate = (mco2UsdcReserve1.times(BIG_DECIMAL_1E12)).div(mco2UsdcReserve2)
 
     return mco2UsdcRate
 }
 
-  /**
-   * Sekula: Need to find the most elegant way to call ether smart contract from here 
-   */
   getTotalSupply(): BigDecimal {
    let ercContract = ERC20.bind(Address.fromString(this.contractAddress))
    let totalSupply = toDecimal(ercContract.totalSupply(), this.getDecimals())

@@ -56,6 +56,10 @@ export class BCT implements IToken {
     const klimaUsdPrice = this.klimaToken.getUSDPrice()
     const bctMarketPrice = this.getMarketPrice()
 
+    if (bctMarketPrice.equals(BigDecimal.zero())) {
+      return BigDecimal.zero()
+    }
+
     return klimaUsdPrice.div(bctMarketPrice)
   }
 

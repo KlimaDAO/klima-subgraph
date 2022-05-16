@@ -47,6 +47,7 @@ export class BondFactory {
         if (address.equals(Address.fromHexString(constants.KLIMA_USDC_BOND_V1))) {
             return new KLIMAUSDCBond(address)
         }
+
         if (address.equals(Address.fromHexString(constants.BCT_USDC_BOND_V1))) {
             return new BCTUSDCBond(address)
         }

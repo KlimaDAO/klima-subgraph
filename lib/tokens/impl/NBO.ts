@@ -45,8 +45,13 @@ export class NBO implements IToken {
     const klimaUsdPrice = this.klimaToken.getUSDPrice()
     const nboMarketPrice = this.getMarketPrice()
 
+    if (nboMarketPrice.equals(BigDecimal.zero())) {
+      return BigDecimal.zero()
+    }
+
     return klimaUsdPrice.div(nboMarketPrice)
   }
+
 
   getTotalSupply(): BigDecimal {
    let ercContract = ERC20.bind(Address.fromString(this.contractAddress))

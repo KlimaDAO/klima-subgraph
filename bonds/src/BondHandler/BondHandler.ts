@@ -20,10 +20,10 @@ export function handleDeposit(event: BondCreated): void {
     deposit.transaction = transaction.id
     deposit.bonder = bonder.id
     deposit.payout = klimaToken.getFormattedPrice(event.params.payout)
-    deposit.bondPrice = bond.getBondPrice(event.params.priceInUSD)
+    deposit.bondPrice = bond.parseBondPrice(event.params.priceInUSD)
     deposit.marketPrice = bond.getToken().getMarketPrice()
-    deposit.discount = (deposit.marketPrice.minus(deposit.bondPrice)).div(deposit.marketPrice)
-    deposit.tokenValue = bond.getBondTokenValueFormatted(event.params.deposit)
+    deposit.discount = (deposit.marketPrice.minus(deposit.bondPrice)).div(deposit.bondPrice)
+    deposit.tokenValue = bond.parseBondTokenValueFormatted(event.params.deposit)
     deposit.carbonCustodied = bond.getCarbonCustodied(event.params.deposit) 
     deposit.timestamp = transaction.timestamp;
     deposit.save()

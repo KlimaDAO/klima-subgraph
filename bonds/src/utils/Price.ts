@@ -29,30 +29,6 @@ export function isLiquidReserves(
     return totalLiquidityInUsd.gt(BigDecimal.fromString(LIQUIDITY_TRESHOLD))
 }
 
-export function getBCTUSDRate(): BigDecimal {
-
-    let pair = UniswapV2Pair.bind(Address.fromString(BCT_USDC_PAIR))
-    let reserveCall = pair.try_getReserves()
-    if (reserveCall.reverted 
-        || !reserveCall.value
-        || !reserveCall.value.value0
-        || !reserveCall.value.value1 
-        || !reserveCall.value.value2
-        || reserveCall.value.value1.equals(BigInt.zero()) 
-        || reserveCall.value.value2.equals(BigInt.zero())) {
-        return BigDecimal.zero()
-    }
-
-    let reserves = reserveCall.value
-    let reserve0 = reserves.value0.toBigDecimal()
-    let reserve1 = reserves.value1.toBigDecimal()
-
-    let bctRate = reserve0.div(reserve1).times(BIG_DECIMAL_1E12)
-    log.debug("BCT rate {}", [bctRate.toString()])
-
-    return bctRate
-}
-
 export function getKLIMAUSDRate(): BigDecimal {
     let pair = UniswapV2Pair.bind(Address.fromString(KLIMA_BCT_PAIR))
 
@@ -77,6 +53,30 @@ export function getKLIMAUSDRate(): BigDecimal {
     log.debug("KLIMA rate {}", [klimaRate.toString()])
 
     return klimaRate
+}
+
+export function getBCTUSDRate(): BigDecimal {
+
+    let pair = UniswapV2Pair.bind(Address.fromString(BCT_USDC_PAIR))
+    let reserveCall = pair.try_getReserves()
+    if (reserveCall.reverted 
+        || !reserveCall.value
+        || !reserveCall.value.value0
+        || !reserveCall.value.value1 
+        || !reserveCall.value.value2
+        || reserveCall.value.value1.equals(BigInt.zero()) 
+        || reserveCall.value.value2.equals(BigInt.zero())) {
+        return BigDecimal.zero()
+    }
+
+    let reserves = reserveCall.value
+    let reserve0 = reserves.value0.toBigDecimal()
+    let reserve1 = reserves.value1.toBigDecimal()
+
+    let bctRate = reserve0.div(reserve1).times(BIG_DECIMAL_1E12)
+    log.debug("BCT rate {}", [bctRate.toString()])
+
+    return bctRate
 }
 
 export function getKLIMABCTRate(): BigDecimal {

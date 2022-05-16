@@ -6,8 +6,10 @@ export interface IBondable {
     getToken(): IToken
     getBondName(): string
     getDaoIncomeForBondPayout(payout: BigDecimal): BigDecimal
-    getBondPrice(priceInUSD: BigInt): BigDecimal
-    getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal
+    getBondPrice(): BigDecimal
+    getBondDiscount(): BigDecimal
+    parseBondPrice(priceInUSD: BigInt): BigDecimal
+    parseBondTokenValueFormatted(rawPrice: BigInt): BigDecimal
     getCarbonCustodied(depositAmount: BigInt): BigDecimal
     getTreasuredAmount(): BigDecimal
   }

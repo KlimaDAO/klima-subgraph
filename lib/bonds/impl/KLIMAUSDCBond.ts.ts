@@ -27,15 +27,32 @@ export class KLIMAUSDCBond implements IBondable {
     return constants.KLIMAUSDC_LPBOND_TOKEN;
   }
 
+  getBondPrice(): BigDecimal {
+
+    let bond = BondV1.bind(this.contractAddress)
+    const bondPriceInUsd = bond.bondPriceInUSD()
+
+    return toDecimal(bondPriceInUsd, 6)
+  }
+  getBondDiscount(): BigDecimal {
+
+    const bondPrice = this.getBondPrice()
+    const marketPrice = this.getToken().getMarketPrice()
+
+    // (bondPrice-marketPrice)/bondPrice
+    const discount = (marketPrice.minus(bondPrice)).div(bondPrice)
+    return discount;
+  }
+
   getDaoIncomeForBondPayout(payout: BigDecimal): BigDecimal {
     return getDaoIncome(this.contractAddress, payout)
   }
 
-  getBondPrice(priceInUSD: BigInt): BigDecimal {
+  parseBondPrice(priceInUSD: BigInt): BigDecimal {
     return toDecimal(priceInUSD, 6);
   }
 
-  getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
+  parseBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
     return toDecimal(rawPrice, 18)
   }
 

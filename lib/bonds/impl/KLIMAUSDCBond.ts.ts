@@ -34,7 +34,7 @@ export class KLIMAUSDCBond implements IBondable {
 
     return toDecimal(bondPriceInUsd, 6)
   }
-
+  
   getBondDiscount(): BigDecimal {
 
     const bondPrice = this.getBondPrice()

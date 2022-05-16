@@ -2,6 +2,7 @@ import { BigDecimal, BigInt, Address, log } from "@graphprotocol/graph-ts";
 import { BondV1 } from "../../../bonds/generated/BCTBondV1/BondV1";
 import { UniswapV2Pair } from "../../../bonds/generated/BCTBondV1/UniswapV2Pair";
 import { getDaoIncome } from "../../../bonds/src/utils/DaoIncome";
+import { calculateBondDiscount } from "../../../bonds/src/utils/Price";
 import { IBondable } from "../IBondable";
 import { IToken } from "../../tokens/IToken";
 
@@ -45,9 +46,7 @@ export class BCTUSDCBond implements IBondable {
     const bondPrice = this.getBondPrice()
     const marketPrice = this.getToken().getMarketPrice()
 
-    // (bondPrice-marketPrice)/bondPrice
-    const discount = (marketPrice.minus(bondPrice)).div(bondPrice)
-    return discount;
+    return calculateBondDiscount(bondPrice, marketPrice)
   }
 
   getDaoIncomeForBondPayout(payout: BigDecimal): BigDecimal {

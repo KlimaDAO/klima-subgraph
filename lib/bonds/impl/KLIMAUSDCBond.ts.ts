@@ -1,12 +1,12 @@
 import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 import { BondV1 } from "../../../bonds/generated/BCTBondV1/BondV1";
 import { getDaoIncome } from "../../../bonds/src/utils/DaoIncome";
+import { calculateBondDiscount } from "../../../bonds/src/utils/Price";
 import { IBondable } from "../IBondable";
 import { IToken } from "../../tokens/IToken";
 
 import * as constants from "../../utils/Constants";
 import { toDecimal } from "../../utils/Decimals";
-import { KLIMA } from "../../tokens/impl/KLIMA";
 import { USDC } from "../../tokens/impl/USDC";
 
 export class KLIMAUSDCBond implements IBondable {
@@ -34,14 +34,13 @@ export class KLIMAUSDCBond implements IBondable {
 
     return toDecimal(bondPriceInUsd, 6)
   }
+
   getBondDiscount(): BigDecimal {
 
     const bondPrice = this.getBondPrice()
     const marketPrice = this.getToken().getMarketPrice()
 
-    // (bondPrice-marketPrice)/bondPrice
-    const discount = (marketPrice.minus(bondPrice)).div(bondPrice)
-    return discount;
+    return calculateBondDiscount(bondPrice, marketPrice)
   }
 
   getDaoIncomeForBondPayout(payout: BigDecimal): BigDecimal {

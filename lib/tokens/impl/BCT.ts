@@ -29,9 +29,20 @@ export class BCT implements IToken {
   }
 
   getMarketPrice(): BigDecimal {
-    let pair = UniswapV2Pair.bind(Address.fromString(constants.KLIMA_BCT_PAIR))
 
-    let reserves = pair.getReserves()
+    log.debug("Get market price for BCT start", [])
+    let pair = UniswapV2Pair.bind(Address.fromString(constants.KLIMA_BCT_PAIR))
+    let reserveCall = pair.try_getReserves()
+      if (reserveCall.reverted 
+          || !reserveCall.value 
+          || !reserveCall.value.value0 
+          || !reserveCall.value.value1
+          || !reserveCall.value.value2
+          || reserveCall.value.value1.equals(BigInt.zero()) 
+          || reserveCall.value.value2.equals(BigInt.zero())) {
+          return BigDecimal.zero()
+      }
+    let reserves = reserveCall.value
     let reserve0 = reserves.value0.toBigDecimal()
     let reserve1 = reserves.value1.toBigDecimal()
 

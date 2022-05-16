@@ -2,6 +2,7 @@ import { BigDecimal, BigInt, Address, log } from "@graphprotocol/graph-ts";
 import { BondV1 } from "../../../bonds/generated/BCTBondV1/BondV1";
 import { ERC20 } from "../../../bonds/generated/BCTBondV1/ERC20";
 import { getDaoIncome } from "../../../bonds/src/utils/DaoIncome";
+import { calculateBondDiscount } from "../../../bonds/src/utils/Price";
 import { IBondable } from "../../bonds/IBondable";
 import { IToken } from "../../tokens/IToken";
 
@@ -27,15 +28,32 @@ export class BCTBond implements IBondable {
     return constants.BCT_BOND_TOKEN;
   }
 
+  getBondPrice(): BigDecimal {
+
+    let bond = BondV1.bind(this.contractAddress)
+    const bondPriceInUsd = bond.bondPriceInUSD()
+
+    return toDecimal(bondPriceInUsd, this.getToken().getDecimals())
+  }
+
+  getBondDiscount(): BigDecimal {
+
+    const bondPrice = this.getBondPrice()
+    const marketPrice = this.getToken().getMarketPrice()
+
+    return calculateBondDiscount(bondPrice, marketPrice)
+  }
+
+
   getDaoIncomeForBondPayout(payout: BigDecimal): BigDecimal {
     return getDaoIncome(this.contractAddress, payout)
   }
 
-  getBondPrice(priceInUSD: BigInt): BigDecimal {
+  parseBondPrice(priceInUSD: BigInt): BigDecimal {
     return toDecimal(priceInUSD, 18);
   }
 
-  getBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
+  parseBondTokenValueFormatted(rawPrice: BigInt): BigDecimal {
     return this.getToken().getFormattedPrice(rawPrice)
   }
 

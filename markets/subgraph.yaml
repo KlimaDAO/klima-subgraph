@@ -4,122 +4,172 @@ repository: https://github.com/KlimaDAO/klima-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
-# BCT ERC20 Contract
+# KLIMA-BCT LP
   - kind: ethereum/contract
-    name: BCTPrice
+    name: KLIMABCT
     network: matic
     source:
-      address: '0x2f800db0fdb5223b3c3f354886d907a671414a7f'
-      abi: ERC20
-      startBlock: 20474600
+      address: '0x9803c7aE526049210a1725F7487AF26fE2c24614'
+      abi: UniswapV2Pair
+      startBlock: 20294501
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - BCTPrice
+        - KLIMABCT
       abis:
         - name: ERC20
           file: ../lib/abis/ERC20.json
         - name: UniswapV2Pair
           file: ../lib/abis/UniswapV2Pair.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
       file: ./src/PriceHandler.ts
 
-# KLIMA ERC20 Contract
+# BCT-USDC LP
   - kind: ethereum/contract
-    name: KLIMAPrice
+    name: BCTUSDC
     network: matic
     source:
-      address: '0x4e78011ce80ee02d2c3e649fb657e45898257815'
-      abi: ERC20
-      startBlock: 20474600
+      address: '0x1E67124681b402064CD0ABE8ed1B5c79D2e02f64'
+      abi: UniswapV2Pair
+      startBlock: 20494523
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - KLIMAPrice
+        - BCTUSDC
       abis:
         - name: ERC20
           file: ../lib/abis/ERC20.json
         - name: UniswapV2Pair
           file: ../lib/abis/UniswapV2Pair.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/PriceHandler.ts
-  
-#MCO2 ERC20 Contract
-  - kind: ethereum/contract
-    name: MCO2Price
-    network: matic
-    source:
-      address: '0xaa7dbd1598251f856c12f63557a4c4397c253cea'
-      abi: ERC20
-      startBlock: 23378497
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - MCO2Price
-      abis:
-        - name: ERC20
-          file: ../lib/abis/ERC20.json
-        - name: UniswapV2Pair
-          file: ../lib/abis/UniswapV2Pair.json
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
       file: ./src/PriceHandler.ts
 
-# UBO ERC20 Contract
+# KLIMA-MCO2 LP
   - kind: ethereum/contract
-    name: UBOPrice
+    name: KLIMAMCO2
     network: matic
     source:
-      address: '0x2B3eCb0991AF0498ECE9135bcD04013d7993110c'
-      abi: ERC20
+      address: '0x64a3b8ca5a7e406a78e660ae10c7563d9153a739'
+      abi: UniswapV2Pair
+      startBlock: 23688190
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - KLIMAMCO2
+      abis:
+        - name: ERC20
+          file: ../lib/abis/ERC20.json
+        - name: UniswapV2Pair
+          file: ../lib/abis/UniswapV2Pair.json
+      eventHandlers:
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+      file: ./src/PriceHandler.ts
+
+# KLIMA-USDC LP
+  - kind: ethereum/contract
+    name: KLIMAUSDC
+    network: matic
+    source:
+      address: '0x5786b267d35f9d011c4750e0b0ba584e1fdbead1'
+      abi: UniswapV2Pair
+      startBlock: 20358666
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - KLIMAUSDC
+      abis:
+        - name: ERC20
+          file: ../lib/abis/ERC20.json
+        - name: UniswapV2Pair
+          file: ../lib/abis/UniswapV2Pair.json
+      eventHandlers:
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+      file: ./src/PriceHandler.ts
+
+# KLIMA-UBO LP
+  - kind: ethereum/contract
+    name: KLIMAUBO
+    network: matic
+    source:
+      address: '0x5400A05B8B45EaF9105315B4F2e31F806AB706dE'
+      abi: UniswapV2Pair
       startBlock: 26470811
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - UBOPrice
+        - KLIMAUBO
       abis:
         - name: ERC20
           file: ../lib/abis/ERC20.json
         - name: UniswapV2Pair
           file: ../lib/abis/UniswapV2Pair.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/PriceHandler.ts 
-      
-# NBO ERC20 Contract
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+      file: ./src/PriceHandler.ts
+
+# KLIMA-NBO LP
   - kind: ethereum/contract
-    name: NBOPrice
+    name: KLIMANBO
     network: matic
     source:
-      address: '0x6BCa3B77C1909Ce1a4Ba1A20d1103bDe8d222E48'
-      abi: ERC20
+      address: '0x251cA6A70cbd93Ccd7039B6b708D4cb9683c266C'
+      abi: UniswapV2Pair
       startBlock: 26470990
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - NBOPrice
+        - KLIMANBO
       abis:
         - name: ERC20
           file: ../lib/abis/ERC20.json
         - name: UniswapV2Pair
           file: ../lib/abis/UniswapV2Pair.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
       file: ./src/PriceHandler.ts
+
+# MCO2-USDC LP
+  - kind: ethereum/contract
+    name: MCO2USDC
+    network: matic
+    source:
+      address: '0x68aB4656736d48bb1DE8661b9A323713104e24cF'
+      abi: UniswapV2Pair
+      startBlock: 23378497
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - MCO2USDC
+      abis:
+        - name: ERC20
+          file: ../lib/abis/ERC20.json
+        - name: UniswapV2Pair
+          file: ../lib/abis/UniswapV2Pair.json
+      eventHandlers:
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+      file: ./src/PriceHandler.ts
+
+  

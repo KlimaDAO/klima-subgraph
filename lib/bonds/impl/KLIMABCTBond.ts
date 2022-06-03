@@ -1,7 +1,7 @@
 import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 import { BondV1 } from "../../../bonds/generated/BCTBondV1/BondV1";
 import { UniswapV2Pair } from "../../../bonds/generated/BCTBondV1/UniswapV2Pair";
-import { getDaoIncome } from "../../../bonds/src/utils/DaoIncome";
+import { getDaoFee } from "../../../bonds/src/utils/DaoFee";
 import { getDiscountedPairCO2, calculateBondDiscount } from "../../../bonds/src/utils/Price";
 import { IBondable } from "../../bonds/IBondable";
 import { IToken } from "../../tokens/IToken";
@@ -48,8 +48,8 @@ export class KLIMABCTBond implements IBondable {
     return calculateBondDiscount(bondPrice, marketPrice)
   }
 
-  getDaoIncomeForBondPayout(payout: BigDecimal): BigDecimal {
-    return getDaoIncome(this.contractAddress, payout)
+  getDaoFeeForBondPayout(payout: BigDecimal): BigDecimal {
+    return getDaoFee(this.contractAddress, payout)
   }
 
   parseBondPrice(priceInUSD: BigInt): BigDecimal {

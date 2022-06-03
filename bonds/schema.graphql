@@ -3,7 +3,7 @@ type DailyBond @entity {
   timestamp: BigInt!
   token: String!
   payout: BigDecimal!
-  daoIncome: BigDecimal!
+  daoFee: BigDecimal!
   tokenValue: BigDecimal!
   carbonCustodied: BigDecimal!
   BCV: BigInt!
@@ -24,7 +24,7 @@ type Deposit @entity {
   transaction: Transaction!
   bonder: Bonder!
   payout: BigDecimal!
-  daoIncome: BigDecimal!
+  daoFee: BigDecimal!
   bondPrice: BigDecimal!
   marketPrice: BigDecimal!
   discount: BigDecimal!

@@ -1,7 +1,7 @@
 import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 import { BondV1 } from "../../../bonds/generated/BCTBondV1/BondV1";
 import { ERC20 } from "../../../bonds/generated/BCTBondV1/ERC20";
-import { getDaoIncome } from "../../../bonds/src/utils/DaoIncome";
+import { getDaoFee } from "../../../bonds/src/utils/DaoFee";
 import { calculateBondDiscount } from "../../../bonds/src/utils/Price";
 import { IBondable } from "../IBondable";
 import { IToken } from "../../tokens/IToken";
@@ -28,8 +28,8 @@ export class UBOBond implements IBondable {
     return constants.UBO_BOND_TOKEN;
   }
 
-  getDaoIncomeForBondPayout(payout: BigDecimal): BigDecimal {
-    return getDaoIncome(this.contractAddress, payout)
+  getDaoFeeForBondPayout(payout: BigDecimal): BigDecimal {
+    return getDaoFee(this.contractAddress, payout)
   }
 
   getBondPrice(): BigDecimal {

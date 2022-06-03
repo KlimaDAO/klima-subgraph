@@ -20,7 +20,7 @@ export function handleDeposit(event: BondCreated): void {
     deposit.transaction = transaction.id
     deposit.bonder = bonder.id
     deposit.payout = klimaToken.getFormattedPrice(event.params.payout)
-    deposit.daoIncome = bond.getDaoIncomeForBondPayout(deposit.payout)
+    deposit.daoFee = bond.getDaoFeeForBondPayout(deposit.payout)
     deposit.bondPrice = bond.parseBondPrice(event.params.priceInUSD)
     deposit.marketPrice = bond.getToken().getMarketPrice()
     deposit.discount = (deposit.marketPrice.minus(deposit.bondPrice)).div(deposit.bondPrice)
@@ -31,11 +31,11 @@ export function handleDeposit(event: BondCreated): void {
 
     bonder.totalCarbonCustodied = bonder.totalCarbonCustodied.plus(deposit.carbonCustodied)
     bonder.totalKlimaBonded = bonder.totalKlimaBonded.plus(deposit.payout)
-    bonder.totalKlimaMintedForDao = bonder.totalKlimaMintedForDao.plus(deposit.daoIncome)
+    bonder.totalKlimaMintedForDao = bonder.totalKlimaMintedForDao.plus(deposit.daoFee)
     bonder.save()
 
 
-    createDailyBondRecord(deposit.timestamp, deposit.token, deposit.payout, deposit.daoIncome, deposit.tokenValue, deposit.carbonCustodied)
+    createDailyBondRecord(deposit.timestamp, deposit.token, deposit.payout, deposit.daoFee, deposit.tokenValue, deposit.carbonCustodied)
 }
 
 export function handleRedeem(event: BondRedeemed): void {

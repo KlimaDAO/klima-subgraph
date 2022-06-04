@@ -1,14 +1,22 @@
 // Tokens definition
-export const BCT_BOND_TOKEN: string = 'BCT';
+// ERC20
+export const BCT_TOKEN: string = 'BCT';
+export const MCO2_TOKEN: string = 'MCO2';
+export const UBO_TOKEN: string = 'UBO';
+export const NBO_TOKEN: string = 'NBO';
+export const NCT_TOKEN: string = 'NCT';
+// LP Bonds
 export const KLIMABCT_LPBOND_TOKEN: string = 'KLIMA-BCT';
 export const BCTUSDC_LPBOND_TOKEN: string = 'BCT-USDC';
-export const MCO2_BOND_TOKEN: string = 'MCO2';
 export const KLIMAMCO2_LPBOND_TOKEN: string = 'KLIMA-MCO2';
-export const UBO_BOND_TOKEN: string = 'UBO';
 export const KLIMAUBO_LPBOND_TOKEN: string = 'KLIMA-UBO';
-export const NBO_BOND_TOKEN: string = 'NBO';
 export const KLIMANBO_LPBOND_TOKEN: string = 'KLIMA-NBO';
 export const KLIMAUSDC_LPBOND_TOKEN: string = 'KLIMA-USDC';
+// Reserve Bonds
+export const BCT_BOND_TOKEN: string = 'BCT';
+export const MCO2_BOND_TOKEN: string = 'MCO2';
+export const UBO_BOND_TOKEN: string = 'UBO';
+export const NBO_BOND_TOKEN: string = 'NBO';
 
 // LP Pair Addresses and Blocks
 export const KLIMA_BCT_PAIR = '0x9803c7aE526049210a1725F7487AF26fE2c24614';
@@ -72,3 +80,9 @@ export const BONDING_CALCULATOR = '0x0b8d6D6611Ed7cCe01BbcC57826548C6107B0478';
 export const C3_PLATFORM = "C3"
 export const C3_WSKLIMA_CONTRACT = "0xe02efadA566Af74c92b6659d03BAaCb4c06Cc856"
 export const C3_WSKLIMA_TOKEN = "WSKLIMA"
+
+// Assumed epochs per day (until we have dynamic)
+export const EPOCHS_PER_DAY = 3.4256
+
+// Misc Items
+export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'

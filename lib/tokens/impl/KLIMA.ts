@@ -1,6 +1,6 @@
 import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 import { getKLIMAUSDRate } from "../../../bonds/src/utils/Price";
-import { ERC20 } from "../../../bonds/generated/BCTBondV1/ERC20";
+import { ERC20 } from '../../generated/ERC20';
 import { IToken } from "../IToken";
 
 import * as constants from "../../utils/Constants";

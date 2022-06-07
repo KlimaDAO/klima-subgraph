@@ -1,10 +1,10 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { IToken } from "../IToken";
+import { ERC20 } from '../../generated/ERC20'
 import * as constants from '../../utils/Constants'
 
 import { getKLIMAUSDRate } from "../../../bonds/src/utils/Price";
 import { toDecimal } from "../../utils/Decimals";
-import { ERC20 } from "../../../user-klima/generated/BCT/ERC20";
 
 export class USDC implements IToken {
 

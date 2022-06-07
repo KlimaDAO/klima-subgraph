@@ -1,6 +1,6 @@
 import { BigDecimal, BigInt, Address, log } from "@graphprotocol/graph-ts";
 import { UniswapV2Pair } from '../../../bonds/generated/BCTBondV1/UniswapV2Pair'
-import { ERC20 } from '../../../bonds/generated/BCTBondV1/ERC20'
+import { ERC20 } from '../../generated/ERC20'
 import { IToken } from "../IToken";
 
 import * as constants from '../../utils/Constants'

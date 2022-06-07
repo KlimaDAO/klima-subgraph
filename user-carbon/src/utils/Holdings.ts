@@ -1,28 +1,27 @@
 import { BigInt, BigDecimal, Address } from "@graphprotocol/graph-ts"
-import { CarbonTokenFactory } from "./carbon_token/CarbonTokenFactory"
 import { dayFromTimestamp } from "../../../lib/utils/Dates"
-import { ICarbonToken } from "./carbon_token/ICarbonToken"
 import { Holding } from "../../generated/schema"
 import { KlimateUtils } from "./Klimate"
+import { IToken } from "../../../lib/tokens/IToken"
 
 export class HoldingsUtils {
 
     private static DAY_IN_SECONDS: BigInt = BigInt.fromString("86400")
 
-    static updateHolding(token: ICarbonToken, timestamp: BigInt, address: Address): void {
+    static updateHolding(token: IToken, timestamp: BigInt, address: Address): void {
         const dayTimestamp = dayFromTimestamp(timestamp)
 
         // Handle the to address
 
         let klimate = KlimateUtils.loadKlimate(address)
-        let holdingId = klimate.id + '-' + token.getToken() + '-' + dayTimestamp
+        let holdingId = klimate.id + '-' + token.getTokenName() + '-' + dayTimestamp
         let klimateHolding = Holding.load(holdingId)
         if (klimateHolding == null) {
             klimateHolding = this.createAndReturnEmptyHolding(holdingId)
         }
-        let newBalance = token.returnAddressBalance(Address.fromString(klimate.id))
+        let newBalance = token.getAddressBalance(Address.fromString(klimate.id))
         klimateHolding.klimate = klimate.id
-        klimateHolding.token = token.getToken()
+        klimateHolding.token = token.getTokenName()
         klimateHolding.timestamp = BigInt.fromString(dayTimestamp)
         klimateHolding.tokenAmount = newBalance
         klimateHolding.carbonValue = newBalance

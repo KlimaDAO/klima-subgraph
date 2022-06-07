@@ -5,6 +5,8 @@ export const MCO2_TOKEN: string = 'MCO2';
 export const UBO_TOKEN: string = 'UBO';
 export const NBO_TOKEN: string = 'NBO';
 export const NCT_TOKEN: string = 'NCT';
+export const KLIMA_TOKEN: string = 'KLIMA';
+export const SKLIMA_TOKEN: string = 'sKLIMA';
 // LP Bonds
 export const KLIMABCT_LPBOND_TOKEN: string = 'KLIMA-BCT';
 export const BCTUSDC_LPBOND_TOKEN: string = 'BCT-USDC';
@@ -70,6 +72,7 @@ export const NCT_ERC20_CONTRACT = '0xD838290e877E0188a4A44700463419ED96c16107';
 export const MCO2_ERC20_CONTRACT = '0xaa7dbd1598251f856c12f63557a4c4397c253cea';
 export const UBO_ERC20_CONTRACT = '0x2B3eCb0991AF0498ECE9135bcD04013d7993110c';
 export const NBO_ERC20_CONTRACT = '0x6BCa3B77C1909Ce1a4Ba1A20d1103bDe8d222E48';
+export const USDC_ERC20_CONTRACT = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
 
 // Protocol Functional Addresses
 export const DAO_MULTISIG = '0x65a5076c0ba74e5f3e069995dc3dab9d197d995c';

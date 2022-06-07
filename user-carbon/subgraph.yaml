@@ -16,7 +16,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/BCT.ts
+      file: ./src/TransferHandler.ts
       entities:
         - BCT
       abis:
@@ -37,7 +37,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/NCT.ts
+      file: ./src/TransferHandler.ts
       entities:
         - NCT
       abis:
@@ -58,7 +58,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/MCO2.ts
+      file: ./src/TransferHandler.ts
       entities:
         - MCO2
       abis:
@@ -79,7 +79,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/UBO.ts
+      file: ./src/TransferHandler.ts
       entities:
         - UBO
       abis:
@@ -100,7 +100,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/NBO.ts
+      file: ./src/TransferHandler.ts
       entities:
         - NBO
       abis:

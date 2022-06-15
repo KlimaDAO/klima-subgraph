@@ -12,6 +12,7 @@ export class VestingMetricUtils {
     vestingMetric.dailyLockAmount =  vestingMetric.dailyLockAmount.plus(amount)
   
     vestingMetric.totalAmountLocked = vestingMetric.totalAmountLocked.plus(amount)
+    vestingMetric.totalSupply = lockableToken.getTotalSupply()
   
     vestingMetric.save()
   }
@@ -22,7 +23,8 @@ export class VestingMetricUtils {
     vestingMetric.dailyUnlockAmount =  vestingMetric.dailyUnlockAmount.plus(amount)
   
     vestingMetric.totalAmountLocked = vestingMetric.totalAmountLocked.minus(amount)
-  
+    vestingMetric.totalSupply = lockableToken.getTotalSupply()
+
     vestingMetric.save()
   }
 
@@ -104,6 +106,7 @@ export class VestingMetricUtils {
     vestingMetrics.dailyMaturityCount = BigInt.zero();
     vestingMetrics.dailyMaturityAmount = BigDecimal.zero();
     vestingMetrics.totalAmountLocked = BigDecimal.zero()
+    vestingMetrics.totalSupply = BigDecimal.zero()
   
     return vestingMetrics as VestingMetric;
   }

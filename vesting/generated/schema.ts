@@ -349,6 +349,15 @@ export class VestingMetric extends Entity {
     this.set("totalAmountLocked", Value.fromBigDecimal(value));
   }
 
+  get totalSupply(): BigDecimal {
+    let value = this.get("totalSupply");
+    return value!.toBigDecimal();
+  }
+
+  set totalSupply(value: BigDecimal) {
+    this.set("totalSupply", Value.fromBigDecimal(value));
+  }
+
   get inFuture(): boolean {
     let value = this.get("inFuture");
     return value!.toBoolean();

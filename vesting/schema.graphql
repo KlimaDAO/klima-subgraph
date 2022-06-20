@@ -36,5 +36,6 @@ type VestingMetric @entity {
   dailyMaturityAmount: BigDecimal! #Aggregated amount of lock period endings -||-
   totalAmountLocked: BigDecimal! #Total amount of locked tokens -||-
   totalSupply: BigDecimal! #Total supply of locked tokens -||-
+  index: BigDecimal!
   inFuture: Boolean! #Returns if the given metric is for the future date or not
 }

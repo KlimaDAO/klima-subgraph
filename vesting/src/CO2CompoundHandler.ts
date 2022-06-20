@@ -4,9 +4,8 @@ import { dayFromTimestamp } from '../../lib/utils/Dates'
 import { toDecimal } from "../../lib/utils/Decimals"
 
 import * as constants from '../../lib/utils/Constants'
-import { BigInt, BigDecimal, Address } from "@graphprotocol/graph-ts"
+import { BigInt, Address } from "@graphprotocol/graph-ts"
 import { Co2Compound } from "./utils/vesting_platforms/impl/Co2Compound"
-import { KlimaStakingV1 } from "../generated/CO2CompoundNFT/KlimaStakingV1"
 import { Transfer } from "../../lib/generated/ERC20"
 import { convertToWsKLIMA } from './utils/Convert'
 
@@ -27,7 +26,7 @@ export function handleTransfers(event: Transfer): void {
     lock.startedAt = event.block.timestamp
     lock.maturityDate = BigInt.fromString("-1")
     lock.lockedInSeconds = BigInt.fromString("-1")
-    lock.lockedAmount = convertToWsKLIMA(toDecimal(event.params.value))
+    lock.lockedAmount = convertToWsKLIMA(toDecimal(event.params.value, 9))
 
     lock.save()
 

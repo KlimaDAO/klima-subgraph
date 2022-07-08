@@ -10,7 +10,7 @@ import { KLIMABCTBond } from "./impl/KLIMABCTBond";
 import { KLIMAMCO2Bond } from "./impl/KLIMAMCO2Bond";
 import { KLIMAUSDCBond } from "./impl/KLIMAUSDCBond.ts";
 import { BCTUSDCBond } from "./impl/BCTUSDCBond";
-import { KLIMAUSDCRevBond } from "./impl/KLIMAUSDCRevBond";
+import { KLIMAUSDCInverseBond } from "./impl/KLIMAUSDCInverseBond";
 
 
 export class BondFactory {
@@ -57,7 +57,7 @@ export class BondFactory {
 
     public getBondForBaseTokenAddress(address: Address): IBondable {
         if (address.equals(Address.fromHexString(constants.USDC_ERC20_CONTRACT))) {
-            return new KLIMAUSDCRevBond()
+            return new KLIMAUSDCInverseBond()
         }
         throw new Error("[Bond Factory] Failed to get Bond for base token address: "+ address.toHexString());
     }

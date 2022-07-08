@@ -7,7 +7,7 @@ import { toDecimal } from "../../utils/Decimals";
 import { USDC } from "../../tokens/impl/USDC";
 import { KLIMA } from "../../tokens/impl/KLIMA";
 
-export class KLIMAUSDCRevBond implements IBondable {
+export class KLIMAUSDCInverseBond implements IBondable {
   
   private usdcToken: IToken
   private klimaToken: IToken

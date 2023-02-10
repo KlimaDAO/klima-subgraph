@@ -56,6 +56,13 @@ typings/
 # Yarn Integrity file
 .yarn-integrity
 
+# Yarn local files
+.yarn/*
+.yarn/install-state.gz
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
 # dotenv environment variables file
 .env
 
@@ -66,3 +73,4 @@ typings/
 build
 bonds/build
 protocol-metrics/build
+generated/

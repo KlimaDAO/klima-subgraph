@@ -6,6 +6,7 @@
         "bonds",
         "pairs",
         "polygon-carbon",
+        "polygon-liquidity",
         "protocol-metrics",
         "user-carbon",
         "vesting"

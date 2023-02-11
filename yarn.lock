@@ -4146,6 +4146,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"polygon-liquidity@workspace:polygon-liquidity":
+  version: 0.0.0-use.local
+  resolution: "polygon-liquidity@workspace:polygon-liquidity"
+  dependencies:
+    "@graphprotocol/graph-cli": ^0.38.0
+    "@graphprotocol/graph-ts": ^0.29.3
+    prettier: 2.7.1
+  languageName: unknown
+  linkType: soft
+
 "prettier@npm:1.19.1, prettier@npm:^1.18.2":
   version: 1.19.1
   resolution: "prettier@npm:1.19.1"

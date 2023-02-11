@@ -1,0 +1,692 @@
+##### Base level dex and token data #####
+
+enum Dex {
+  SUSHI_V2
+  SUSHI_TRIDENT
+}
+
+type Token @entity {
+  "Ethereum contract address"
+  id: Bytes!
+
+  "Name of the token"
+  name: String!
+
+  "Symbol of the token"
+  symbol: String!
+
+  "Decimals of the token"
+  decimals: Int!
+
+  "Latest price in USD"
+  latestPriceUSD: BigDecimal!
+
+  "Latest price update timestamp"
+  latestPriceUpdated: BigInt!
+}
+
+type Pool @entity {
+  "Smart contract address of the pool"
+  id: Bytes!
+
+  " Name of liquidity pool (e.g. Curve.fi DAI/USDC/USDT) "
+  name: String
+
+  " Symbol of liquidity pool (e.g. 3CRV) "
+  symbol: String
+
+  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
+  tokens: [Token!]!
+
+  " Creation timestamp "
+  createdTimestamp: BigInt!
+
+  " Creation block number "
+  createdBlockNumber: BigInt!
+
+  ##### Quantitative Data #####
+
+  " Total liquidity token supply for the pool. "
+  lpTokenSupply: BigInt!
+
+  " The sum of all active and non-active liquidity in USD for this pool. "
+  totalLiquidityUSD: BigDecimal!
+
+  " Amount of each token in the pool. The ordering should be the same as the pool's `tokens` field. "
+  reserves: [BigInt!]!
+
+  " USD value of each token in the pool. The ordering should be the same as the pool's `tokens` field. "
+  reservesUSD: [BigDecimal!]!
+
+  " All trade volume occurred for a specific token, in native amount. The ordering should be the same as the pool's `tokens` field. "
+  cumulativeVolumeReserves: [BigInt!]!
+
+  " All trade volume occurred for a specific token, in USD. The ordering should be the same as the pool's `tokens` field. "
+  cumulativeVolumeReservesUSD: [BigDecimal!]!
+
+  " All historical trade volume occurred in this pool, in USD "
+  cumulativeVolumeUSD: BigDecimal!
+
+  " Total number of deposit events (add liquidity) "
+  cumulativeDepositCount: Int!
+
+  " Total number of withdrawal events (remove liquidity) "
+  cumulativeWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
+
+  " Day ID of the most recent daily snapshot "
+  lastSnapshotDayID: Int!
+
+  " Hour ID of the most recent hourly snapshot "
+  lastSnapshotHourID: Int!
+
+  " Timestamp of the last time this entity was updated "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the last time this entity was updated "
+  lastUpdateBlockNumber: BigInt!
+
+  ##### Snapshots #####
+
+  " Liquidity pool daily snapshots "
+  dailySnapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
+
+  " Liquidity pool hourly snapshots "
+  hourlySnapshots: [PoolHourlySnapshot!]! @derivedFrom(field: "pool")
+
+  # ##### Events #####
+
+  " All deposit (add liquidity) events occurred in this pool "
+  deposits: [Deposit!]! @derivedFrom(field: "pool")
+
+  " All withdraw (remove liquidity) events occurred in this pool "
+  withdraws: [Withdraw!]! @derivedFrom(field: "pool")
+
+  " All trade (swap) events occurred in this pool "
+  swaps: [Swap!]! @derivedFrom(field: "pool")
+}
+
+type PoolDailySnapshot @entity {
+  "{Contract address of the pool}-{Days since Unix epoc}"
+  id: Bytes!
+
+  " Number of hours since Unix epoch time "
+  day: Int!
+
+  " The pool this snapshot belongs to "
+  pool: Pool!
+
+  ##### Cumulative Data #####
+
+  " Total liquidity token supply for the pool. "
+  lpTokenSupply: BigInt!
+
+  " The sum of all active and non-active liquidity in USD for this pool. "
+  totalLiquidityUSD: BigDecimal!
+
+  " All trade volume occurred for a specific token, in native amount. The ordering should be the same as the pool's `tokens` field. "
+  cumulativeVolumeReserves: [BigInt!]!
+
+  " All trade volume occurred for a specific token, in USD. The ordering should be the same as the pool's `tokens` field. "
+  cumulativeVolumeReservesUSD: [BigDecimal!]!
+
+  " All historical trade volume occurred in this pool, in USD "
+  cumulativeVolumeUSD: BigDecimal!
+
+  ##### Delta Amounts #####
+
+  " Total liquidity token supply for the pool. "
+  deltalpTokenSupply: BigInt!
+
+  " The sum of all active and non-active liquidity in USD for this pool. "
+  deltaLiquidityUSD: BigDecimal!
+
+  " All trade volume occurred for a specific token, in native amount. The ordering should be the same as the pool's `tokens` field. "
+  deltaVolumeReserves: [BigInt!]!
+
+  " All trade volume occurred for a specific token, in USD. The ordering should be the same as the pool's `tokens` field. "
+  deltaVolumeReservesUSD: [BigDecimal!]!
+
+  " All historical trade volume occurred in this pool, in USD "
+  deltaVolumeUSD: BigDecimal!
+
+  " Total number of deposit events (add liquidity) "
+  deltaDepositCount: Int!
+
+  " Total number of withdrawal events (remove liquidity) "
+  deltaWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  deltaSwapCount: Int!
+
+  " Timestamp of the last time this entity was updated "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the last time this entity was updated "
+  lastUpdateBlockNumber: BigInt!
+}
+
+type PoolHourlySnapshot @entity {
+  "{Contract address of the pool}-{Days since Unix epoc}"
+  id: Bytes!
+
+  " Number of hours since Unix epoch time "
+  day: Int!
+
+  " The pool this snapshot belongs to "
+  pool: Pool!
+
+  ##### Cumulative Data #####
+
+  " Total liquidity token supply for the pool. "
+  lpTokenSupply: BigInt!
+
+  " The sum of all active and non-active liquidity in USD for this pool. "
+  totalLiquidityUSD: BigDecimal!
+
+  " All trade volume occurred for a specific token, in native amount. The ordering should be the same as the pool's `tokens` field. "
+  cumulativeVolumeReserves: [BigInt!]!
+
+  " All trade volume occurred for a specific token, in USD. The ordering should be the same as the pool's `tokens` field. "
+  cumulativeVolumeReservesUSD: [BigDecimal!]!
+
+  " All historical trade volume occurred in this pool, in USD "
+  cumulativeVolumeUSD: BigDecimal!
+
+  ##### Delta Amounts #####
+
+  " Total liquidity token supply for the pool. "
+  deltalpTokenSupply: BigInt!
+
+  " The sum of all active and non-active liquidity in USD for this pool. "
+  deltaLiquidityUSD: BigDecimal!
+
+  " All trade volume occurred for a specific token, in native amount. The ordering should be the same as the pool's `tokens` field. "
+  deltaVolumeReserves: [BigInt!]!
+
+  " All trade volume occurred for a specific token, in USD. The ordering should be the same as the pool's `tokens` field. "
+  deltaVolumeReservesUSD: [BigDecimal!]!
+
+  " All historical trade volume occurred in this pool, in USD "
+  deltaVolumeUSD: BigDecimal!
+
+  " Total number of deposit events (add liquidity) "
+  deltaDepositCount: Int!
+
+  " Total number of withdrawal events (remove liquidity) "
+  deltaWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  deltaSwapCount: Int!
+
+  " Timestamp of the last time this entity was updated "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the last time this entity was updated "
+  lastUpdateBlockNumber: BigInt!
+}
+
+type Account @entity {
+  id: Bytes!
+  deposits: [Deposit!]! @derivedFrom(field: "account")
+  withdraws: [Withdraw!]! @derivedFrom(field: "account")
+  swaps: [Swap!]! @derivedFrom(field: "account")
+}
+
+##### EVENT LEVEL ENTITIES #####
+
+" This maps to the AddLiquidity event "
+type Deposit @entity(immutable: true) {
+  " { Transaction hash }-{ Log index } "
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: Bytes!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: BigInt!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Gas limit of the transaction that emitted this event "
+  gasLimit: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
+
+  " Gas price of the transaction that emitted this event "
+  gasPrice: BigInt
+
+  " Account that emitted this event "
+  account: Account!
+
+  #" The user position changed by this event "
+  #position: Position
+
+  " The pool involving this event "
+  pool: Pool!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Amount of liquidity tokens minted "
+  liquidity: BigInt!
+
+  " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
+  tokens: [Token!]!
+
+  " Amount of input tokens in the token's native unit "
+  reserves: [BigInt!]!
+
+  " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
+  amountUSD: BigDecimal!
+}
+
+" This maps to RemoveLiquidity and RemoveLiquidityOneToken events "
+type Withdraw @entity(immutable: true) {
+  " { Transaction hash }-{ Log index }"
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: Bytes!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: BigInt!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Gas limit of the transaction that emitted this event "
+  gasLimit: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
+
+  " Gas price of the transaction that emitted this event "
+  gasPrice: BigInt
+
+  " Account that emitted this event "
+  account: Account!
+
+  #" The user position changed by this event "
+  #position: Position
+
+  " The pool involving this event "
+  pool: Pool!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Amount of liquidity tokens burned "
+  liquidity: BigInt!
+
+  " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
+  tokens: [Token!]!
+
+  " Amount of input tokens in the token's native unit "
+  reserves: [BigInt!]!
+
+  " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
+  amountUSD: BigDecimal!
+}
+
+type Swap @entity(immutable: true) {
+  " Transaction hash-log index"
+  id: ID!
+
+  " Transaction hash of the event "
+  hash: Bytes!
+
+  " Nonce of the transaction "
+  nonce: BigInt!
+
+  " Log index of the event "
+  logIndex: Int!
+
+  " Gas limit of the transaction "
+  gasLimit: BigInt
+
+  " Gas used for the transaction "
+  gasUsed: BigInt
+
+  " Gas price for the transaction "
+  gasPrice: BigInt
+
+  " Address that sent the transaction "
+  account: Account!
+
+  " Pool involving this event "
+  pool: Pool!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Token deposited into the pool "
+  fromToken: Token!
+
+  " Amount of token deposited into the pool in native units "
+  amountIn: BigInt!
+
+  " Token withdrawn from the pool "
+  toToken: Token!
+
+  " Amount of the token withdrawn from the pool in native units "
+  amountOut: BigInt!
+}
+
+# ##############################
+# #### Carbon Specific Data ####
+# ##############################
+
+# type CarbonProject @entity {
+#   "{Registry Abbreviation}-{Registry Project ID}"
+#   id: ID!
+
+#   "Issuing registry"
+#   registry: Registry!
+
+#   "Registry Project ID"
+#   projectID: String!
+
+#   "Methodologies associated with this project. For projects having more than one, the first one is the primary methodology."
+#   methodology: String!
+
+#   "Category associated with this project"
+#   category: String!
+
+#   "Country where the project takes place"
+#   country: String!
+
+#   "Region within the country where the project takes place"
+#   region: String!
+# }
+
+# type CarbonOffset @entity {
+#   "Ethereum address where the token is deployed"
+#   id: Bytes!
+
+#   "Carbon Project this token belongs to"
+#   project: CarbonProject!
+
+#   "Vintage of issuance"
+#   vintage: Int!
+
+#   "Current token supply"
+#   currentSupply: BigInt!
+
+#   "Total tokens issued via bridging"
+#   bridged: BigInt!
+
+#   "Total tokens retired"
+#   retired: BigInt!
+
+#   "All bridge events for this offset"
+#   bridges: [Bridge!]! @derivedFrom(field: "offset")
+
+#   "All retirement events for this offset"
+#   retires: [Retire!]! @derivedFrom(field: "offset")
+
+#   "Current pool balances for this offset"
+#   poolBalances: [PoolBalance!]! @derivedFrom(field: "offset")
+# }
+
+# type Bridge @entity {
+#   "{Transaction hash}-{Log Index}"
+#   id: Bytes!
+
+#   "Offset bridged"
+#   offset: CarbonOffset!
+
+#   "Account receiving the bridged carbon"
+#   account: Account!
+
+#   "Amount of tokens bridged in native units"
+#   amount: BigInt!
+
+#   "Block timestamp of the bridge"
+#   timestamp: BigInt!
+# }
+
+# type Retire @entity {
+#   "{Account}-{Total Retirement Counter}"
+#   id: Bytes!
+
+#   "Carbon offset being retired"
+#   offset: CarbonOffset!
+
+#   "Pool offset was sourced from, if any"
+#   pool: CarbonPool
+
+#   "Source of the retirement"
+#   source: RetireSource!
+
+#   "Amount of carbon retired"
+#   amount: BigInt!
+
+#   "Beneficiary address"
+#   beneficiaryAddress: Account!
+
+#   "Beneficiary description"
+#   beneficiaryName: String!
+
+#   "Retiree address"
+#   retiringAddress: Account!
+
+#   "Retiree description"
+#   retiringName: String!
+
+#   "Block timestamp of retirement"
+#   timestamp: BigInt!
+
+#   ### Additional attributes if applicable ###
+
+#   klimaRetire: KlimaRetire @derivedFrom(field: "retire")
+# }
+
+# type KlimaRetire @entity {
+#   "{Account}-{Klima Retirement Index}"
+#   id: Bytes!
+
+#   "Retirement made by the aggregator"
+#   retire: Retire!
+
+#   "Klima retirement index"
+#   index: BigInt!
+
+#   "Fee charged for retirement in native units"
+#   feeAmount: BigInt!
+
+#   "Selective retirement"
+#   specific: Boolean!
+# }
+
+# ##############################
+# ###### Carbon Pool Data ######
+# ##############################
+
+# type CarbonPool @entity {
+#   "Ethereum address of the pool contract"
+#   id: Bytes!
+
+#   "Current supply"
+#   supply: BigInt!
+
+#   "Current balances of underlying project tokens"
+#   offsetBalances: [PoolCarbonOffsetBalance!]! @derivedFrom(field: "pool")
+
+#   ### Snapshots ###
+
+#   dailySnapshots: [CarbonPoolDailySnapshot!]! @derivedFrom(field: "pool")
+
+#   ### Event level data ###
+
+#   deposits: [PoolDeposit!]! @derivedFrom(field: "pool")
+
+#   redeems: [PoolRedeem!]! @derivedFrom(field: "pool")
+# }
+
+# type CarbonPoolDailySnapshot @entity {
+#   "Ethereum address of the pool contract"
+#   id: Bytes!
+
+#   "Pool this snapshot belongs to"
+#   pool: CarbonPool!
+
+#   "Current supply"
+#   supply: BigInt!
+
+#   "Current balances of underlying project tokens"
+#   offsetBalances: [PoolCarbonOffsetBalanceDailySnapshot!]!
+#     @derivedFrom(field: "poolSnapshot")
+# }
+
+# type PoolCarbonOffsetBalance @entity {
+#   "{Pool Address}-{Offset Address}"
+#   id: Bytes!
+
+#   "Target carbon pool"
+#   pool: CarbonPool!
+
+#   "Offset being pooled"
+#   offset: CarbonOffset!
+
+#   "Current balance"
+#   balance: BigInt!
+
+#   "Deposited amount"
+#   deposited: BigInt!
+
+#   "Redeemed amount"
+#   redeemed: BigInt!
+# }
+
+# type PoolCarbonOffsetBalanceDailySnapshot @entity {
+#   "{Pool Address}-{Offset Address}"
+#   id: Bytes!
+
+#   "Target carbon pool"
+#   pool: CarbonPool!
+
+#   "Offset being pooled"
+#   offset: CarbonOffset!
+
+#   "The daily pool snapshot that this belongs to"
+#   poolSnapshot: CarbonPoolDailySnapshot!
+
+#   "Current balance"
+#   balance: BigInt!
+
+#   "Deposited amount"
+#   deposited: BigInt!
+
+#   "Redeemed amount"
+#   redeemed: BigInt!
+# }
+
+# type PoolDeposit @entity {
+#   "{Transaction hash}-{Log Index}"
+#   id: Bytes!
+
+#   "Account making the deposit"
+#   account: Account!
+
+#   "Pool that the offset was deposited in"
+#   pool: CarbonPool!
+
+#   "Offset deposited in the pool"
+#   offset: CarbonOffset!
+
+#   "Amount deposited in native units"
+#   amount: BigInt!
+
+#   "Block timestamp of the deposit"
+#   timestamp: BigInt!
+# }
+
+# type PoolRedeem @entity {
+#   "{Transaction hash}-{Log Index}"
+#   id: Bytes!
+
+#   "Account making the redemption"
+#   account: Account!
+
+#   "Pool that the offset was redeemed from"
+#   pool: CarbonPool!
+
+#   "Offset redeemed from the pool"
+#   offset: CarbonOffset!
+
+#   "Amount redeemed in native units"
+#   amount: BigInt!
+
+#   "Block timestamp of the deposit"
+#   timestamp: BigInt!
+# }
+
+# ##############################
+# ##### Account level data #####
+# ##############################
+
+# type Account @entity {
+#   "Ethereum address of the account"
+#   id: Bytes!
+
+#   ## Carbon Offset Activity ##
+#   bridges: [Bridge!]! @derivedFrom(field: "account")
+#   retiresBeneficiary: [Retire!]! @derivedFrom(field: "beneficiaryAddress")
+#   retiresInitiator: [Retire!]! @derivedFrom(field: "retiringAddress")
+
+#   ## Pool Activity ##
+#   poolDeposits: [PoolDeposit!]! @derivedFrom(field: "account")
+#   poolRedeems: [PoolRedeem!]! @derivedFrom(field: "account")
+
+#   ## Token Balance Activity ##
+#   holdings: [Holding!]! @derivedFrom(field: "account")
+#   holdingSnapshots: [HoldingDailySnapshot!]! @derivedFrom(field: "account")
+# }
+
+# type Holding @entity {
+#   "{Account}-{Token}"
+#   id: Bytes!
+
+#   "Account this belongs to"
+#   account: Account!
+
+#   "Token being held"
+#   token: Token!
+
+#   "Amount currently held in native units"
+#   amount: BigInt!
+
+#   "Timestamp last updated"
+#   lastUpdated: BigInt!
+# }
+
+# type HoldingDailySnapshot @entity {
+#   "{Account}-{Token}-{Days since Unix epoch}"
+#   id: Bytes!
+
+#   "Account this belongs to"
+#   account: Account!
+
+#   "Token being held"
+#   token: Token!
+
+#   "Day in Unix timestamp"
+#   timestamp: BigInt!
+
+#   "Amount currently held in native units"
+#   amount: BigInt!
+# }

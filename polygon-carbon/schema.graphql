@@ -169,7 +169,7 @@ type CarbonPool @entity {
   supply: BigInt!
 
   "Current balances of underlying project tokens"
-  offsetBalances: [PoolBalance!]! @derivedFrom(field: "pool")
+  offsetBalances: [PoolCarbonOffsetBalance!]! @derivedFrom(field: "pool")
 
   ### Snapshots ###
 
@@ -193,11 +193,11 @@ type CarbonPoolDailySnapshot @entity {
   supply: BigInt!
 
   "Current balances of underlying project tokens"
-  offsetBalances: [PoolBalanceDailySnapshot!]!
+  offsetBalances: [PoolCarbonOffsetBalanceDailySnapshot!]!
     @derivedFrom(field: "poolSnapshot")
 }
 
-type PoolBalance @entity {
+type PoolCarbonOffsetBalance @entity {
   "{Pool Address}-{Offset Address}"
   id: Bytes!
 
@@ -217,7 +217,7 @@ type PoolBalance @entity {
   redeemed: BigInt!
 }
 
-type PoolBalanceDailySnapshot @entity {
+type PoolCarbonOffsetBalanceDailySnapshot @entity {
   "{Pool Address}-{Offset Address}"
   id: Bytes!
 

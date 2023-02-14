@@ -22,12 +22,21 @@ type Token @entity {
   latestPriceUSD: BigDecimal!
 
   "Latest price update timestamp"
-  latestPriceUpdated: BigInt!
+  latestPriceUSDUpdated: BigInt!
+
+  "Latest price in KLIMA"
+  latestPricePerKLIMA: BigDecimal!
+
+  "Latest price in KLIMAupdate timestamp"
+  latestPricePerKLIMAUpdated: BigInt!
 }
 
 type Pool @entity {
   "Smart contract address of the pool"
   id: Bytes!
+
+  "Dex this pool belongs to"
+  dex: Dex!
 
   " Name of liquidity pool (e.g. Curve.fi DAI/USDC/USDT) "
   name: String
@@ -135,6 +144,15 @@ type PoolDailySnapshot @entity {
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
 
+  " Total number of deposit events (add liquidity) "
+  cumulativeDepositCount: Int!
+
+  " Total number of withdrawal events (remove liquidity) "
+  cumulativeWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
+
   ##### Delta Amounts #####
 
   " Total liquidity token supply for the pool. "
@@ -173,7 +191,7 @@ type PoolHourlySnapshot @entity {
   id: Bytes!
 
   " Number of hours since Unix epoch time "
-  day: Int!
+  hour: Int!
 
   " The pool this snapshot belongs to "
   pool: Pool!
@@ -194,6 +212,15 @@ type PoolHourlySnapshot @entity {
 
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
+
+  " Total number of deposit events (add liquidity) "
+  cumulativeDepositCount: Int!
+
+  " Total number of withdrawal events (remove liquidity) "
+  cumulativeWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
 
   ##### Delta Amounts #####
 

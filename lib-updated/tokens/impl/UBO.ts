@@ -53,12 +53,15 @@ export class UBO implements IToken {
     token.save()
   }
 
-  updateUSDPrice(timestamp: BigInt, blockNumber: BigInt): void {
+  updateUSDPrice(timestamp: BigInt, blockNumber: BigInt, klimaPrice: BigDecimal = ZERO_BD): BigDecimal {
     let token = loadOrCreateToken(this.contractAddress)
 
-    token.latestPriceUSD = this.getMarketPrice() == ZERO_BD ? ZERO_BD : this.klimaToken.getUSDPrice().div(this.getMarketPrice())
+    if (klimaPrice == ZERO_BD) klimaPrice = this.klimaToken.getUSDPrice()
+
+    token.latestPriceUSD = token.latestPricePerKLIMA == ZERO_BD ? ZERO_BD : klimaPrice.div(token.latestPricePerKLIMA)
     token.latestPriceUSDUpdated = timestamp
     token.save()
+    return token.latestPriceUSD
   }
 
   getTotalSupply(): BigDecimal {

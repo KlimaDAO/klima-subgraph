@@ -12,11 +12,26 @@ import {
   ZERO_BI,
 } from '../../../lib-updated/utils/Decimals'
 import { dayFromTimestamp, hourFromTimestamp } from '../../../lib-updated/utils/Dates'
-import { KLIMA_NBO_PAIR, KLIMA_UBO_PAIR, KLIMA_PAIRED_LIQUIDITY, KLIMA_UBO_PAIR_BLOCK, KLIMA_NBO_PAIR_BLOCK } from '../../../lib-updated/utils/Constants'
+import {
+  KLIMA_NBO_PAIR,
+  KLIMA_UBO_PAIR,
+  KLIMA_UBO_PAIR_BLOCK,
+  KLIMA_NBO_PAIR_BLOCK,
+  KLIMA_USDC_PAIR,
+  KLIMA_BCT_PAIR,
+  KLIMA_NCT_PAIR,
+  KLIMA_BCT_PAIR_BLOCK,
+  KLIMA_NCT_PAIR_BLOCK,
+} from '../../../lib-updated/utils/Constants'
 import { TokenFactory } from '../../../lib-updated/tokens/TokenFactory'
 import { NBO } from '../../../lib-updated/tokens/impl/NBO'
 import { KLIMA } from '../../../lib-updated/tokens/impl/KLIMA'
 import { UBO } from '../../../lib-updated/tokens/impl/UBO'
+import { BCT } from '../../../lib-updated/tokens/impl/BCT'
+import { NCT } from '../../../lib-updated/tokens/impl/NCT'
+import { loadOrCreateToken } from '../../../lib-updated/utils/Token'
+
+/** Basic Entity Operations */
 
 export function createPool(poolAddress: Address, dex: string, tokens: Address[], timestamp: BigInt, blockNumber: BigInt): Pool {
   let pool = new Pool(poolAddress)
@@ -68,6 +83,8 @@ export function loadOrCreatePool(poolAddress: Address, dex: string, tokens: Addr
   if (pool == null) pool = createPool(poolAddress, dex, tokens, timestamp, blockNumber)
   return pool as Pool
 }
+
+/** Base Pool entity updates */
 
 export function updatePoolVolumes(poolAddress: Address, fromToken: Address, amountIn: BigInt, toToken: Address, amountOut: BigInt): void {
   let pool = loadPool(poolAddress)
@@ -133,6 +150,8 @@ export function incrementPoolWithdraw(poolAddress: Address): void {
   pool.cumulativeWithdrawCount += 1
   pool.save()
 }
+
+/** Snapshot management */
 
 export function checkForSnapshot(poolAddress: Address, timestamp: BigInt, blockNumber: BigInt): void {
   // We check for the prior period snapshot and then take one if needed
@@ -258,38 +277,53 @@ export function loadOrCreatePoolHourlySnapshot(poolAddress: Address, hourID: i32
   return snapshot as PoolHourlySnapshot
 }
 
-export function updateKlimaPrice(timestamp: BigInt, blockNumber: BigInt): void {
-  let klima = new KLIMA()
-  klima.updateUSDPrice(timestamp, blockNumber)
+/** Price specific update functions */
 
-  // Update dependent prices
+export function updateKlimaDependentPrices(timestamp: BigInt, blockNumber: BigInt): void {
+  let token = new KLIMA()
+  let klimaPrice = token.updateUSDPrice(timestamp, blockNumber)
 
+  if (blockNumber > KLIMA_BCT_PAIR_BLOCK) {
+    let token = new BCT()
+    token.updateUSDPrice(timestamp, blockNumber, klimaPrice)
+  }
+  if (blockNumber > KLIMA_NCT_PAIR_BLOCK) {
+    let token = new NCT()
+    token.updateUSDPrice(timestamp, blockNumber, klimaPrice)
+  }
   if (blockNumber > KLIMA_UBO_PAIR_BLOCK) {
     let token = new UBO()
-    token.updateUSDPrice(timestamp, blockNumber)
+    token.updateUSDPrice(timestamp, blockNumber, klimaPrice)
   }
   if (blockNumber > KLIMA_NBO_PAIR_BLOCK) {
     let token = new NBO()
-    token.updateUSDPrice(timestamp, blockNumber)
+    token.updateUSDPrice(timestamp, blockNumber, klimaPrice)
   }
 }
 
 export function updatePoolTokenPrices(poolAddress: Address, timestamp: BigInt, blockNumber: BigInt): void {
   let pool = loadPool(poolAddress)
+  log.debug('Updating prices for {} pool', [poolAddress.toHexString()])
 
-  let klima = new KLIMA()
-  klima.updateUSDPrice(timestamp, blockNumber)
-
-  if (poolAddress == KLIMA_UBO_PAIR) {
+  if (poolAddress == KLIMA_USDC_PAIR) {
+    log.debug('Updating KLIMA Dependent prices', [])
+    updateKlimaDependentPrices(timestamp, blockNumber)
+  } else if (poolAddress == KLIMA_BCT_PAIR) {
+    // Klima is token1 and BCT is token0
+    let token = new BCT()
+    token.updateMarketPrice(timestamp, toDecimal(pool.reserves[0], token.getDecimals()).div(toDecimal(pool.reserves[1], 9)))
+  } else if (poolAddress == KLIMA_NCT_PAIR) {
+    // Klima is token0 and NCT is token1
+    let token = new NCT()
+    token.updateMarketPrice(timestamp, toDecimal(pool.reserves[1], token.getDecimals()).div(toDecimal(pool.reserves[0], 9)))
+  } else if (poolAddress == KLIMA_UBO_PAIR) {
     // Klima is token1 and UBO is token0
     let token = new UBO()
     token.updateMarketPrice(timestamp, toDecimal(pool.reserves[0], token.getDecimals()).div(toDecimal(pool.reserves[1], 9)))
-    token.updateUSDPrice(timestamp, blockNumber)
   } else if (poolAddress == KLIMA_NBO_PAIR) {
     // Klima is token0 and NBO is token1
     let token = new NBO()
     token.updateMarketPrice(timestamp, toDecimal(pool.reserves[1], token.getDecimals()).div(toDecimal(pool.reserves[0], 9)))
-    token.updateUSDPrice(timestamp, blockNumber)
   }
 
   pool.reservesUSD = getCalculatedReserveUSDValues(pool.tokens, pool.reserves)
@@ -300,8 +334,8 @@ export function updatePoolTokenPrices(poolAddress: Address, timestamp: BigInt, b
 export function getCalculatedReserveUSDValues(tokens: Bytes[], reserves: BigInt[]): BigDecimal[] {
   let results = emptyBigDecimalArray(tokens.length)
   for (let i = 0; i < tokens.length; i++) {
-    let token = new TokenFactory().getTokenForAddress(Address.fromBytes(tokens[i]))
-    results[i] = toDecimal(reserves[i], token.getDecimals()).times(token.getUSDPrice())
+    let token = loadOrCreateToken(Address.fromBytes(tokens[i]))
+    results[i] = toDecimal(reserves[i], token.decimals).times(token.latestPriceUSD)
   }
   return results
 }

@@ -9,6 +9,6 @@ export interface IToken {
   getUSDPrice(): BigDecimal
   getTotalSupply(): BigDecimal
   updateMarketPrice(timestamp: BigInt, newPrice: BigDecimal): void
-  updateUSDPrice(timestamp: BigInt, blockNumber: BigInt): void
+  updateUSDPrice(timestamp: BigInt, blockNumber: BigInt, klimaPrice: BigDecimal): BigDecimal
   getAddressBalance(address: Address): BigDecimal
 }

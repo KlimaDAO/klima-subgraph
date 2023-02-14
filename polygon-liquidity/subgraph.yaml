@@ -10,7 +10,7 @@ dataSources:
     source:
       address: '0x5786b267d35f9d011c4750e0b0ba584e1fdbead1'
       abi: Pair
-      startBlock: 26470811 #20358667
+      startBlock: 20358666
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -26,6 +26,68 @@ dataSources:
         - name: UniswapV2Pair
           file: ../lib/abis/UniswapV2Pair.json
       eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+      file: ./src/UniswapV2Pair.ts
+  - kind: ethereum/contract
+    name: KLIMA_BCT
+    network: matic
+    source:
+      address: '0x9803c7aE526049210a1725F7487AF26fE2c24614'
+      abi: Pair
+      startBlock: 20294501
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Swap
+      abis:
+        - name: Pair
+          file: ../lib/abis/Pair.json
+        - name: ERC20
+          file: ../lib/abis/ERC20.json
+        - name: UniswapV2Pair
+          file: ../lib/abis/UniswapV2Pair.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+      file: ./src/UniswapV2Pair.ts
+  - kind: ethereum/contract
+    name: KLIMA_NCT
+    network: matic
+    source:
+      address: '0xb2D0D5C86d933b0aceFE9B95bEC160d514d152E1'
+      abi: Pair
+      startBlock: 32607148
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Swap
+      abis:
+        - name: Pair
+          file: ../lib/abis/Pair.json
+        - name: ERC20
+          file: ../lib/abis/ERC20.json
+        - name: UniswapV2Pair
+          file: ../lib/abis/UniswapV2Pair.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
         - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
           handler: handleSwap
       file: ./src/UniswapV2Pair.ts

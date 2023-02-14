@@ -36,8 +36,9 @@ export class USDC implements IToken {
     // Not implemented, constant value stablecoin
   }
 
-  updateUSDPrice(timestamp: BigInt, blockNumber: BigInt): void {
+  updateUSDPrice(timestamp: BigInt, blockNumber: BigInt, klimaPrice: BigDecimal): BigDecimal {
     // Not implemented, constant value stablecoin
+    return BigDecimal.fromString('1')
   }
 
   getTotalSupply(): BigDecimal {

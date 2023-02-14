@@ -39,7 +39,7 @@ export class KLIMA implements IToken {
     // Always 1
   }
 
-  updateUSDPrice(timestamp: BigInt, blockNumber: BigInt): void {
+  updateUSDPrice(timestamp: BigInt, blockNumber: BigInt, klimaPrice: BigDecimal = ZERO_BD): BigDecimal {
     let token = loadOrCreateToken(this.contractAddress)
     log.info('Updating KLIMA price: {}', [PriceUtil.getKLIMA_BCTRate().times(PriceUtil.getBCT_USDRate()).toString()])
 
@@ -49,6 +49,8 @@ export class KLIMA implements IToken {
     } else token.latestPriceUSD = PriceUtil.getKLIMA_USDRate()
     token.latestPriceUSDUpdated = timestamp
     token.save()
+
+    return token.latestPriceUSD
   }
 
   getTotalSupply(): BigDecimal {

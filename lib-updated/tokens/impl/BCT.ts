@@ -53,19 +53,24 @@ export class BCT implements IToken {
     token.save()
   }
 
-  updateUSDPrice(timestamp: BigInt, blockNumber: BigInt): void {
+  updateUSDPrice(timestamp: BigInt, blockNumber: BigInt, klimaPrice: BigDecimal = ZERO_BD): BigDecimal {
     let token = loadOrCreateToken(this.contractAddress)
 
     // We are going through BCT-USD until the liquidity is removed
     if (blockNumber < constants.BCT_USDC_PAIR_REMOVE_LIQUIDITY_BLOCK) {
       token.latestPriceUSD = PriceUtil.getBCT_USDRate()
       token.latestPriceUSDUpdated = timestamp
-      return
+      token.save()
+      return token.latestPriceUSD
     }
 
-    token.latestPriceUSD = this.getMarketPrice().times(this.klimaToken.getUSDPrice())
+    if (klimaPrice == ZERO_BD) klimaPrice = this.klimaToken.getUSDPrice()
+
+    token.latestPriceUSD = token.latestPricePerKLIMA.times(klimaPrice)
     token.latestPriceUSDUpdated = timestamp
     token.save()
+
+    return token.latestPriceUSD
   }
 
   getTotalSupply(): BigDecimal {

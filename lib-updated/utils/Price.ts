@@ -26,7 +26,7 @@ export class PriceUtil {
   private static usdcToken: USDC = new USDC()
 
   static getBCT_USDRate(): BigDecimal {
-    return this.getUniV2Rate(Address.fromString(BCT_USDC_PAIR), this.usdcToken.getDecimals(), this.bctToken.getDecimals(), RATE_FOR_TOKEN.SECOND)
+    return this.getUniV2Rate(BCT_USDC_PAIR, this.usdcToken.getDecimals(), this.bctToken.getDecimals(), RATE_FOR_TOKEN.SECOND)
   }
 
   static getKLIMA_BCTRate(): BigDecimal {
@@ -34,7 +34,7 @@ export class PriceUtil {
   }
 
   static getKLIMA_USDRate(): BigDecimal {
-    return this.getUniV2Rate(Address.fromString(KLIMA_USDC_PAIR), this.usdcToken.getDecimals(), this.klimaToken.getDecimals(), RATE_FOR_TOKEN.SECOND)
+    return this.getUniV2Rate(KLIMA_USDC_PAIR, this.usdcToken.getDecimals(), this.klimaToken.getDecimals(), RATE_FOR_TOKEN.SECOND)
   }
 
   // static getKLIMA_MCO2Rate(): BigDecimal {

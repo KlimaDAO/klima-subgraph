@@ -28,7 +28,13 @@ type Token @entity {
   latestPriceUSD: BigDecimal!
 
   "Latest price update timestamp"
-  latestPriceUpdated: BigInt!
+  latestPriceUSDUpdated: BigInt!
+
+  "Latest price in KLIMA"
+  latestPricePerKLIMA: BigDecimal!
+
+  "Latest price in KLIMAupdate timestamp"
+  latestPricePerKLIMAUpdated: BigInt!
 }
 
 ##############################
@@ -84,7 +90,7 @@ type CarbonOffset @entity {
   retires: [Retire!]! @derivedFrom(field: "offset")
 
   "Current pool balances for this offset"
-  poolBalances: [PoolBalance!]! @derivedFrom(field: "offset")
+  poolBalances: [PoolCarbonOffsetBalance!]! @derivedFrom(field: "offset")
 }
 
 type Bridge @entity {
@@ -193,8 +199,7 @@ type CarbonPoolDailySnapshot @entity {
   supply: BigInt!
 
   "Current balances of underlying project tokens"
-  offsetBalances: [PoolCarbonOffsetBalanceDailySnapshot!]!
-    @derivedFrom(field: "poolSnapshot")
+  offsetBalances: [PoolCarbonOffsetBalanceDailySnapshot!]! @derivedFrom(field: "poolSnapshot")
 }
 
 type PoolCarbonOffsetBalance @entity {

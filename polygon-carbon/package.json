@@ -13,7 +13,8 @@
         "create-args": "graph create --node $npm_config_node placeholder",
         "deploy-args": "graph deploy --ipfs $npm_config_ipfs --node $npm_config_node placeholder",
         "deploy-version": "graph deploy --ipfs $npm_config_ipfs --node $npm_config_node --version-label $npm_config_label placeholder",
-        "deploy-staging": "graph deploy --ipfs https://api.staging.thegraph.com/ipfs/ --node https://api.staging.thegraph.com/deploy/ rplaceholder"
+        "deploy-staging": "graph deploy --ipfs https://api.staging.thegraph.com/ipfs/ --node https://api.staging.thegraph.com/deploy/ rplaceholder",
+        "deploy-hosted": "graph deploy --product hosted-service cujowolf/polygon-carbon"
     },
     "devDependencies": {
         "@graphprotocol/graph-cli": "^0.38.0",

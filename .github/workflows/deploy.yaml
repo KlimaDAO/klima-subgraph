@@ -31,7 +31,7 @@ jobs:
               with:
                   node-version: '16'
             - name: Install dependencies
-              run: npm install
+              run: yarn --frozen-lockfile
               working-directory: '${{ matrix.value }}'
 
             # Generate code and check for uncommitted changes
@@ -66,5 +66,5 @@ jobs:
               env:
                   REF: ${{ github.ref }}
             - name: Deploy Subgraph
-              run: node_modules/.bin/graph deploy --product hosted-service --deploy-key ${{ secrets.HOSTED_SERVICE_ACCESS_TOKEN }} klimadao/${{ steps.staging_or_not.outputs.subgraph }}
+              run: ../node_modules/.bin/graph deploy --product hosted-service --deploy-key ${{ secrets.HOSTED_SERVICE_ACCESS_TOKEN }} klimadao/${{ steps.staging_or_not.outputs.subgraph }}
               working-directory: '${{ matrix.value }}'

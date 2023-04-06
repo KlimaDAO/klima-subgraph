@@ -72,5 +72,16 @@ typings/
 # thegraph build
 build
 bonds/build
+pairs/build
 protocol-metrics/build
+user-carbon/build
+vesting/build
+
+# thegraph generated
 generated/
+bonds/generated
+pairs/generated
+protocol-metrics/generated
+user-carbon/generated
+vesting/generated
+

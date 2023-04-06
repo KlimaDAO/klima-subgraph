@@ -1,6 +1,6 @@
 {
   "name": "ethereum-bridged-carbon",
-  "repository": "https://github.com/klimadao/carbon-subgraph",
+  "repository": "https://github.com/klimadao/klima-subgraph",
   "license": "MIT",
   "scripts": {
     "codegen": "graph codegen",

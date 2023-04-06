@@ -4,6 +4,7 @@
     "packageManager": "yarn@3.4.1",
     "workspaces": [
         "bonds",
+        "ethereum-bridged-carbon",
         "pairs",
         "polygon-bridged-carbon",
         "protocol-metrics",

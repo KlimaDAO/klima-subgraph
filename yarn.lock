@@ -2059,6 +2059,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ethereum-bridged-carbon@workspace:ethereum-bridged-carbon":
+  version: 0.0.0-use.local
+  resolution: "ethereum-bridged-carbon@workspace:ethereum-bridged-carbon"
+  dependencies:
+    "@graphprotocol/graph-cli": 0.45.0
+    "@graphprotocol/graph-ts": 0.29.3
+    prettier: 2.7.1
+  languageName: unknown
+  linkType: soft
+
 "ethereum-cryptography@npm:^0.1.3":
   version: 0.1.3
   resolution: "ethereum-cryptography@npm:0.1.3"

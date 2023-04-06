@@ -5,8 +5,6 @@
     "workspaces": [
         "bonds",
         "pairs",
-        "polygon-carbon",
-        "polygon-liquidity",
         "protocol-metrics",
         "user-carbon",
         "vesting"
@@ -18,7 +16,7 @@
         "test": "graph test"
     },
     "devDependencies": {
-        "@graphprotocol/graph-cli": "^0.38.0",
+        "@graphprotocol/graph-cli": "^0.45.0",
         "@graphprotocol/graph-ts": "^0.29.3",
         "prettier": "2.7.1"
     }

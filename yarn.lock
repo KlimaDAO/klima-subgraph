@@ -4543,6 +4543,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"polygon-bridged-carbon@workspace:polygon-bridged-carbon":
+  version: 0.0.0-use.local
+  resolution: "polygon-bridged-carbon@workspace:polygon-bridged-carbon"
+  dependencies:
+    "@graphprotocol/graph-cli": ^0.45.0
+    "@graphprotocol/graph-ts": ^0.29.3
+    prettier: 2.7.1
+  languageName: unknown
+  linkType: soft
+
 "prettier@npm:1.19.1":
   version: 1.19.1
   resolution: "prettier@npm:1.19.1"

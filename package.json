@@ -5,6 +5,7 @@
     "workspaces": [
         "bonds",
         "pairs",
+        "polygon-bridged-carbon",
         "protocol-metrics",
         "user-carbon",
         "vesting"

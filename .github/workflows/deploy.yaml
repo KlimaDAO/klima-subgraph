@@ -12,7 +12,17 @@ jobs:
         name: Deploy
         strategy:
             matrix:
-                value: ['bonds', 'protocol-metrics', 'vesting', 'user-carbon', 'pairs']
+                value:
+                    [
+                        'bonds',
+                        'protocol-metrics',
+                        'vesting',
+                        'user-carbon',
+                        'pairs',
+                        'celo-bridged-carbon',
+                        'ethereum-bridged-carbon',
+                        'polygon-bridged-carbon',
+                    ]
         steps:
             - name: Check out source repository
               uses: actions/checkout@v2

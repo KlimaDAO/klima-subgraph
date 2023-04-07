@@ -133,7 +133,7 @@ export function handleSwap(event: SwapEvent): void {
   let contract = PairContract.bind(event.address)
   let total_lp = toUnits(contract.totalSupply(), 18)
   let tokenBalance = toUnits(contract.balanceOf(treasury_address), 18)
-  let ownedLP = tokenBalance.div(total_lp)
+  let ownedLP = total_lp == BigDecimalZero ? BigDecimalZero : tokenBalance.div(total_lp)
 
   let hour_timestamp = hourFromTimestamp(event.block.timestamp)
   let hourlyId = event.address.toHexString() + hour_timestamp

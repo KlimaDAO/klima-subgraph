@@ -83,6 +83,7 @@ export function loadOrCreateProtocolMetric(timestamp: BigInt): ProtocolMetric {
         protocolMetric.nextEpochRebase = BigDecimal.fromString('0')
         protocolMetric.nextDistributedKlima = BigDecimal.fromString('0')
         protocolMetric.currentAKR = BigDecimal.fromString('0')
+        protocolMetric.runwayCurrent = BigDecimal.fromString('0')
         protocolMetric.treasuryCarbon = BigDecimal.fromString('0')
         protocolMetric.klimaIndex = BigDecimal.fromString('0')
         protocolMetric.holders = BigInt.fromI32(0)

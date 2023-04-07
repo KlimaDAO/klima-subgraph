@@ -9,6 +9,7 @@ export function loadOrCreateDailyBond(timestamp: BigInt, token: string): DailyBo
   let dailyBond = DailyBond.load(id)
   if (dailyBond == null) {
     dailyBond = new DailyBond(id)
+    dailyBond.bondVersion = ''
     dailyBond.timestamp = BigInt.fromString(day_timestamp)
     dailyBond.token = token
     dailyBond.payout = BigDecimal.zero()

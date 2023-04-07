@@ -12,44 +12,40 @@ import { CarbonMetricUtils } from './utils/CarbonMetrics'
 import { C3T } from './utils/carbon_token/impl/C3T'
 
 export function handleTransfer(event: Transfer): void {
+  let transaction = loadOrCreateTransaction(event.transaction, event.block)
+  let offsetERC20 = C3ProjectToken.bind(event.address)
 
-    let transaction = loadOrCreateTransaction(event.transaction, event.block)
-    let offsetERC20 = C3ProjectToken.bind(event.address)
+  // TODO: read registry name from C3T contract
+  let carbonOffset = loadOrCreateCarbonOffset(transaction, event.address, 'C3', '')
 
-    // TODO: read registry name from C3T contract
-    let carbonOffset = loadOrCreateCarbonOffset(transaction, event.address, 'C3', '')
+  // Handle Fractionalizing (Mints from briding)
+  if (event.params.from == Address.fromString('0x0000000000000000000000000000000000000000')) {
+    let bridge = loadOrCreateBridge(carbonOffset, transaction)
+    bridge.value = toDecimal(event.params.value, 18)
+    bridge.bridger = event.params.to.toHexString()
 
-    // Handle Fractionalizing (Mints from briding)
-    if (event.params.from == Address.fromString('0x0000000000000000000000000000000000000000')) {
+    bridge.save()
 
-        let bridge = loadOrCreateBridge(carbonOffset, transaction)
-        bridge.value = toDecimal(event.params.value, 18)
-        bridge.bridger = event.params.to.toHexString()
+    carbonOffset.totalBridged = carbonOffset.totalBridged.plus(toDecimal(event.params.value, 18))
 
-        bridge.save()
+    //carbonOffset.bridges.push(bridge.id)
+  }
 
-        carbonOffset.totalBridged = carbonOffset.totalBridged.plus(toDecimal(event.params.value, 18))
+  // Handle Retirements
+  if (event.params.to == Address.fromString('0x0000000000000000000000000000000000000000')) {
+    let retire = loadOrCreateRetire(carbonOffset, transaction)
+    retire.value = toDecimal(event.params.value, 18)
+    retire.retiree = event.params.from.toHexString()
 
-        //carbonOffset.bridges.push(bridge.id)
-    }
+    retire.save()
 
-    // Handle Retirements
-    if (event.params.to == Address.fromString('0x0000000000000000000000000000000000000000')) {
+    carbonOffset.totalRetired = carbonOffset.totalRetired.plus(toDecimal(event.params.value, 18))
+    //carbonOffset.retirements.push(retire.id)
+    CarbonMetricUtils.updateCarbonTokenRetirements(new C3T(), event.block.timestamp, event.params.value)
+  }
 
-        let retire = loadOrCreateRetire(carbonOffset, transaction)
-        retire.value = toDecimal(event.params.value, 18)
-        retire.retiree = event.params.from.toHexString()
+  carbonOffset.currentSupply = toDecimal(offsetERC20.totalSupply(), 18)
+  carbonOffset.lastUpdate = transaction.timestamp
 
-        retire.save()
-
-        carbonOffset.totalRetired = carbonOffset.totalRetired.plus(toDecimal(event.params.value, 18))
-        //carbonOffset.retirements.push(retire.id)
-        CarbonMetricUtils.updateCarbonTokenRetirements(new C3T(), event.block.timestamp, event.params.value)
-
-    }
-
-    carbonOffset.currentSupply = toDecimal(offsetERC20.totalSupply(), 18)
-    carbonOffset.lastUpdate = transaction.timestamp
-
-    carbonOffset.save()
+  carbonOffset.save()
 }

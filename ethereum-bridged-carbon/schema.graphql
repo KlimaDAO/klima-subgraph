@@ -36,7 +36,6 @@ type Bridge @entity {
   bridger: String!
 }
 
-
 type Retire @entity {
   id: ID!
   timestamp: BigInt!

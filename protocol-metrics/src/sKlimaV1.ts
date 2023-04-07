@@ -4,8 +4,8 @@ import { updateProtocolMetrics } from './utils/ProtocolMetrics'
 import { EpochUtil } from './utils/Epoch'
 
 export function handleRebase(event: LogRebase): void {
-    let transaction = loadOrCreateTransaction(event.transaction, event.block)
-    EpochUtil.handleNewEpoch(event)
+  let transaction = loadOrCreateTransaction(event.transaction, event.block)
+  EpochUtil.handleNewEpoch(event)
 
-    updateProtocolMetrics(transaction)
+  updateProtocolMetrics(transaction)
 }

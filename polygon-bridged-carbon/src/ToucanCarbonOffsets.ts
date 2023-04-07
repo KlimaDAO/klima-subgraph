@@ -12,48 +12,42 @@ import { TCO2 } from './utils/carbon_token/impl/TCO2'
 import { CarbonMetricUtils } from './utils/CarbonMetrics'
 
 export function handleTransfer(event: Transfer): void {
+  let transaction = loadOrCreateTransaction(event.transaction, event.block)
+  let offsetERC20 = ToucanCarbonOffsets.bind(event.address)
 
-    let transaction = loadOrCreateTransaction(event.transaction, event.block)
-    let offsetERC20 = ToucanCarbonOffsets.bind(event.address)
+  let carbonOffset = loadOrCreateCarbonOffset(transaction, event.address, 'Toucan', 'Verra')
 
-    let carbonOffset = loadOrCreateCarbonOffset(transaction, event.address, 'Toucan', 'Verra')
+  // Handle Fractionalizing (Mints from briding)
+  if (event.params.from == Address.fromString('0x0000000000000000000000000000000000000000')) {
+    let bridge = loadOrCreateBridge(carbonOffset, transaction)
+    bridge.value = toDecimal(event.params.value, 18)
+    bridge.bridger = event.params.to.toHexString()
 
+    bridge.save()
 
-    // Handle Fractionalizing (Mints from briding)
-    if (event.params.from == Address.fromString('0x0000000000000000000000000000000000000000')) {
+    carbonOffset.totalBridged = carbonOffset.totalBridged.plus(toDecimal(event.params.value, 18))
 
-        let bridge = loadOrCreateBridge(carbonOffset, transaction)
-        bridge.value = toDecimal(event.params.value, 18)
-        bridge.bridger = event.params.to.toHexString()
+    //carbonOffset.bridges.push(bridge.id)
+  }
 
-        bridge.save()
+  // Handle Retirements
+  if (event.params.to == Address.fromString('0x0000000000000000000000000000000000000000')) {
+    // This is a temporary solution - we are not tracking retirements related to HFC-23 Credits
+    // What needs to be done is to track Retire events instead of Transfer
+    if (carbonOffset.methodology != 'AM0001') {
+      let retire = loadOrCreateRetire(carbonOffset, transaction)
+      retire.value = toDecimal(event.params.value, 18)
+      retire.retiree = event.params.from.toHexString()
 
-        carbonOffset.totalBridged = carbonOffset.totalBridged.plus(toDecimal(event.params.value, 18))
+      retire.save()
 
-        //carbonOffset.bridges.push(bridge.id)
+      carbonOffset.totalRetired = carbonOffset.totalRetired.plus(toDecimal(event.params.value, 18))
+      CarbonMetricUtils.updateCarbonTokenRetirements(new TCO2(), event.block.timestamp, event.params.value)
     }
+  }
 
-    // Handle Retirements
-    if (event.params.to == Address.fromString('0x0000000000000000000000000000000000000000')) {
+  carbonOffset.currentSupply = toDecimal(offsetERC20.totalSupply(), 18)
+  carbonOffset.lastUpdate = transaction.timestamp
 
-        // This is a temporary solution - we are not tracking retirements related to HFC-23 Credits
-        // What needs to be done is to track Retire events instead of Transfer
-        if (carbonOffset.methodology != "AM0001") {
-
-        let retire = loadOrCreateRetire(carbonOffset, transaction)
-        retire.value = toDecimal(event.params.value, 18)
-        retire.retiree = event.params.from.toHexString()
-
-        retire.save()
-
-        carbonOffset.totalRetired = carbonOffset.totalRetired.plus(toDecimal(event.params.value, 18))
-            CarbonMetricUtils.updateCarbonTokenRetirements(new TCO2(), event.block.timestamp, event.params.value)
-        }
-    }
-
-    carbonOffset.currentSupply = toDecimal(offsetERC20.totalSupply(), 18)
-    carbonOffset.lastUpdate = transaction.timestamp
-
-    carbonOffset.save()
-
+  carbonOffset.save()
 }

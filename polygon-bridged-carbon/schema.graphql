@@ -4,19 +4,14 @@ type _Schema_
     language: en
     algorithm: rank
     include: [
-      { 
-         entity: "CarbonOffset", 
-         fields: [
-            { name: "methodologyCategory" },
-            { name: "region" },
-            { name: "country" },
-            { name: "vintageYear" }
-         ] 
+      {
+        entity: "CarbonOffset"
+        fields: [{ name: "methodologyCategory" }, { name: "region" }, { name: "country" }, { name: "vintageYear" }]
       }
-   ]
+    ]
   )
-  
-  type CarbonOffset @entity {
+
+type CarbonOffset @entity {
   id: ID!
   name: String!
   tokenAddress: String!

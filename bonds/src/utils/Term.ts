@@ -16,6 +16,7 @@ export function createTerm(marketId: BigInt): Term {
   term.market = marketId.toString()
   term.conclusion = terms_call.value.value4
   term.termExpiration = BigIntZero
+  term.controlVariable = BigIntZero
 
   return term as Term
 }

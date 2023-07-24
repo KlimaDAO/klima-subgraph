@@ -12,6 +12,7 @@ import { CrossChainBridge } from '../generated/schema'
 import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/CarbonPool'
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
+import { recordProvenance } from './utils/Provenance'
 
 export function handleCreditTransfer(event: Transfer): void {
   if (event.address == MCO2_ERC20_CONTRACT) loadOrCreateCarbonCredit(MCO2_ERC20_CONTRACT, 'MOSS')
@@ -33,6 +34,16 @@ export function handleCreditTransfer(event: Transfer): void {
         event.params.value,
         event.block.timestamp
       )
+
+      recordProvenance(
+        event.transaction.hash,
+        event.address,
+        event.params.from,
+        event.params.to,
+        'ORIGINATION',
+        event.params.value,
+        event.block.timestamp
+      )
     }
   } else {
     loadOrCreateAccount(event.params.from)
@@ -42,9 +53,9 @@ export function handleCreditTransfer(event: Transfer): void {
     fromHolding.save()
 
     // Delete holding entity if there are no tokens held
-    if (fromHolding.amount == ZERO_BI) {
-      store.remove('Holding', fromHolding.id.toHexString())
-    }
+    // if (fromHolding.amount == ZERO_BI) {
+    //   store.remove('Holding', fromHolding.id.toHexString())
+    // }
   }
 
   if (event.params.to == ZERO_ADDRESS) {
@@ -55,6 +66,18 @@ export function handleCreditTransfer(event: Transfer): void {
     toHolding.amount = toHolding.amount.plus(event.params.value)
     toHolding.lastUpdated = event.block.timestamp
     toHolding.save()
+
+    if (event.params.from != ZERO_ADDRESS) {
+      recordProvenance(
+        event.transaction.hash,
+        event.address,
+        event.params.from,
+        event.params.to,
+        'TRANSFER',
+        event.params.value,
+        event.block.timestamp
+      )
+    }
   }
 
   // Update active credits list

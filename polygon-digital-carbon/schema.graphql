@@ -23,6 +23,37 @@ enum CrossChainBridgeDirection {
   RECEIVED
 }
 
+enum ProvenanceType {
+  ORIGINATION
+  TRANSFER
+  RETIREMENT
+}
+
+type ProvenanceRecord @entity {
+  "Token address - Holding address - increment"
+  id: Bytes!
+
+  token: Bytes!
+
+  transactionHash: Bytes!
+
+  transactionType: ProvenanceType!
+
+  priorRecords: [ProvenanceRecord!]!
+
+  sender: Bytes!
+
+  receiver: Bytes!
+
+  originalAmount: BigInt!
+
+  remainingAmount: BigInt!
+
+  createdAt: BigInt!
+
+  updatedAt: BigInt!
+}
+
 type Token @entity {
   "Ethereum contract address"
   id: Bytes!
@@ -130,8 +161,7 @@ type CarbonCredit @entity {
   "All retirement events for this credit"
   retires: [Retire!]! @derivedFrom(field: "credit")
 
-  "Current pool balances for this credit"
-  poolBalances: [CarbonPoolCreditBalance!]! @derivedFrom(field: "credit")
+  provenanceCount: Int!
 }
 
 type CarbonCreditSnapshot @entity {
@@ -492,6 +522,10 @@ type Holding @entity {
 
   "Amount currently held in native units"
   amount: BigInt!
+
+  activeProvenanceRecords: [ProvenanceRecord!]!
+
+  historicalProvenanceRecords: [ProvenanceRecord!]!
 
   "Timestamp last updated"
   lastUpdated: BigInt!

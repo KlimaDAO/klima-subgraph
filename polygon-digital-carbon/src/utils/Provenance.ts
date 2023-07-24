@@ -1,6 +1,6 @@
 import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
 import { ProvenanceRecord } from '../../generated/schema'
-import { loadCarbonOffset } from './CarbonCredit'
+import { loadCarbonOffset } from './CarbonOffset'
 import { loadOrCreateHolding } from './Holding'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 

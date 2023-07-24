@@ -6,6 +6,7 @@ import { Retired, Retired1 as Retired_1_4_0 } from '../generated/templates/Touca
 import { incrementAccountRetirements, loadOrCreateAccount } from './utils/Account'
 import { loadCarbonCredit, loadOrCreateCarbonCredit } from './utils/CarbonCredit'
 import { loadOrCreateCarbonProject } from './utils/CarbonProject'
+import { recordProvenance } from './utils/Provenance'
 import { saveRetire } from './utils/Retire'
 
 export function saveToucanRetirement(event: Retired): void {
@@ -33,6 +34,16 @@ export function saveToucanRetirement(event: Retired): void {
   )
 
   incrementAccountRetirements(event.transaction.from)
+
+  recordProvenance(
+    event.transaction.hash,
+    event.address,
+    event.params.sender,
+    ZERO_ADDRESS,
+    'RETIREMENT',
+    event.params.tokenId,
+    event.block.timestamp
+  )
 }
 
 export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
@@ -60,6 +71,16 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
   )
 
   incrementAccountRetirements(event.transaction.from)
+
+  recordProvenance(
+    event.transaction.hash,
+    event.address,
+    event.params.sender,
+    ZERO_ADDRESS,
+    'RETIREMENT',
+    event.params.amount,
+    event.block.timestamp
+  )
 }
 
 export function handleVCUOMinted(event: VCUOMinted): void {

@@ -1,6 +1,6 @@
 import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
 import { ProvenanceRecord } from '../../generated/schema'
-import { loadCarbonOffset } from './CarbonOffset'
+import { loadCarbonCredit } from './CarbonCredit'
 import { loadOrCreateHolding } from './Holding'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 import { loadOrCreateToucanBatch } from './ToucanBatch'
@@ -14,8 +14,8 @@ export function recordProvenance(
   amount: BigInt,
   timestamp: BigInt
 ): void {
-  let offset = loadCarbonOffset(token)
-  let id = token.concat(receiver).concatI32(offset.provenanceCount)
+  let credit = loadCarbonCredit(token)
+  let id = token.concat(receiver).concatI32(credit.provenanceCount)
   let record = new ProvenanceRecord(id)
   record.token = token
   record.transactionHash = hash
@@ -48,8 +48,8 @@ export function recordProvenance(
   receiverHolding.save()
 
   if (recordType == 'ORIGINATION') {
-    if (offset.bridgeProtocol == 'TOUCAN') {
-      let batch = loadOrCreateToucanBatch(offset.lastBatchId)
+    if (credit.bridgeProtocol == 'TOUCAN') {
+      let batch = loadOrCreateToucanBatch(credit.lastBatchId)
       record.registrySerialNumbers = batch.registrySerialNumbers
       record.save()
     }

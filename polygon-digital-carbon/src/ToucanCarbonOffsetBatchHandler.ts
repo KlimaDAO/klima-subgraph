@@ -1,5 +1,5 @@
 import { BatchMinted, BatchUpdated, Transfer } from '../generated/ToucanCarbonOffsetBatch/ToucanCarbonOffsetBatches'
-import { CarbonOffset } from '../generated/schema'
+import { CarbonCredit } from '../generated/schema'
 import { loadOrCreateToucanBatch } from './utils/ToucanBatch'
 
 export function handleBatchMinted(event: BatchMinted): void {
@@ -10,14 +10,26 @@ export function handleBatchMinted(event: BatchMinted): void {
 
 export function handleBatchUpdated(event: BatchUpdated): void {
   let batch = loadOrCreateToucanBatch(event.params.tokenId)
+
+  // Toucan emits a comma delimited list of serials for batches with more than one included
   let serials = event.params.serialNumber.split(',')
+
   batch.registrySerialNumbers = serials
   batch.save()
 }
 
 export function handleBatchTransfer(event: Transfer): void {
-  let offset = CarbonOffset.load(event.params.to)
+  let offset = CarbonCredit.load(event.params.to)
+
+  // Don't update transfer to non-credit addresses
   if (offset == null) return
+
+  /** Update the credit for the latest fractionalization.
+   * The order is the following:
+   * Token created
+   * Batch sent to token
+   * ERC20s transfered to caller
+   */
 
   offset.lastBatchId = event.params.tokenId
   offset.save()

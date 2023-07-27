@@ -45,7 +45,7 @@ export function handleCreditTransfer(event: Transfer): void {
         event.block.timestamp
       )
 
-      offset.provenanceCount += 1
+      credit.provenanceCount += 1
     }
   } else {
     loadOrCreateAccount(event.params.from)
@@ -54,10 +54,10 @@ export function handleCreditTransfer(event: Transfer): void {
     fromHolding.lastUpdated = event.block.timestamp
     fromHolding.save()
 
-    // Delete holding entity if there are no tokens held
-    // if (fromHolding.amount == ZERO_BI) {
-    //   store.remove('Holding', fromHolding.id.toHexString())
-    // }
+    // Delete holding entity if there are no tokens held and this isn't needed for provenance records.
+    if (fromHolding.amount == ZERO_BI && fromHolding.historicalProvenanceRecords.length == 0) {
+      store.remove('Holding', fromHolding.id.toHexString())
+    }
   }
 
   if (event.params.to == ZERO_ADDRESS) {
@@ -80,7 +80,7 @@ export function handleCreditTransfer(event: Transfer): void {
         event.block.timestamp
       )
 
-      offset.provenanceCount += 1
+      credit.provenanceCount += 1
     }
   }
 

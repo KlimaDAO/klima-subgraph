@@ -33,26 +33,37 @@ type ProvenanceRecord @entity {
   "Token address - Holding address - increment"
   id: Bytes!
 
+  "Credit token address"
   token: Bytes!
 
+  "Transaction hash creating this record"
   transactionHash: Bytes!
 
+  "Action being made with the credit"
   transactionType: ProvenanceType!
 
+  "Any applicable registry serial numbers for origination"
   registrySerialNumbers: [String!]!
 
+  "Prior records associated with this transaction"
   priorRecords: [ProvenanceRecord!]!
 
+  "Sender of the credit"
   sender: Bytes!
 
+  "Receiver of the credit"
   receiver: Bytes!
 
+  "Original amount received"
   originalAmount: BigInt!
 
+  "Remaining amount held"
   remainingAmount: BigInt!
 
+  "Unix timestamp created"
   createdAt: BigInt!
 
+  "Unix timestamp updated"
   updatedAt: BigInt!
 }
 
@@ -163,8 +174,10 @@ type CarbonCredit @entity {
   "All retirement events for this credit"
   retires: [Retire!]! @derivedFrom(field: "credit")
 
+  "Total provenance records for this credit"
   provenanceCount: Int!
 
+  "Last batch ID that was fractionalized if applicable"
   lastBatchId: BigInt!
 }
 

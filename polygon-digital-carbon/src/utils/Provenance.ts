@@ -3,6 +3,7 @@ import { ProvenanceRecord } from '../../generated/schema'
 import { loadCarbonOffset } from './CarbonOffset'
 import { loadOrCreateHolding } from './Holding'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
+import { loadOrCreateToucanBatch } from './ToucanBatch'
 
 export function recordProvenance(
   hash: Bytes,
@@ -15,24 +16,19 @@ export function recordProvenance(
 ): void {
   let offset = loadCarbonOffset(token)
   let id = token.concat(receiver).concatI32(offset.provenanceCount)
-  let record = ProvenanceRecord.load(id)
-  if (record == null) {
-    record = new ProvenanceRecord(id)
-    record.token = token
-    record.transactionHash = hash
-    record.transactionType = recordType
-    record.priorRecords = []
-    record.sender = sender
-    record.receiver = receiver
-    record.originalAmount = amount
-    record.remainingAmount = amount
-    record.createdAt = timestamp
-    record.updatedAt = timestamp
-    record.save()
-
-    offset.provenanceCount += 1
-    offset.save()
-  }
+  let record = new ProvenanceRecord(id)
+  record.token = token
+  record.transactionHash = hash
+  record.transactionType = recordType
+  record.registrySerialNumbers = []
+  record.priorRecords = []
+  record.sender = sender
+  record.receiver = receiver
+  record.originalAmount = amount
+  record.remainingAmount = amount
+  record.createdAt = timestamp
+  record.updatedAt = timestamp
+  record.save()
 
   let senderHolding = loadOrCreateHolding(sender, token)
   let receiverHolding = loadOrCreateHolding(receiver, token)
@@ -51,19 +47,31 @@ export function recordProvenance(
   receiverHolding.historicalProvenanceRecords = receiverHistoryRecords
   receiverHolding.save()
 
-  // Update records and lists if not an origination
-  if (recordType != 'ORIGINATION') {
+  if (recordType == 'ORIGINATION') {
+    if (offset.bridgeProtocol == 'TOUCAN') {
+      let batch = loadOrCreateToucanBatch(offset.lastBatchId)
+      record.registrySerialNumbers = batch.registrySerialNumbers
+      record.save()
+    }
+  } else {
     let remainingAmount = amount
 
     while (remainingAmount > ZERO_BI && senderActiveRecords.length > 0) {
       let priorRecord = ProvenanceRecord.load(senderActiveRecords[0])
 
-      if (priorRecord == null) return
+      if (priorRecord == null) break
 
-      if (priorRecord.remainingAmount >= remainingAmount) {
+      if (priorRecord.remainingAmount > remainingAmount) {
         recordPriorRecords.push(priorRecord.id)
         priorRecord.remainingAmount = priorRecord.remainingAmount.minus(remainingAmount)
         remainingAmount = ZERO_BI
+      } else if (priorRecord.remainingAmount == remainingAmount) {
+        recordPriorRecords.push(priorRecord.id)
+        priorRecord.remainingAmount = ZERO_BI
+        remainingAmount = ZERO_BI
+
+        // Remove the record from the active list
+        senderActiveRecords.shift()
       } else {
         recordPriorRecords.push(priorRecord.id)
         remainingAmount = remainingAmount.minus(priorRecord.remainingAmount)
@@ -72,6 +80,13 @@ export function recordProvenance(
         // Remove the record from the active list
         senderActiveRecords.shift()
       }
+
+      // Pull in the previous prior records. This allows the final provenance record to have the full
+      // custody chain rather than having to traverse until origination
+      for (let i = 0; i < priorRecord.priorRecords.length; i++) {
+        recordPriorRecords.push(priorRecord.priorRecords[i])
+      }
+
       record.priorRecords = recordPriorRecords
       record.save()
       priorRecord.save()

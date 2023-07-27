@@ -44,6 +44,8 @@ export function handleCreditTransfer(event: Transfer): void {
         event.params.value,
         event.block.timestamp
       )
+
+      offset.provenanceCount += 1
     }
   } else {
     loadOrCreateAccount(event.params.from)
@@ -77,6 +79,8 @@ export function handleCreditTransfer(event: Transfer): void {
         event.params.value,
         event.block.timestamp
       )
+
+      offset.provenanceCount += 1
     }
   }
 

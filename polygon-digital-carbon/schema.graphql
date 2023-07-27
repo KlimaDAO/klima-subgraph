@@ -39,6 +39,8 @@ type ProvenanceRecord @entity {
 
   transactionType: ProvenanceType!
 
+  registrySerialNumbers: [String!]!
+
   priorRecords: [ProvenanceRecord!]!
 
   sender: Bytes!
@@ -162,6 +164,8 @@ type CarbonCredit @entity {
   retires: [Retire!]! @derivedFrom(field: "credit")
 
   provenanceCount: Int!
+
+  lastBatchId: BigInt!
 }
 
 type CarbonCreditSnapshot @entity {
@@ -292,6 +296,21 @@ type KlimaRetire @entity {
 
   "Selective retirement"
   specific: Boolean!
+}
+
+##############################
+#### Bridge Specific Data ####
+##############################
+
+type ToucanBatch @entity {
+  "Token ID"
+  id: ID!
+
+  "Registry serial numbers associated with this batch"
+  registrySerialNumbers: [String!]!
+
+  "Creation Transaction hash"
+  creationTransactionHash: Bytes!
 }
 
 ##############################

@@ -19,6 +19,7 @@ export function loadOrCreateCarbonOffset(tokenAddress: Address, bridge: string):
     offset.bridged = ZERO_BI
     offset.retired = ZERO_BI
     offset.provenanceCount = 0
+    offset.lastBatchId = ZERO_BI
     offset.save()
   }
   return offset as CarbonOffset

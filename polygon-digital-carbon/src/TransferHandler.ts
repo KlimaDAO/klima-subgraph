@@ -15,6 +15,9 @@ import { loadOrCreateEcosystem } from './utils/Ecosystem'
 import { recordProvenance } from './utils/Provenance'
 
 export function handleCreditTransfer(event: Transfer): void {
+  // Ignore transfers of zero value
+  if (event.params.value == ZERO_BI) return
+
   if (event.address == MCO2_ERC20_CONTRACT) loadOrCreateCarbonCredit(MCO2_ERC20_CONTRACT, 'MOSS')
   let credit = loadCarbonCredit(event.address)
 
@@ -119,6 +122,9 @@ export function handleCreditTransfer(event: Transfer): void {
 }
 
 export function handlePoolTransfer(event: Transfer): void {
+  // Ignore transfers of zero value
+  if (event.params.value == ZERO_BI) return
+
   if (event.params.from != ZERO_ADDRESS) {
     loadOrCreateAccount(event.params.from)
     let fromHolding = loadOrCreateHolding(event.params.from, event.address)
@@ -142,9 +148,15 @@ export function handlePoolTransfer(event: Transfer): void {
 }
 
 export function handleToucanRetired(event: Retired): void {
+  // Ignore retirements of zero value
+  if (event.params.tokenId == ZERO_BI) return
+
   saveToucanRetirement(event)
 }
 
 export function handleToucanRetired_1_4_0(event: Retired_1_4_0): void {
+  // Ignore retirements of zero value
+  if (event.params.amount == ZERO_BI) return
+
   saveToucanRetirement_1_4_0(event)
 }

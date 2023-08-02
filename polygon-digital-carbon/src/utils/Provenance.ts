@@ -62,10 +62,14 @@ export function recordProvenance(
       if (priorRecord == null) break
 
       if (priorRecord.remainingAmount > remainingAmount) {
+        // Transfered fewer than the available credits
+
         recordPriorRecords.push(priorRecord.id)
         priorRecord.remainingAmount = priorRecord.remainingAmount.minus(remainingAmount)
         remainingAmount = ZERO_BI
       } else if (priorRecord.remainingAmount == remainingAmount) {
+        // Transferred the exact number of credits from prior record
+
         recordPriorRecords.push(priorRecord.id)
         priorRecord.remainingAmount = ZERO_BI
         remainingAmount = ZERO_BI
@@ -73,6 +77,8 @@ export function recordProvenance(
         // Remove the record from the active list
         senderActiveRecords.shift()
       } else {
+        // Transferred more than the number of credits from prior record
+
         recordPriorRecords.push(priorRecord.id)
         remainingAmount = remainingAmount.minus(priorRecord.remainingAmount)
         priorRecord.remainingAmount = ZERO_BI

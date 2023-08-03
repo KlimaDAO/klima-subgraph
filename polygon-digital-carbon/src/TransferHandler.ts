@@ -38,17 +38,19 @@ export function handleCreditTransfer(event: Transfer): void {
         event.block.timestamp
       )
 
-      recordProvenance(
-        event.transaction.hash,
-        event.address,
-        event.params.from,
-        event.params.to,
-        'ORIGINATION',
-        event.params.value,
-        event.block.timestamp
-      )
+      if (event.address != MCO2_ERC20_CONTRACT) {
+        recordProvenance(
+          event.transaction.hash,
+          event.address,
+          event.params.from,
+          event.params.to,
+          'ORIGINATION',
+          event.params.value,
+          event.block.timestamp
+        )
 
-      credit.provenanceCount += 1
+        credit.provenanceCount += 1
+      }
     }
   } else {
     loadOrCreateAccount(event.params.from)
@@ -72,7 +74,7 @@ export function handleCreditTransfer(event: Transfer): void {
     toHolding.lastUpdated = event.block.timestamp
     toHolding.save()
 
-    if (event.params.from != ZERO_ADDRESS) {
+    if (event.params.from != ZERO_ADDRESS && event.address != MCO2_ERC20_CONTRACT) {
       recordProvenance(
         event.transaction.hash,
         event.address,

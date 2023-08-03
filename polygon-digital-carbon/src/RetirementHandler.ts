@@ -116,6 +116,16 @@ export function handleVCUOMinted(event: VCUOMinted): void {
     null
   )
 
+  recordProvenance(
+    event.transaction.hash,
+    projectAddress,
+    event.params.sender,
+    ZERO_ADDRESS,
+    'RETIREMENT',
+    retireAmount,
+    event.block.timestamp
+  )
+
   incrementAccountRetirements(event.transaction.from)
 }
 

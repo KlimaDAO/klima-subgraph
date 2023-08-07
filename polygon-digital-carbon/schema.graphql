@@ -405,6 +405,9 @@ type CarbonPoolCreditBalance @entity {
   "Current balance"
   balance: BigInt!
 
+  "Current balance bridge to another chain"
+  crossChainSupply: BigInt!
+
   "LTD deposited amount"
   deposited: BigInt!
 
@@ -442,6 +445,9 @@ type CarbonPoolCreditBalanceDailySnapshot @entity {
   "Current balance"
   balance: BigInt!
 
+  "Current balance bridge to another chain"
+  crossChainSupply: BigInt!
+
   "Deposited amount"
   deposited: BigInt!
 
@@ -450,6 +456,9 @@ type CarbonPoolCreditBalanceDailySnapshot @entity {
 
   "Delta balance"
   deltaBalance: BigInt!
+
+  "Delta balance bridge to another chain"
+  deltaCrossChainSupply: BigInt!
 
   "Delta Redeemed"
   deltaRedeemed: BigInt!

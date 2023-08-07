@@ -76,6 +76,8 @@ dataSources:
           handler: handleDeposited
         - event: Redeemed(address,address,uint256)
           handler: handleRedeemed
+        - event: TCO2Bridged(indexed uint32,indexed address,uint256)
+          handler: handleToucanTCO2Bridged
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
   - kind: ethereum/contract
@@ -102,6 +104,8 @@ dataSources:
           handler: handleDeposited
         - event: Redeemed(address,address,uint256)
           handler: handleRedeemed
+        - event: TCO2Bridged(indexed uint32,indexed address,uint256)
+          handler: handleToucanTCO2Bridged
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
   # Toucan cross chain bridges

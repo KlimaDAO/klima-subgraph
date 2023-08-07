@@ -10,6 +10,11 @@ import { recordProvenance } from './utils/Provenance'
 import { saveRetire } from './utils/Retire'
 
 export function saveToucanRetirement(event: Retired): void {
+  // Disregard events with zero amount
+  if (event.params.tokenId == ZERO_BI) {
+    return
+  }
+
   let credit = loadCarbonCredit(event.address)
 
   credit.retired = credit.retired.plus(event.params.tokenId)
@@ -47,6 +52,11 @@ export function saveToucanRetirement(event: Retired): void {
 }
 
 export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
+  // Disregard events with zero amount
+  if (event.params.amount == ZERO_BI) {
+    return
+  }
+
   let credit = loadCarbonCredit(event.address)
 
   credit.retired = credit.retired.plus(event.params.amount)

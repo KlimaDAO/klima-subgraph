@@ -174,6 +174,9 @@ type CarbonCredit @entity {
   "All retirement events for this credit"
   retires: [Retire!]! @derivedFrom(field: "credit")
 
+  "Current pool balances for this credit"
+  poolBalances: [CarbonPoolCreditBalance!]! @derivedFrom(field: "credit")
+
   "Total provenance records for this credit"
   provenanceCount: Int!
 

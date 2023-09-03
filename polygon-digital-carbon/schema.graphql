@@ -104,6 +104,23 @@ type Ecosystem @entity {
   activeCredits: [Bytes!]!
 }
 
+type Epoch @entity {
+  "sKLIMA epoch number"
+  id: ID!
+
+  "Numeric field for sorting"
+  epoch: BigInt!
+
+  "Total active carbon credit supply"
+  creditSupply: BigInt!
+
+  "Change in active supply since last epoch"
+  deltaCreditSupply: BigInt!
+
+  "600 epoch credit supply SMA"
+  creditSMA: BigInt!
+}
+
 type Methodology @entity {
   id: ID!
 

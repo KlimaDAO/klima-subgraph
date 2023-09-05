@@ -1,6 +1,7 @@
 import { Address, BigInt } from '@graphprotocol/graph-ts'
 import { loadCarbonCredit } from './CarbonCredit'
 import { CarbonCreditSnapshot, Epoch } from '../../generated/schema'
+import { MCO2_ERC20_CONTRACT } from '../../../lib/utils/Constants'
 
 export function recordCarbonCreditSnapshot(
   token: Address,
@@ -20,7 +21,9 @@ export function recordCarbonCreditSnapshot(
   snapshot.createdAt = timestamp
   snapshot.save()
 
-  epoch.creditSupply = epoch.creditSupply.plus(credit.currentSupply).plus(credit.crossChainSupply)
-  epoch.save()
+  if (token != MCO2_ERC20_CONTRACT) {
+    epoch.creditSupply = epoch.creditSupply.plus(credit.currentSupply).plus(credit.crossChainSupply)
+    epoch.save()
+  }
   return epoch
 }

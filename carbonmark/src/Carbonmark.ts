@@ -1,0 +1,136 @@
+import { Bytes } from '@graphprotocol/graph-ts'
+import { ListingCancelled, ListingCreated, ListingFilled, ListingUpdated } from '../generated/Carbonmark/Carbonmark'
+import {
+  loadOrCreateActivity,
+  loadOrCreateListing,
+  loadOrCreateProject,
+  loadOrCreatePurchase,
+  loadOrCreateUser,
+} from './Entities'
+import { ZERO_BI } from '../../lib/utils/Decimals'
+
+export function handleListingCreated(event: ListingCreated): void {
+  // Ensure the user entity exists
+  loadOrCreateUser(event.params.account)
+  loadOrCreateUser(event.transaction.from)
+  loadOrCreateProject(event.params.token)
+
+  let listing = loadOrCreateListing(event.params.id.toHexString())
+  listing.totalAmountToSell = event.params.amount
+  listing.leftToSell = event.params.amount
+  listing.tokenAddress = event.params.token
+  listing.active = true
+  listing.deleted = false
+  listing.singleUnitPrice = event.params.price
+  listing.expiration = event.params.deadline
+  listing.minFillAmount = event.params.minFillAmount
+  listing.seller = event.params.account
+  listing.createdAt = event.block.timestamp
+  listing.updatedAt = event.block.timestamp
+  listing.save()
+
+  let activity = loadOrCreateActivity(event.transaction.hash.toHexString().concat('ListingCreated'))
+  activity.amount = event.params.amount
+  activity.price = event.params.price
+  activity.timeStamp = event.block.timestamp
+  activity.activityType = 'CreatedListing'
+  activity.user = event.params.account
+  activity.listing = listing.id
+  activity.seller = event.params.account
+  activity.save()
+}
+
+export function handleListingUpdated(event: ListingUpdated): void {
+  // User should already exist from creating the listing.
+
+  let listing = loadOrCreateListing(event.params.id.toHexString())
+  let activity = loadOrCreateActivity(event.transaction.hash.toHexString().concat('ListingUpdated'))
+
+  if (event.params.oldAmount != event.params.newAmount) {
+    listing.totalAmountToSell = event.params.newAmount
+    listing.leftToSell = event.params.newAmount
+    listing.updatedAt = event.block.timestamp
+
+    activity.activityType = 'UpdatedQuantity'
+    activity.previousAmount = event.params.oldAmount
+    activity.amount = event.params.newAmount
+    activity.timeStamp = event.block.timestamp
+    activity.seller = listing.seller
+  }
+
+  if (event.params.oldUnitPrice != event.params.newUnitPrice) {
+    listing.singleUnitPrice = event.params.newUnitPrice
+    listing.updatedAt = event.block.timestamp
+
+    activity.activityType = 'UpdatedPrice'
+    activity.price = event.params.newUnitPrice
+    activity.previousAmount = event.params.oldUnitPrice
+    activity.timeStamp = event.block.timestamp
+    activity.seller = listing.seller
+  }
+
+  listing.save()
+  activity.save()
+}
+
+export function handleListingFilled(event: ListingFilled): void {
+  // Ensure the buyer user entity exists
+  loadOrCreateUser(event.transaction.from)
+
+  let listing = loadOrCreateListing(event.params.id.toHexString())
+  let buyerActivty = loadOrCreateActivity(event.transaction.hash.toHexString().concat('Purchase'))
+  let sellerActivity = loadOrCreateActivity(event.transaction.hash.toHexString().concat('Sold'))
+
+  listing.leftToSell = listing.leftToSell.minus(event.params.amount)
+  if (listing.leftToSell == ZERO_BI) {
+    listing.active = false
+  }
+  listing.updatedAt = event.block.timestamp
+  listing.save()
+
+  buyerActivty.amount = event.params.amount
+  buyerActivty.price = listing.singleUnitPrice
+  buyerActivty.timeStamp = event.block.timestamp
+  buyerActivty.activityType = 'Purchase'
+  buyerActivty.user = event.transaction.from
+  buyerActivty.listing = listing.id
+  buyerActivty.seller = event.params.account
+  buyerActivty.buyer = event.transaction.from
+  buyerActivty.save()
+
+  sellerActivity.amount = event.params.amount
+  sellerActivity.price = listing.singleUnitPrice
+  sellerActivity.timeStamp = event.block.timestamp
+  sellerActivity.activityType = 'Sold'
+  sellerActivity.user = event.params.account
+  sellerActivity.listing = listing.id
+  sellerActivity.seller = event.params.account
+  sellerActivity.buyer = event.transaction.from
+  sellerActivity.save()
+
+  let purchase = loadOrCreatePurchase(event.transaction.hash)
+  purchase.price = listing.singleUnitPrice
+  purchase.amount = event.params.amount
+  purchase.timeStamp = event.block.timestamp
+  purchase.user = event.transaction.from
+  purchase.listing = listing.id
+  purchase.save()
+}
+
+export function handleListingCancelled(event: ListingCancelled): void {
+  let listing = loadOrCreateListing(event.params.id.toHexString())
+
+  listing.active = false
+  listing.deleted = true
+  listing.leftToSell = ZERO_BI
+  listing.updatedAt = event.block.timestamp
+  listing.save()
+
+  let activity = loadOrCreateActivity(event.transaction.hash.toHexString().concat('DeletedListing'))
+  activity.timeStamp = event.block.timestamp
+  activity.activityType = 'DeletedListing'
+  activity.user = event.transaction.from
+  activity.listing = listing.id
+  activity.seller = listing.seller
+  activity.save()
+}

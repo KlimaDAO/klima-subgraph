@@ -1,0 +1,32 @@
+specVersion: 0.0.4
+description: Carbonmark
+repository: https://github.com/KlimaDAO/klima-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Carbonmark
+    network: mumbai
+    source:
+      address: '0x5DC7083cD6Ff9A46C36661750faBcbB9aE2abed2'
+      abi: Carbonmark
+      startBlock: 39934330
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/Carbonmark.ts
+      entities:
+        - Carbonmark
+      abis:
+        - name: Carbonmark
+          file: ../lib/abis/Carbonmark.json
+      eventHandlers:
+        - event: ListingCreated(bytes32,address,address,uint256,uint256,uint256,uint256)
+          handler: handleListingCreated
+        - event: ListingUpdated(bytes32,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleListingUpdated
+        - event: ListingFilled(bytes32,address,uint256,uint256)
+          handler: handleListingFilled
+        - event: ListingCancelled(bytes32)
+          handler: handleListingCancelled

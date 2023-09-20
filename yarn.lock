@@ -1419,6 +1419,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"carbonmark@workspace:carbonmark":
+  version: 0.0.0-use.local
+  resolution: "carbonmark@workspace:carbonmark"
+  dependencies:
+    "@graphprotocol/graph-cli": 0.56.0
+    "@graphprotocol/graph-ts": 0.31.0
+    prettier: 2.7.1
+  languageName: unknown
+  linkType: soft
+
 "cardinal@npm:^2.1.1":
   version: 2.1.1
   resolution: "cardinal@npm:2.1.1"

@@ -18,19 +18,19 @@ type User @entity {
 type Project @entity {
   id: ID!
   key: String!
-  projectID: String!
-  projectType: String!
-  region: String!
+  # projectID: String!
+  # projectType: String!
+  # region: String!
   name: String!
   methodology: String!
   vintage: BigInt!
   projectAddress: Bytes!
-  registry: String!
+  # registry: String!
   #   #relationships
   activities: [Activity!] @derivedFrom(field: "project")
   listings: [Listing!] @derivedFrom(field: "project")
-  category: Category
-  country: Country
+  category: Category!
+  country: Country!
   updatedAt: BigInt
 }
 

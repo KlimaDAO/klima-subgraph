@@ -13,7 +13,7 @@ export function handleListingCreated(event: ListingCreated): void {
   // Ensure the user entity exists
   loadOrCreateUser(event.params.account)
   loadOrCreateUser(event.transaction.from)
-  loadOrCreateProject(event.params.token)
+  let project = loadOrCreateProject(event.params.token)
 
   let listing = loadOrCreateListing(event.params.id.toHexString())
   listing.totalAmountToSell = event.params.amount
@@ -24,6 +24,7 @@ export function handleListingCreated(event: ListingCreated): void {
   listing.singleUnitPrice = event.params.price
   listing.expiration = event.params.deadline
   listing.minFillAmount = event.params.minFillAmount
+  listing.project = project.id
   listing.seller = event.params.account
   listing.createdAt = event.block.timestamp
   listing.updatedAt = event.block.timestamp
@@ -52,6 +53,7 @@ export function handleListingUpdated(event: ListingUpdated): void {
     listing.updatedAt = event.block.timestamp
 
     activity.activityType = 'UpdatedQuantity'
+    activity.project = listing.project
     activity.previousAmount = event.params.oldAmount
     activity.amount = event.params.newAmount
     activity.timeStamp = event.block.timestamp
@@ -63,6 +65,7 @@ export function handleListingUpdated(event: ListingUpdated): void {
     listing.updatedAt = event.block.timestamp
 
     activity.activityType = 'UpdatedPrice'
+    activity.project = listing.project
     activity.price = event.params.newUnitPrice
     activity.previousAmount = event.params.oldUnitPrice
     activity.timeStamp = event.block.timestamp
@@ -92,6 +95,7 @@ export function handleListingFilled(event: ListingFilled): void {
   buyerActivty.price = listing.singleUnitPrice
   buyerActivty.timeStamp = event.block.timestamp
   buyerActivty.activityType = 'Purchase'
+  buyerActivty.project = listing.project
   buyerActivty.user = event.transaction.from
   buyerActivty.listing = listing.id
   buyerActivty.seller = event.params.account
@@ -102,6 +106,7 @@ export function handleListingFilled(event: ListingFilled): void {
   sellerActivity.price = listing.singleUnitPrice
   sellerActivity.timeStamp = event.block.timestamp
   sellerActivity.activityType = 'Sold'
+  sellerActivity.project = listing.project
   sellerActivity.user = event.params.account
   sellerActivity.listing = listing.id
   sellerActivity.seller = event.params.account
@@ -129,6 +134,7 @@ export function handleListingCancelled(event: ListingCancelled): void {
   let activity = loadOrCreateActivity(event.transaction.hash.toHexString().concat('DeletedListing'))
   activity.timeStamp = event.block.timestamp
   activity.activityType = 'DeletedListing'
+  activity.project = listing.project
   activity.user = event.transaction.from
   activity.listing = listing.id
   activity.seller = listing.seller

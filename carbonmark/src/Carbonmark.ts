@@ -8,6 +8,7 @@ import {
   loadOrCreateUser,
 } from './Entities'
 import { ZERO_BI } from '../../lib/utils/Decimals'
+import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 
 export function handleListingCreated(event: ListingCreated): void {
   // Ensure the user entity exists
@@ -35,6 +36,7 @@ export function handleListingCreated(event: ListingCreated): void {
   activity.price = event.params.price
   activity.timeStamp = event.block.timestamp
   activity.activityType = 'CreatedListing'
+  activity.project = listing.project
   activity.user = event.params.account
   activity.listing = listing.id
   activity.seller = event.params.account
@@ -54,20 +56,27 @@ export function handleListingUpdated(event: ListingUpdated): void {
 
     activity.activityType = 'UpdatedQuantity'
     activity.project = listing.project
+    activity.user = event.transaction.from
     activity.previousAmount = event.params.oldAmount
     activity.amount = event.params.newAmount
     activity.timeStamp = event.block.timestamp
     activity.seller = listing.seller
+    activity.save()
   }
 
   if (event.params.oldUnitPrice != event.params.newUnitPrice) {
+    if (activity.seller != ZERO_ADDRESS) {
+      activity = loadOrCreateActivity(event.transaction.hash.toHexString().concat('ListingUpdated2'))
+    }
+
     listing.singleUnitPrice = event.params.newUnitPrice
     listing.updatedAt = event.block.timestamp
 
     activity.activityType = 'UpdatedPrice'
     activity.project = listing.project
+    activity.user = event.transaction.from
     activity.price = event.params.newUnitPrice
-    activity.previousAmount = event.params.oldUnitPrice
+    activity.previousPrice = event.params.oldUnitPrice
     activity.timeStamp = event.block.timestamp
     activity.seller = listing.seller
   }
@@ -98,7 +107,7 @@ export function handleListingFilled(event: ListingFilled): void {
   buyerActivty.project = listing.project
   buyerActivty.user = event.transaction.from
   buyerActivty.listing = listing.id
-  buyerActivty.seller = event.params.account
+  buyerActivty.seller = listing.seller
   buyerActivty.buyer = event.transaction.from
   buyerActivty.save()
 
@@ -109,7 +118,7 @@ export function handleListingFilled(event: ListingFilled): void {
   sellerActivity.project = listing.project
   sellerActivity.user = event.params.account
   sellerActivity.listing = listing.id
-  sellerActivity.seller = event.params.account
+  sellerActivity.seller = listing.seller
   sellerActivity.buyer = event.transaction.from
   sellerActivity.save()
 

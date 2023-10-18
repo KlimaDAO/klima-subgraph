@@ -8,10 +8,12 @@ export function loadOrCreateProject(token: Address): Project {
   // Find the project + vintage ID from token address
   let tokenAddress = token.toHexString()
   let id = ''
+  let registry = ''
   let projectIndex = 0
   for (let i = 0; i < PROJECT_INFO.length; i++) {
     if (tokenAddress == PROJECT_INFO[i][0]) {
       id = PROJECT_INFO[i][1] + '-' + PROJECT_INFO[i][2]
+      registry = PROJECT_INFO[i][1].split('-')[0]
       projectIndex = i
       break
     }
@@ -29,7 +31,7 @@ export function loadOrCreateProject(token: Address): Project {
     project.methodology = PROJECT_INFO[projectIndex][4]
     project.vintage = BigInt.fromString(PROJECT_INFO[projectIndex][2])
     project.projectAddress = token
-    // project.registry = 'VCS'
+    project.registry = registry
     project.category = PROJECT_INFO[projectIndex][5]
     project.country = PROJECT_INFO[projectIndex][6]
     project.save()

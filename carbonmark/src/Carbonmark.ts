@@ -1,4 +1,3 @@
-import { Bytes } from '@graphprotocol/graph-ts'
 import { ListingCancelled, ListingCreated, ListingFilled, ListingUpdated } from '../generated/Carbonmark/Carbonmark'
 import {
   loadOrCreateActivity,
@@ -53,6 +52,7 @@ export function handleListingUpdated(event: ListingUpdated): void {
     listing.totalAmountToSell = event.params.newAmount
     listing.leftToSell = event.params.newAmount
     listing.updatedAt = event.block.timestamp
+    listing.expiration = event.params.newDeadline
 
     activity.activityType = 'UpdatedQuantity'
     activity.project = listing.project
@@ -71,6 +71,7 @@ export function handleListingUpdated(event: ListingUpdated): void {
 
     listing.singleUnitPrice = event.params.newUnitPrice
     listing.updatedAt = event.block.timestamp
+    listing.expiration = event.params.newDeadline
 
     activity.activityType = 'UpdatedPrice'
     activity.project = listing.project

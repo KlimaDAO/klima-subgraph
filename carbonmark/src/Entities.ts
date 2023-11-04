@@ -24,9 +24,6 @@ export function loadOrCreateProject(token: Address): Project {
   if (project == null) {
     project = new Project(id)
     project.key = PROJECT_INFO[projectIndex][1]
-    // project.projectID = '981'
-    // project.projectType = ''
-    // project.region = ''
     project.name = PROJECT_INFO[projectIndex][3]
     project.methodology = PROJECT_INFO[projectIndex][4]
     project.vintage = BigInt.fromString(PROJECT_INFO[projectIndex][2])

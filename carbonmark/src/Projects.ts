@@ -3448,4 +3448,23 @@ export const PROJECT_INFO = [
     'Renewable Energy',
     'China',
   ],
+  // Mumbai
+  [
+    '0x51298f2f1142ecb129a2db5e6afd24f34f2e53f1',
+    'ICR-78040',
+    '2021',
+    'A New Development Project',
+    'VM0034',
+    'Other',
+    'Iceland',
+  ],
+  [
+    '0xecf4a1b92a463c843cdcb7cb7a2f2ddfe07651bb',
+    'VCS-725',
+    '2007',
+    'Shibeishan Wind Power Generation Project in Huilai County, Guangdong Province',
+    'ACM0002',
+    'Renewable Energy',
+    'China',
+  ],
 ]

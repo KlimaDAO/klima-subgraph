@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Carbonmark
-    network: matic
+    network: mumbai
     source:
-      address: '0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821'
+      address: '0xD973F90a4C49607EABeFdb2C45d4F39436c7e7fA'
       abi: Carbonmark
-      startBlock: 49503672
+      startBlock: 42480600
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

@@ -2,7 +2,7 @@ import { Activity, Category, Country, Listing, Project, Purchase, User } from '.
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
-import { PROJECT_INFO } from './Projects'
+import { PROJECT_INFO_MUMBAI } from './Projects'
 
 export function loadOrCreateProject(token: Address): Project {
   // Find the project + vintage ID from token address
@@ -10,10 +10,10 @@ export function loadOrCreateProject(token: Address): Project {
   let id = ''
   let registry = ''
   let projectIndex = 0
-  for (let i = 0; i < PROJECT_INFO.length; i++) {
-    if (tokenAddress == PROJECT_INFO[i][0]) {
-      id = PROJECT_INFO[i][1] + '-' + PROJECT_INFO[i][2]
-      registry = PROJECT_INFO[i][1].split('-')[0]
+  for (let i = 0; i < PROJECT_INFO_MUMBAI.length; i++) {
+    if (tokenAddress == PROJECT_INFO_MUMBAI[i][0]) {
+      id = PROJECT_INFO_MUMBAI[i][1] + '-' + PROJECT_INFO_MUMBAI[i][2]
+      registry = PROJECT_INFO_MUMBAI[i][1].split('-')[0]
       projectIndex = i
       break
     }
@@ -23,14 +23,14 @@ export function loadOrCreateProject(token: Address): Project {
 
   if (project == null) {
     project = new Project(id)
-    project.key = PROJECT_INFO[projectIndex][1]
-    project.name = PROJECT_INFO[projectIndex][3]
-    project.methodology = PROJECT_INFO[projectIndex][4]
-    project.vintage = BigInt.fromString(PROJECT_INFO[projectIndex][2])
+    project.key = PROJECT_INFO_MUMBAI[projectIndex][1]
+    project.name = PROJECT_INFO_MUMBAI[projectIndex][3]
+    project.methodology = PROJECT_INFO_MUMBAI[projectIndex][4]
+    project.vintage = BigInt.fromString(PROJECT_INFO_MUMBAI[projectIndex][2])
     project.projectAddress = token
     project.registry = registry
-    project.category = PROJECT_INFO[projectIndex][5]
-    project.country = PROJECT_INFO[projectIndex][6]
+    project.category = PROJECT_INFO_MUMBAI[projectIndex][5]
+    project.country = PROJECT_INFO_MUMBAI[projectIndex][6]
     project.save()
 
     createCountry(project.country)

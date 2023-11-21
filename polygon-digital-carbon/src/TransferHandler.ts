@@ -18,7 +18,7 @@ export function handleCreditTransfer(event: Transfer): void {
   // Ignore transfers of zero value
   if (event.params.value == ZERO_BI) return
 
-  if (event.address == MCO2_ERC20_CONTRACT) loadOrCreateCarbonCredit(MCO2_ERC20_CONTRACT, 'MOSS')
+  if (event.address == MCO2_ERC20_CONTRACT) loadOrCreateCarbonCredit(MCO2_ERC20_CONTRACT, 'MOSS', null)
   let credit = loadCarbonCredit(event.address)
 
   if (event.params.from == ZERO_ADDRESS) {

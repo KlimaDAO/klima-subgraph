@@ -143,7 +143,7 @@ export function handleMossRetirement(event: CarbonOffset): void {
   // Don't process zero amount events
   if (event.params.carbonTon == ZERO_BI) return
 
-  let credit = loadOrCreateCarbonCredit(MCO2_ERC20_CONTRACT, 'MOSS')
+  let credit = loadOrCreateCarbonCredit(MCO2_ERC20_CONTRACT, 'MOSS', null)
 
   // Set up project/default info for Moss "project"
 

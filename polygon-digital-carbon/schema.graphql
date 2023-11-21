@@ -161,8 +161,14 @@ type CarbonProject @entity {
 }
 
 type CarbonCredit @entity {
-  "Ethereum address where the token is deployed"
+  "{tokenAddress}-{tokenId} concatenated. If no tokenId, then just the tokenAddress."
   id: Bytes!
+
+  "Ethereum address where the token is deployed"
+  tokenAddress: Bytes!
+
+  "Token ID for the credit vintage (if applicable)"
+  tokenId: BigInt
 
   "Protocol used to bridge the tons"
   bridgeProtocol: BridgeProtocol!

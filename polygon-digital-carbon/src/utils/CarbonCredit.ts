@@ -1,4 +1,4 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
 import { stdYearFromTimestamp } from '../../../lib/utils/Dates'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 import { C3ProjectToken } from '../../generated/templates/C3ProjectToken/C3ProjectToken'
@@ -7,10 +7,17 @@ import { ToucanCarbonOffsets } from '../../generated/templates/ToucanCarbonOffse
 import { loadOrCreateCarbonProject } from './CarbonProject'
 import { MethodologyCategories } from './MethodologyCategories'
 
-export function loadOrCreateCarbonCredit(tokenAddress: Address, bridge: string): CarbonCredit {
-  let credit = CarbonCredit.load(tokenAddress)
+export function loadOrCreateCarbonCredit(tokenAddress: Address, bridge: string, tokenId: BigInt | null): CarbonCredit {
+  let id = Bytes.fromHexString(tokenAddress.toHexString())
+
+  if (tokenId !== null) {
+    id = Bytes.fromHexString(tokenAddress.toHexString()).concatI32(tokenId.toI32())
+  }
+
+  let credit = CarbonCredit.load(id)
   if (credit == null) {
-    credit = new CarbonCredit(tokenAddress)
+    credit = new CarbonCredit(id)
+    credit.tokenAddress = tokenAddress
     credit.bridgeProtocol = bridge
     credit.project = ''
     credit.vintage = 1970

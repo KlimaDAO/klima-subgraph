@@ -43,6 +43,7 @@ export function saveToucanRetirement(event: Retired): void {
   recordProvenance(
     event.transaction.hash,
     event.address,
+    null,
     event.params.sender,
     ZERO_ADDRESS,
     'RETIREMENT',
@@ -85,6 +86,7 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
   recordProvenance(
     event.transaction.hash,
     event.address,
+    null,
     event.params.sender,
     ZERO_ADDRESS,
     'RETIREMENT',
@@ -129,6 +131,7 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   recordProvenance(
     event.transaction.hash,
     projectAddress,
+    null,
     event.params.sender,
     ZERO_ADDRESS,
     'RETIREMENT',

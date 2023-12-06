@@ -35,8 +35,7 @@ export function saveToucanRetirement(event: Retired): void {
     '',
     event.transaction.from,
     '',
-    event.block.timestamp,
-    null
+    event.block.timestamp
   )
 
   incrementAccountRetirements(event.transaction.from)
@@ -125,8 +124,7 @@ export function handleVCUOMinted(event: VCUOMinted): void {
     '',
     event.transaction.from,
     '',
-    event.block.timestamp,
-    null
+    event.block.timestamp
   )
 
   recordProvenance(
@@ -204,7 +202,8 @@ export function saveICRRetirement(event: RetiredVintage): void {
     event.transaction.from,
     '',
     event.block.timestamp,
-    event.params.nftTokenId.toString()
+    event.params.nftTokenId.toString(),
+    event.params.data.toString()
   )
 
   incrementAccountRetirements(event.transaction.from)

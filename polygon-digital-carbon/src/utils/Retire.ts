@@ -12,7 +12,8 @@ export function saveRetire(
   retiringAddress: Address,
   retiringName: string,
   timestamp: BigInt,
-  bridgeID: string | null
+  bridgeID: string | null = null,
+  message: string = ''
 ): void {
   let retire = new Retire(id)
   retire.credit = credit
@@ -21,7 +22,7 @@ export function saveRetire(
   retire.amount = amount
   retire.beneficiaryAddress = beneficiary
   retire.beneficiaryName = beneficiaryName
-  retire.retirementMessage = ''
+  retire.retirementMessage = message
   retire.retiringAddress = retiringAddress
   retire.retiringName = retiringName
   retire.timestamp = timestamp

@@ -27,7 +27,7 @@ export function saveToucanRetirement(event: Retired): void {
 
   saveRetire(
     event.transaction.from.concatI32(sender.totalRetirements),
-    event.address,
+    credit.id,
     ZERO_ADDRESS,
     'OTHER',
     event.params.tokenId,
@@ -70,7 +70,7 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
 
   saveRetire(
     event.transaction.from.concatI32(sender.totalRetirements),
-    event.address,
+    credit.id,
     ZERO_ADDRESS,
     'OTHER',
     event.params.amount,
@@ -195,7 +195,7 @@ export function saveICRRetirement(event: RetiredVintage): void {
 
   saveRetire(
     event.transaction.from.concatI32(sender.totalRetirements),
-    event.address,
+    credit.id,
     ZERO_ADDRESS,
     'OTHER',
     event.params.amount,

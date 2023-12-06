@@ -3,7 +3,7 @@ import { Retire } from '../../generated/schema'
 
 export function saveRetire(
   id: Bytes,
-  credit: Address,
+  credit: Bytes,
   pool: Address,
   source: string,
   amount: BigInt,

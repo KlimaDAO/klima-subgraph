@@ -13,7 +13,7 @@ import {
 import { loadOrCreateHolding } from './utils/Holding'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { loadOrCreateAccount } from './utils/Account'
-import { saveToucanRetirement, saveToucanRetirement_1_4_0 } from './RetirementHandler'
+import { saveICRRetirement, saveToucanRetirement, saveToucanRetirement_1_4_0 } from './RetirementHandler'
 import { saveBridge } from './utils/Bridge'
 import { CarbonCredit, CrossChainBridge } from '../generated/schema'
 import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/CarbonPool'
@@ -105,7 +105,12 @@ export function handle1155CreditTransferBatch(event: TransferBatch): void {
   }
 }
 
-export function handleICRRetired(event: RetiredVintage): void {}
+export function handleICRRetired(event: RetiredVintage): void {
+  // Ignore retirements of zero value
+  if (event.params.amount == ZERO_BI) return
+
+  saveICRRetirement(event)
+}
 
 export function handleExPostCreated(event: ExPostCreated): void {
   updateICRCredit(event.address, event.params.tokenId, event.params.verificationPeriodStart)

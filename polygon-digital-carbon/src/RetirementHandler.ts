@@ -2,6 +2,7 @@ import { MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { C3OffsetNFT, VCUOMinted } from '../generated/C3-Offset/C3OffsetNFT'
 import { CarbonOffset } from '../generated/MossCarbonOffset/CarbonChain'
+import { RetiredVintage } from '../generated/templates/ICRProjectToken/ICRProjectToken'
 import { Retired, Retired1 as Retired_1_4_0 } from '../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
 import { incrementAccountRetirements, loadOrCreateAccount } from './utils/Account'
 import { loadCarbonCredit, loadOrCreateCarbonCredit } from './utils/CarbonCredit'
@@ -182,4 +183,40 @@ export function handleMossRetirement(event: CarbonOffset): void {
   incrementAccountRetirements(event.transaction.from)
 }
 
-// export function handleMossRetirementToMainnet(): void {}
+export function saveICRRetirement(event: RetiredVintage): void {
+  let credit = loadOrCreateCarbonCredit(event.address, 'ICR', event.params.tokenId)
+
+  credit.retired = credit.retired.plus(event.params.amount)
+  credit.save()
+
+  // Ensure account entities are created for all addresses
+  loadOrCreateAccount(event.params.account)
+  let sender = loadOrCreateAccount(event.transaction.from)
+
+  saveRetire(
+    event.transaction.from.concatI32(sender.totalRetirements),
+    event.address,
+    ZERO_ADDRESS,
+    'OTHER',
+    event.params.amount,
+    event.params.account,
+    '',
+    event.transaction.from,
+    '',
+    event.block.timestamp,
+    event.params.nftTokenId.toString()
+  )
+
+  incrementAccountRetirements(event.transaction.from)
+
+  recordProvenance(
+    event.transaction.hash,
+    event.address,
+    event.params.tokenId,
+    event.params.account,
+    ZERO_ADDRESS,
+    'RETIREMENT',
+    event.params.amount,
+    event.block.timestamp
+  )
+}

@@ -422,6 +422,8 @@ dataSources:
       eventHandlers:
         - event: CarbonRetired(uint8,indexed address,string,indexed address,string,string,indexed address,address,uint256)
           handler: handleCarbonRetired
+        - event: CarbonRetired(uint8,indexed address,string,indexed address,string,string,indexed address,address,uint256,uint256)
+          handler: handleCarbonRetiredWithTokenId
   # Track KLIMA rebases for creating supply snapshot
   - kind: ethereum/contract
     name: sKlimaERC20V1

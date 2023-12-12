@@ -322,6 +322,9 @@ type Retire @entity {
   "Retiree description"
   retiringName: String!
 
+  "Transaction hash of the retirement"
+  hash: Bytes!
+
   "Block timestamp of retirement"
   timestamp: BigInt!
 

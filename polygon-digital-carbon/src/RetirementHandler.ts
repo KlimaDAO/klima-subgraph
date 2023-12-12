@@ -1,4 +1,4 @@
-import { MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
+import { KLIMA_INFINITY_DIAMOND, MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { C3OffsetNFT, VCUOMinted } from '../generated/C3-Offset/C3OffsetNFT'
 import { CarbonOffset } from '../generated/MossCarbonOffset/CarbonChain'
@@ -35,7 +35,8 @@ export function saveToucanRetirement(event: Retired): void {
     '',
     event.transaction.from,
     '',
-    event.block.timestamp
+    event.block.timestamp,
+    event.transaction.hash
   )
 
   incrementAccountRetirements(event.transaction.from)
@@ -44,7 +45,7 @@ export function saveToucanRetirement(event: Retired): void {
     event.transaction.hash,
     event.address,
     null,
-    event.params.sender,
+    event.transaction.to === KLIMA_INFINITY_DIAMOND ? KLIMA_INFINITY_DIAMOND : event.params.sender,
     ZERO_ADDRESS,
     'RETIREMENT',
     event.params.tokenId,
@@ -78,6 +79,7 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
     event.transaction.from,
     '',
     event.block.timestamp,
+    event.transaction.hash,
     event.params.eventId.toString()
   )
 
@@ -87,7 +89,7 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
     event.transaction.hash,
     event.address,
     null,
-    event.params.sender,
+    event.transaction.to === KLIMA_INFINITY_DIAMOND ? KLIMA_INFINITY_DIAMOND : event.params.sender,
     ZERO_ADDRESS,
     'RETIREMENT',
     event.params.amount,
@@ -124,14 +126,15 @@ export function handleVCUOMinted(event: VCUOMinted): void {
     '',
     event.transaction.from,
     '',
-    event.block.timestamp
+    event.block.timestamp,
+    event.transaction.hash
   )
 
   recordProvenance(
     event.transaction.hash,
     projectAddress,
     null,
-    event.params.sender,
+    event.transaction.to === KLIMA_INFINITY_DIAMOND ? KLIMA_INFINITY_DIAMOND : event.params.sender,
     ZERO_ADDRESS,
     'RETIREMENT',
     retireAmount,
@@ -175,7 +178,7 @@ export function handleMossRetirement(event: CarbonOffset): void {
     event.transaction.from,
     '',
     event.block.timestamp,
-    null
+    event.transaction.hash
   )
 
   incrementAccountRetirements(event.transaction.from)
@@ -202,6 +205,7 @@ export function saveICRRetirement(event: RetiredVintage): void {
     event.transaction.from,
     '',
     event.block.timestamp,
+    event.transaction.hash,
     event.params.nftTokenId.toString(),
     event.params.data.toString()
   )
@@ -212,7 +216,7 @@ export function saveICRRetirement(event: RetiredVintage): void {
     event.transaction.hash,
     event.address,
     event.params.tokenId,
-    event.params.account,
+    event.transaction.to === KLIMA_INFINITY_DIAMOND ? KLIMA_INFINITY_DIAMOND : event.params.account,
     ZERO_ADDRESS,
     'RETIREMENT',
     event.params.amount,

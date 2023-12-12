@@ -12,6 +12,7 @@ export function saveRetire(
   retiringAddress: Address,
   retiringName: string,
   timestamp: BigInt,
+  hash: Bytes,
   bridgeID: string | null = null,
   message: string = ''
 ): void {
@@ -26,6 +27,7 @@ export function saveRetire(
   retire.retiringAddress = retiringAddress
   retire.retiringName = retiringName
   retire.timestamp = timestamp
+  retire.hash = hash
   if (bridgeID !== null) retire.bridgeID = bridgeID
   retire.save()
 }

@@ -1,5 +1,5 @@
 import { VERRA_PROJECT_NAMES } from '../../../lib/utils/VerraProjectInfo'
-import { ICR_PROJECT_NAMES } from '../../../lib/utils/ICRProjectIfno'
+import { ICR_PROJECT_NAMES } from '../../../lib/utils/ICRProjectInfo'
 
 import { CarbonProject } from '../../generated/schema'
 

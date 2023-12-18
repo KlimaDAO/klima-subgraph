@@ -1,4 +1,5 @@
 import { VERRA_PROJECT_NAMES } from '../../../lib/utils/VerraProjectInfo'
+import { ICR_PROJECT_NAMES } from '../../../lib/utils/ICRProjectIfno'
 
 import { CarbonProject } from '../../generated/schema'
 
@@ -20,6 +21,16 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
         if (projectID == VERRA_PROJECT_NAMES[i][0]) {
           project.name = VERRA_PROJECT_NAMES[i][1]
           project.country = VERRA_PROJECT_NAMES[i][2]
+          break
+        }
+      }
+    }
+
+    if (registry == 'ICR') {
+      for (let i = 0; i < ICR_PROJECT_NAMES.length; i++) {
+        if (projectID == ICR_PROJECT_NAMES[i][0]) {
+          project.name = ICR_PROJECT_NAMES[i][1]
+          project.country = ICR_PROJECT_NAMES[i][2]
           break
         }
       }

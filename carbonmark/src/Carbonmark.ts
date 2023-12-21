@@ -8,6 +8,7 @@ import {
 } from './Entities'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
+import { ERC20 } from '../generated/Carbonmark/ERC20'
 
 export function handleListingCreated(event: ListingCreated): void {
   // Ensure the user entity exists
@@ -16,6 +17,9 @@ export function handleListingCreated(event: ListingCreated): void {
   let project = loadOrCreateProject(event.params.token)
 
   let listing = loadOrCreateListing(event.params.id.toHexString())
+
+  let tokenContract = ERC20.bind(event.params.token)
+
   listing.totalAmountToSell = event.params.amount
   listing.leftToSell = event.params.amount
   listing.tokenAddress = event.params.token
@@ -28,6 +32,8 @@ export function handleListingCreated(event: ListingCreated): void {
   listing.seller = event.params.account
   listing.createdAt = event.block.timestamp
   listing.updatedAt = event.block.timestamp
+  listing.tokenSymbol = tokenContract.symbol()
+
   listing.save()
 
   let activity = loadOrCreateActivity(event.transaction.hash.toHexString().concat('ListingCreated'))

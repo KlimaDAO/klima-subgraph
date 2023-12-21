@@ -21,6 +21,8 @@ dataSources:
       abis:
         - name: Carbonmark
           file: ../lib/abis/Carbonmark.json
+        - name: ERC20
+          file: ../lib/abis/ERC20.json
       eventHandlers:
         - event: ListingCreated(bytes32,address,address,uint256,uint256,uint256,uint256,uint256)
           handler: handleListingCreated

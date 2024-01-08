@@ -5,6 +5,7 @@ import { loadOrCreateCarbonCredit } from '../utils/CarbonCredit'
 import { loadOrCreateCarbonProject } from '../utils/CarbonProject'
 import { MethodologyCategories } from '../utils/MethodologyCategories'
 import { Address, BigInt, log } from '@graphprotocol/graph-ts'
+import { ICR_PROJECT_INFO } from '../../../lib/utils/ICRProjectInfo'
 
 export function handleNewICC(event: ProjectCreated): void {
   // Start indexing the C3T tokens; `event.params.tokenAddress` is the
@@ -13,11 +14,17 @@ export function handleNewICC(event: ProjectCreated): void {
   ICRProjectToken.create(event.params.projectAddress)
 
   let project = loadOrCreateCarbonProject('ICR', event.params.projectId.toString())
-  // let projectCall = TokenCall.bind(event.params.projectAddress)
 
-  project.name = event.params.projectName
-  //   project.methodologies = projectCall.methodology()
-  //   project.category = MethodologyCategories.getMethodologyCategory(project.methodologies)
+  for (let i = 0; i < ICR_PROJECT_INFO.length; i++) {
+    if (event.params.projectAddress.toHexString().toLowerCase() == ICR_PROJECT_INFO[i][0]) {
+      project.id = ICR_PROJECT_INFO[i][1]
+      project.name = ICR_PROJECT_INFO[i][2]
+      project.methodologies = ICR_PROJECT_INFO[i][4]
+      project.category = ICR_PROJECT_INFO[i][5]
+      project.country = ICR_PROJECT_INFO[i][6]
+      break
+    }
+  }
   project.save()
 
   // Load a default credit with ID 0 for future use

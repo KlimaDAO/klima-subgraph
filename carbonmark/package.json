@@ -4,6 +4,7 @@
   "repository": "https://github.com/KlimaDAO/klima-subgraphs/carbonmark",
   "license": "MIT",
   "scripts": {
+    "updateICR": "ts-node src/scripts/updateICRProjects.ts",
     "codegen": "rm -rf ./generated && graph codegen",
     "build": "graph build",
     "create-local": "graph create --node http://127.0.0.1:8020 carbonmark",
@@ -19,7 +20,9 @@
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.56.0",
     "@graphprotocol/graph-ts": "0.31.0",
-    "prettier": "2.7.1"
+    "dotenv": "16.3.1",
+    "prettier": "2.7.1",
+    "ts-node": "10.9.2"
   },
   "private": true
 }

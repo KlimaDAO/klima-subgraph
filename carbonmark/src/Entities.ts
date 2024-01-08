@@ -66,6 +66,7 @@ export function loadOrCreateListing(id: string): Listing {
     listing.seller = ZERO_ADDRESS
     listing.createdAt = ZERO_BI
     listing.updatedAt = ZERO_BI
+    listing.tokenSymbol = ''
     listing.save()
   }
   return listing

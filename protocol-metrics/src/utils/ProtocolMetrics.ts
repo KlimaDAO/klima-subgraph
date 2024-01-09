@@ -74,6 +74,7 @@ export function loadOrCreateProtocolMetric(timestamp: BigInt): ProtocolMetric {
     protocolMetric.daoBalanceUSDC = BigDecimal.fromString('0')
     protocolMetric.daoBalanceKLIMA = BigDecimal.fromString('0')
     protocolMetric.treasuryBalanceUSDC = BigDecimal.fromString('0')
+    protocolMetric.treasuryBalanceKLIMA = BigDecimal.fromString('0')
     protocolMetric.treasuryUSDCInLP = BigDecimal.fromString('0')
     protocolMetric.totalSupply = BigDecimal.fromString('0')
     protocolMetric.klimaPrice = BigDecimal.fromString('0')
@@ -159,9 +160,13 @@ function getSklimaSupply(transaction: Transaction): BigDecimal {
 }
 
 function updateTreasuryAssets(transaction: Transaction): string[] {
-  //USDC
+  // USDC
   let usdcERC20 = ERC20.bind(USDC_ERC20_CONTRACT)
   let treasuryUSDC = loadOrCreateTreasuryAsset(transaction.timestamp, USDC_ERC20_CONTRACT.toHexString())
+
+  // KLIMA
+  let klimaERC20 = ERC20.bind(KLIMA_ERC20_V1_CONTRACT)
+  let treasuryKLIMA = loadOrCreateTreasuryAsset(transaction.timestamp, KLIMA_ERC20_V1_CONTRACT.toHexString())
 
   // BCT
   let bctERC20 = ERC20.bind(BCT_ERC20_CONTRACT)
@@ -186,6 +191,7 @@ function updateTreasuryAssets(transaction: Transaction): string[] {
   // Treasury token balance
   treasuryUSDC.tokenBalance = toDecimal(usdcERC20.balanceOf(TREASURY_ADDRESS), 6)
   treasuryBCT.tokenBalance = toDecimal(bctERC20.balanceOf(TREASURY_ADDRESS), 18)
+  treasuryKLIMA.tokenBalance = toDecimal(klimaERC20.balanceOf(TREASURY_ADDRESS), 9)
 
   if (transaction.blockNumber.gt(NCT_USDC_PAIR_BLOCK)) {
     treasuryNCT.tokenBalance = toDecimal(nctERC20.balanceOf(TREASURY_ADDRESS), 18)
@@ -229,6 +235,8 @@ function updateTreasuryAssets(transaction: Transaction): string[] {
 
   // Get market value if pools are deployed
   treasuryUSDC.marketValue = treasuryUSDC.tokenBalance
+  treasuryKLIMA.marketValue = treasuryKLIMA.tokenBalance * klimaUsdPrice
+
   if (transaction.blockNumber.gt(BCT_USDC_PAIR_BLOCK)) {
     treasuryBCT.marketValue = treasuryBCT.tokenBalance.times(bctUsdPrice)
   }
@@ -250,6 +258,7 @@ function updateTreasuryAssets(transaction: Transaction): string[] {
   }
 
   treasuryUSDC.save()
+  treasuryKLIMA.save()
   treasuryBCT.save()
   treasuryNCT.save()
   treasuryMCO2.save()
@@ -434,6 +443,7 @@ function updateTreasuryAssets(transaction: Transaction): string[] {
 
   return [
     treasuryUSDC.id,
+    treasuryKLIMA.id,
     treasuryBCT.id,
     treasuryMCO2.id,
     treasuryUBO.id,
@@ -605,47 +615,50 @@ export function getKlimaIndex(): BigDecimal {
 export function updateProtocolMetrics(transaction: Transaction): void {
   let pm = loadOrCreateProtocolMetric(transaction.timestamp)
 
-  //Total Supply
+  // Total Supply
   pm.totalSupply = getTotalSupply()
 
-  //Circ Supply
+  // Circ Supply
   pm.klimaCirculatingSupply = getCirculatingSupply(transaction, pm.totalSupply)
 
-  // //Index
+  // Index
   pm.klimaIndex = getKlimaIndex()
 
-  //Total Klima in LP
+  // Total Klima in LP
   pm.totalKlimaInLP = getKlimaAmountFromLP(transaction)
 
-  //sKlima Supply
+  // sKlima Supply
   pm.sKlimaCirculatingSupply = getSklimaSupply(transaction)
 
-  //Total Klima unstaked
+  // Total Klima unstaked
   pm.totalKlimaUnstaked = pm.totalSupply.minus(pm.totalKlimaInLP).minus(pm.sKlimaCirculatingSupply)
 
   const klimaToken = new KLIMA()
-  //KLIMA Price
+  // KLIMA Price
   if (transaction.blockNumber.gt(KLIMA_BCT_PAIR_BLOCK)) {
     pm.klimaPrice = klimaToken.getUSDPrice(transaction.blockNumber)
   }
 
-  //DAO KLIMA Balance
+  // DAO KLIMA Balance
   pm.daoBalanceKLIMA = klimaToken.getAddressBalance(DAO_MULTISIG)
 
   const usdcToken = new USDC()
-  //DAO USDC Balance
+  // DAO USDC Balance
   pm.daoBalanceUSDC = usdcToken.getAddressBalance(DAO_MULTISIG)
 
-  //Treasury USDC Balance
+  // Treasury KLIMA Balance
+  pm.treasuryBalanceKLIMA = klimaToken.getAddressBalance(TREASURY_ADDRESS)
+
+  // Treasury USDC Balance
   pm.treasuryBalanceUSDC = usdcToken.getAddressBalance(TREASURY_ADDRESS)
 
-  //USDC Balance in LP
+  // USDC Balance in LP
   pm.treasuryUSDCInLP = getUSDCAmountFromLP(transaction)
 
-  //KLIMA Market Cap
+  // KLIMA Market Cap
   pm.marketCap = pm.klimaCirculatingSupply.times(pm.klimaPrice)
 
-  //Total Value Locked
+  // Total Value Locked
   pm.totalValueLocked = pm.sKlimaCirculatingSupply.times(pm.klimaPrice)
 
   // Update Treasury Assets

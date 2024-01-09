@@ -19,9 +19,9 @@ export function handleNewICC(event: ProjectCreated): void {
     if (event.params.projectAddress.toHexString().toLowerCase() == ICR_PROJECT_INFO[i][0]) {
       project.id = ICR_PROJECT_INFO[i][1]
       project.name = ICR_PROJECT_INFO[i][2]
-      project.methodologies = ICR_PROJECT_INFO[i][4]
-      project.category = ICR_PROJECT_INFO[i][5]
-      project.country = ICR_PROJECT_INFO[i][6]
+      project.methodologies = ICR_PROJECT_INFO[i][3]
+      project.category = ICR_PROJECT_INFO[i][4]
+      project.country = ICR_PROJECT_INFO[i][5]
       break
     }
   }

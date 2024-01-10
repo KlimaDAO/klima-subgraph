@@ -7,7 +7,7 @@ import { Retired, Retired1 as Retired_1_4_0 } from '../generated/templates/Touca
 import { incrementAccountRetirements, loadOrCreateAccount } from './utils/Account'
 import { loadCarbonCredit, loadOrCreateCarbonCredit } from './utils/CarbonCredit'
 import { loadOrCreateCarbonProject } from './utils/CarbonProject'
-import { recordProvenance } from './utils/Provenance'
+import { recordProvenance, updateProvenanceForRetirement } from './utils/Provenance'
 import { saveRetire } from './utils/Retire'
 
 export function saveToucanRetirement(event: Retired): void {
@@ -40,6 +40,8 @@ export function saveToucanRetirement(event: Retired): void {
   )
 
   incrementAccountRetirements(event.params.sender)
+
+  updateProvenanceForRetirement(event.transaction.hash, event.address, null)
 }
 
 export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
@@ -73,6 +75,8 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
   )
 
   incrementAccountRetirements(event.params.sender)
+
+  updateProvenanceForRetirement(event.transaction.hash, event.address, null)
 }
 
 export function handleVCUOMinted(event: VCUOMinted): void {
@@ -108,16 +112,7 @@ export function handleVCUOMinted(event: VCUOMinted): void {
     event.transaction.hash
   )
 
-  recordProvenance(
-    event.transaction.hash,
-    projectAddress,
-    null,
-    event.transaction.to === KLIMA_INFINITY_DIAMOND ? KLIMA_INFINITY_DIAMOND : event.params.sender,
-    ZERO_ADDRESS,
-    'RETIREMENT',
-    retireAmount,
-    event.block.timestamp
-  )
+  updateProvenanceForRetirement(event.transaction.hash, projectAddress, null)
 
   incrementAccountRetirements(event.params.sender)
 }
@@ -190,14 +185,5 @@ export function saveICRRetirement(event: RetiredVintage): void {
 
   incrementAccountRetirements(event.params.account)
 
-  recordProvenance(
-    event.transaction.hash,
-    event.address,
-    event.params.tokenId,
-    event.transaction.to === KLIMA_INFINITY_DIAMOND ? KLIMA_INFINITY_DIAMOND : event.params.account,
-    ZERO_ADDRESS,
-    'RETIREMENT',
-    event.params.amount,
-    event.block.timestamp
-  )
+  updateProvenanceForRetirement(event.transaction.hash, event.address, event.params.tokenId)
 }

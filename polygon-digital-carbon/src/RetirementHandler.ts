@@ -22,11 +22,11 @@ export function saveToucanRetirement(event: Retired): void {
   credit.save()
 
   // Ensure account entities are created for all addresses
-  loadOrCreateAccount(event.params.sender)
-  let sender = loadOrCreateAccount(event.transaction.from)
+  loadOrCreateAccount(event.transaction.from)
+  let sender = loadOrCreateAccount(event.params.sender)
 
   saveRetire(
-    event.transaction.from.concatI32(sender.totalRetirements),
+    event.params.sender.concatI32(sender.totalRetirements),
     credit.id,
     ZERO_ADDRESS,
     'OTHER',
@@ -39,18 +39,7 @@ export function saveToucanRetirement(event: Retired): void {
     event.transaction.hash
   )
 
-  incrementAccountRetirements(event.transaction.from)
-
-  recordProvenance(
-    event.transaction.hash,
-    event.address,
-    null,
-    event.transaction.to === KLIMA_INFINITY_DIAMOND ? KLIMA_INFINITY_DIAMOND : event.params.sender,
-    ZERO_ADDRESS,
-    'RETIREMENT',
-    event.params.tokenId,
-    event.block.timestamp
-  )
+  incrementAccountRetirements(event.params.sender)
 }
 
 export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
@@ -65,11 +54,11 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
   credit.save()
 
   // Ensure account entities are created for all addresses
-  loadOrCreateAccount(event.params.sender)
-  let sender = loadOrCreateAccount(event.transaction.from)
+  loadOrCreateAccount(event.transaction.from)
+  let sender = loadOrCreateAccount(event.params.sender)
 
   saveRetire(
-    event.transaction.from.concatI32(sender.totalRetirements),
+    event.params.sender.concatI32(sender.totalRetirements),
     credit.id,
     ZERO_ADDRESS,
     'OTHER',
@@ -83,18 +72,7 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
     event.params.eventId.toString()
   )
 
-  incrementAccountRetirements(event.transaction.from)
-
-  recordProvenance(
-    event.transaction.hash,
-    event.address,
-    null,
-    event.transaction.to === KLIMA_INFINITY_DIAMOND ? KLIMA_INFINITY_DIAMOND : event.params.sender,
-    ZERO_ADDRESS,
-    'RETIREMENT',
-    event.params.amount,
-    event.block.timestamp
-  )
+  incrementAccountRetirements(event.params.sender)
 }
 
 export function handleVCUOMinted(event: VCUOMinted): void {
@@ -113,11 +91,11 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   credit.save()
 
   // Ensure account entities are created for all addresses
-  loadOrCreateAccount(event.params.sender)
-  let sender = loadOrCreateAccount(event.transaction.from)
+  loadOrCreateAccount(event.transaction.from)
+  let sender = loadOrCreateAccount(event.params.sender)
 
   saveRetire(
-    event.transaction.from.concatI32(sender.totalRetirements),
+    event.params.sender.concatI32(sender.totalRetirements),
     projectAddress,
     ZERO_ADDRESS,
     'OTHER',
@@ -141,7 +119,7 @@ export function handleVCUOMinted(event: VCUOMinted): void {
     event.block.timestamp
   )
 
-  incrementAccountRetirements(event.transaction.from)
+  incrementAccountRetirements(event.params.sender)
 }
 
 export function handleMossRetirement(event: CarbonOffset): void {
@@ -164,11 +142,11 @@ export function handleMossRetirement(event: CarbonOffset): void {
   credit.save()
 
   // Ensure account entities are created for all addresses
-  loadOrCreateAccount(event.params.sender)
-  let sender = loadOrCreateAccount(event.transaction.from)
+  loadOrCreateAccount(event.transaction.from)
+  let sender = loadOrCreateAccount(event.params.sender)
 
   saveRetire(
-    event.transaction.from.concatI32(sender.totalRetirements),
+    event.params.sender.concatI32(sender.totalRetirements),
     MCO2_ERC20_CONTRACT,
     MCO2_ERC20_CONTRACT,
     'OTHER',
@@ -181,7 +159,7 @@ export function handleMossRetirement(event: CarbonOffset): void {
     event.transaction.hash
   )
 
-  incrementAccountRetirements(event.transaction.from)
+  incrementAccountRetirements(event.params.sender)
 }
 
 export function saveICRRetirement(event: RetiredVintage): void {
@@ -191,11 +169,11 @@ export function saveICRRetirement(event: RetiredVintage): void {
   credit.save()
 
   // Ensure account entities are created for all addresses
-  loadOrCreateAccount(event.params.account)
-  let sender = loadOrCreateAccount(event.transaction.from)
+  loadOrCreateAccount(event.transaction.from)
+  let sender = loadOrCreateAccount(event.params.account)
 
   saveRetire(
-    event.transaction.from.concatI32(sender.totalRetirements),
+    event.params.account.concatI32(sender.totalRetirements),
     credit.id,
     ZERO_ADDRESS,
     'OTHER',
@@ -210,7 +188,7 @@ export function saveICRRetirement(event: RetiredVintage): void {
     event.params.data.toString()
   )
 
-  incrementAccountRetirements(event.transaction.from)
+  incrementAccountRetirements(event.params.account)
 
   recordProvenance(
     event.transaction.hash,

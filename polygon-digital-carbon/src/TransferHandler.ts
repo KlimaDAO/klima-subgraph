@@ -201,6 +201,10 @@ function recordTransfer(
 
   if (to == ZERO_ADDRESS) {
     credit.currentSupply = credit.currentSupply.minus(amount)
+
+    recordProvenance(hash, tokenAddress, tokenId, from, to, 'TRANSFER', amount, timestamp)
+
+    credit.provenanceCount += 1
   } else {
     loadOrCreateAccount(to)
     let toHolding = loadOrCreateHolding(to, tokenAddress, tokenId)

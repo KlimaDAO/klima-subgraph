@@ -19,11 +19,11 @@ export function handleMossRetired(event: MossRetired): void {
   let klimaRetirements = KlimaCarbonRetirements.bind(KLIMA_CARBON_RETIREMENTS_CONTRACT)
   let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
 
-  let sender = loadOrCreateAccount(event.params.beneficiaryAddress)
+  let sender = loadOrCreateAccount(event.transaction.from)
   loadOrCreateAccount(event.params.beneficiaryAddress)
   loadOrCreateAccount(event.params.retiringAddress)
 
-  let retire = loadRetire(event.params.beneficiaryAddress.concatI32(sender.totalRetirements - 1))
+  let retire = loadRetire(event.transaction.from.concatI32(sender.totalRetirements - 1))
 
   if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
 

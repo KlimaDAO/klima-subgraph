@@ -137,11 +137,11 @@ export function handleMossRetirement(event: CarbonOffset): void {
   credit.save()
 
   // Ensure account entities are created for all addresses
-  loadOrCreateAccount(event.transaction.from)
-  let sender = loadOrCreateAccount(event.params.sender)
+  loadOrCreateAccount(event.params.sender)
+  let sender = loadOrCreateAccount(event.transaction.from)
 
   saveRetire(
-    event.params.sender.concatI32(sender.totalRetirements),
+    event.transaction.from.concatI32(sender.totalRetirements),
     MCO2_ERC20_CONTRACT,
     MCO2_ERC20_CONTRACT,
     'OTHER',
@@ -154,7 +154,7 @@ export function handleMossRetirement(event: CarbonOffset): void {
     event.transaction.hash
   )
 
-  incrementAccountRetirements(event.params.sender)
+  incrementAccountRetirements(event.transaction.from)
 }
 
 export function saveICRRetirement(event: RetiredVintage): void {

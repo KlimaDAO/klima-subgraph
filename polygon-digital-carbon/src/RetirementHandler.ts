@@ -42,8 +42,6 @@ export function saveToucanRetirement(event: Retired): void {
   )
 
   incrementAccountRetirements(senderAddress)
-
-  updateProvenanceForRetirement(event.transaction.hash, event.address, null)
 }
 
 export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
@@ -78,8 +76,6 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
   )
 
   incrementAccountRetirements(senderAddress)
-
-  updateProvenanceForRetirement(event.transaction.hash, event.address, null)
 }
 
 export function handleVCUOMinted(event: VCUOMinted): void {
@@ -115,8 +111,6 @@ export function handleVCUOMinted(event: VCUOMinted): void {
     event.block.timestamp,
     event.transaction.hash
   )
-
-  updateProvenanceForRetirement(event.transaction.hash, event.address, null)
 
   incrementAccountRetirements(senderAddress)
 }
@@ -190,6 +184,4 @@ export function saveICRRetirement(event: RetiredVintage): void {
   )
 
   incrementAccountRetirements(senderAddress)
-
-  updateProvenanceForRetirement(event.transaction.hash, event.address, event.params.tokenId)
 }

@@ -111,17 +111,15 @@ export function recordProvenance(
   senderHolding.save()
 }
 
-export function updateProvenanceForRetirement(hash: Bytes, tokenAddress: Address, tokenId: BigInt | null): void {
-  let creditId =
-    tokenId !== null
-      ? Bytes.fromHexString(tokenAddress.toHexString()).concatI32(tokenId.toI32())
-      : Bytes.fromHexString(tokenAddress.toHexString())
-
+export function updateProvenanceForRetirement(creditId: Bytes): Bytes | null {
   let credit = loadCarbonCredit(creditId)
   let id = creditId.concat(ZERO_ADDRESS).concatI32(credit.provenanceCount - 1)
   let record = ProvenanceRecord.load(id)
-  if (record != null) {
-    record.transactionType = 'RETIREMENT'
-    record.save()
+  if (record == null) {
+    return null
   }
+
+  record.transactionType = 'RETIREMENT'
+  record.save()
+  return record.id
 }

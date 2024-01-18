@@ -142,20 +142,6 @@ function recordTransfer(
   if (tokenId !== null) {
     tokenVar = tokenId.toString()
   }
-  log.debug(
-    'tokenAddress: {}, tokenId: {}, from: {}, to: {}, amount: {}, hash: {}, logIndex: {}, timestamp: {}, blockNumber: {}',
-    [
-      tokenAddress.toHexString(),
-      tokenVar,
-      from.toHexString(),
-      to.toHexString(),
-      amount.toString(),
-      hash.toHexString(),
-      logIndex.toString(),
-      timestamp.toString(),
-      blockNumber.toString(),
-    ]
-  )
   // Ignore transfers of zero value
   if (amount == ZERO_BI) return
 
@@ -212,6 +198,7 @@ function recordTransfer(
     toHolding.lastUpdated = timestamp
     toHolding.save()
 
+    // Exclude MCO2 retirements that are bridged back for one final burn to the zero address on mainnet
     if (from != ZERO_ADDRESS && tokenAddress != MCO2_ERC20_CONTRACT) {
       recordProvenance(hash, tokenAddress, tokenId, from, to, 'TRANSFER', amount, timestamp)
 

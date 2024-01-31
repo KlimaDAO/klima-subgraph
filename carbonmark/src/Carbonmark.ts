@@ -21,6 +21,15 @@ export function handleListingCreated(event: ListingCreated): void {
   let tokenContract = ERC20.bind(event.params.token)
   let tokenSymbol = tokenContract.try_symbol()
 
+  // If the token is not an ERC20, it is an ERC1155
+  if (!tokenSymbol.reverted) {
+    listing.tokenStandard = 'ERC20'
+    listing.tokenSymbol = tokenSymbol.value
+  } else {
+    listing.tokenStandard = 'ERC1155'
+    listing.tokenSymbol = project.id
+  }
+
   listing.totalAmountToSell = event.params.amount
   listing.leftToSell = event.params.amount
   listing.tokenAddress = event.params.token
@@ -34,9 +43,6 @@ export function handleListingCreated(event: ListingCreated): void {
   listing.seller = event.params.account
   listing.createdAt = event.block.timestamp
   listing.updatedAt = event.block.timestamp
-  if (!tokenSymbol.reverted) {
-    listing.tokenSymbol = tokenSymbol.value
-  }
 
   listing.save()
 

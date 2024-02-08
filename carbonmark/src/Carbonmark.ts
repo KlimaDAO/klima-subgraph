@@ -122,6 +122,8 @@ export function handleListingUpdated(event: ListingUpdated): void {
     activity.user = event.transaction.from
     activity.price = event.params.newUnitPrice
     activity.previousPrice = event.params.oldUnitPrice
+    activity.previousAmount = event.params.oldAmount
+    activity.amount = event.params.newAmount
     activity.timeStamp = event.block.timestamp
     activity.seller = listing.seller
     activity.save()

@@ -24,3 +24,5 @@ const updateProjectInfo = async () => {
   console.log('new PROJECT_INFO successfuly stored on ProjectInfo facet: ', receipt.transactionHash)
   console.log('ipfs hash: ', res.IpfsHash)
 }
+
+updateProjectInfo()

@@ -1,16 +1,13 @@
-import axios from 'axios'
-import fs from 'fs'
 import { ipfsPinProjectInfo } from './ipfsPinProjectInfo'
 import ethers from 'ethers'
 
+// Project info facet
 const carbonmarkAddress = '0x875EB08884a634FF01b007902f5A6f382eD43830'
-
-const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:8545')
-
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!)
-
 const abi = ['function updateProjectInfo(string memory newHash)']
 
+// set up signer
+const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:8545')
+const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!)
 const signer = wallet.connect(provider)
 
 const updateProjectInfo = async () => {
@@ -27,4 +24,3 @@ const updateProjectInfo = async () => {
   console.log('new PROJECT_INFO successfuly stored on ProjectInfo facet: ', receipt.transactionHash)
   console.log('ipfs hash: ', res.IpfsHash)
 }
-updateProjectInfo()

@@ -19,7 +19,8 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "test": "graph test",
-    "pin": "bun carbonmark/src/scripts/updateProjectInfo/ipfsPinProjectInfo.ts"
+    "pin": "bun carbonmark/src/scripts/updateProjectInfo/ipfsPinProjectInfo.ts",
+    "update": "bun carbonmark/src/scripts/updateProjectInfo/updateProjectInfo.ts"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.56.0",
@@ -29,6 +30,7 @@
   },
   "dependencies": {
     "@pinata/sdk": "2.1.0",
-    "dotenv": "16.4.4"
+    "dotenv": "16.4.4",
+    "ethers": "5"
   }
 }

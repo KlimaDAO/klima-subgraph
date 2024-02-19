@@ -1,0 +1,36 @@
+[
+  {
+    "type": "function",
+    "name": "PROJECT_INFO_HASHES",
+    "inputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [{ "name": "", "type": "string", "internalType": "string" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getAllProjectInfoHashes",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "string[]", "internalType": "string[]" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getProjectInfoHash",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "string", "internalType": "string" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "updateProjectInfo",
+    "inputs": [{ "name": "newHash", "type": "string", "internalType": "string" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "ProjectInfoUpdated",
+    "inputs": [{ "name": "_projectInfoHash", "type": "string", "indexed": true, "internalType": "string" }],
+    "anonymous": false
+  }
+]

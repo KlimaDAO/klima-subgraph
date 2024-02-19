@@ -16,6 +16,22 @@ type User @entity {
   purchases: [Purchase!] @derivedFrom(field: "user")
 }
 
+type ProjectInfo @entity {
+  id: ID!
+  hash: String!
+}
+
+type ProjectInfoContent @entity {
+  id: ID!
+  projectId: String!
+  certification: String
+  year: String
+  description: String
+  standard: String
+  projectType: String
+  country: String
+}
+
 type Project @entity {
   id: ID!
   key: String!

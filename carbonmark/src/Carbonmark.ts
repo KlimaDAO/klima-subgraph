@@ -1,4 +1,6 @@
 import { ListingCancelled, ListingCreated, ListingFilled, ListingUpdated } from '../generated/Carbonmark/Carbonmark'
+import { ProjectInfoUpdated } from '../generated/templates/ProjectInfo/ProjectInfoFacet'
+import { ProjectInfo } from '../generated/schema'
 import {
   loadOrCreateActivity,
   loadOrCreateListing,
@@ -10,7 +12,12 @@ import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { ERC20 } from '../generated/Carbonmark/ERC20'
 import { ERC1155 } from '../generated/Carbonmark/ERC1155'
-import { Bytes, log } from '@graphprotocol/graph-ts'
+import { Bytes, dataSource, log, json } from '@graphprotocol/graph-ts'
+
+export function handleProjectInfo(event: ProjectInfoUpdated): void {
+  let projectInfo = new ProjectInfo(dataSource.stringParam())
+  log.info('ProjectInfoUpdated: {}', [projectInfo.id])
+}
 
 export function handleListingCreated(event: ListingCreated): void {
   // Ensure the user entity exists

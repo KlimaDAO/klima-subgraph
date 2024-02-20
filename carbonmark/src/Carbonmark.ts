@@ -1,6 +1,6 @@
 import { ListingCancelled, ListingCreated, ListingFilled, ListingUpdated } from '../generated/Carbonmark/Carbonmark'
 import { ProjectInfoUpdated } from '../generated/templates/ProjectInfo/ProjectInfoFacet'
-import { ProjectInfo } from '../generated/schema'
+import { Project, ProjectInfo } from '../generated/schema'
 import {
   loadOrCreateActivity,
   loadOrCreateListing,
@@ -14,11 +14,42 @@ import { ERC20 } from '../generated/Carbonmark/ERC20'
 import { ERC1155 } from '../generated/Carbonmark/ERC1155'
 import { Bytes, dataSource, log, json } from '@graphprotocol/graph-ts'
 
-export function handleProjectInfo(event: ProjectInfoUpdated): void {
-  let projectInfo = new ProjectInfo(dataSource.stringParam())
-  log.info('ProjectInfoUpdated: {}', [projectInfo.id])
-}
+export function handleProjectInfoUpdated(content: Bytes): void {
+  const cid = dataSource.stringParam()
+  log.info('Processing content for CID: ', [cid])
 
+  // Parse the JSON bytes into an array of objects
+  const projectsArray = json.fromBytes(content).toArray()
+
+  for (let i = 0; i < projectsArray.length; i++) {
+    const projectObject = projectsArray[i].toObject()
+    const projectId = projectObject.get('projectId')
+    const vintage = projectObject.get('vintage')
+    const description = projectObject.get('description')
+    const methodology = projectObject.get('methodology')
+    const projectType = projectObject.get('projectType')
+    const country = projectObject.get('country')
+
+    // Construct a unique ID for each ProjectInfo entity
+    // This example concatenates the CID with the loop index. Adjust as necessary.
+    let projectInfoId = cid + '-' + i.toString()
+    let projectInfo = new ProjectInfo(projectInfoId)
+
+    if (projectId && vintage && description && methodology && projectType && country) {
+      projectInfo.projectId = projectId.toString()
+      projectInfo.vintage = vintage.toString()
+      projectInfo.description = description.toString()
+      projectInfo.methodology = methodology.toString()
+      projectInfo.projectType = projectType.toString()
+      projectInfo.country = country.toString()
+
+      projectInfo.save()
+      log.info('Saved ProjectInfo entity with ID: ', [projectInfoId])
+    } else {
+      log.warning('Missing data in project object at index: ', [i.toString()])
+    }
+  }
+}
 export function handleListingCreated(event: ListingCreated): void {
   // Ensure the user entity exists
   loadOrCreateUser(event.params.account)

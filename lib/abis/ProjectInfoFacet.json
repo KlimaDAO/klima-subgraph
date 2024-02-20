@@ -30,7 +30,7 @@
   {
     "type": "event",
     "name": "ProjectInfoUpdated",
-    "inputs": [{ "name": "_projectInfoHash", "type": "string", "indexed": true, "internalType": "string" }],
+    "inputs": [{ "name": "projectInfoHash", "type": "string", "indexed": false, "internalType": "string" }],
     "anonymous": false
   }
 ]

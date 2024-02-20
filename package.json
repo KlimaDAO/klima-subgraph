@@ -22,7 +22,7 @@
     "local-pin": "node carbonmark/src/scripts/updateProjectInfo/localPin.js",
     "pin": "bun carbonmark/src/scripts/updateProjectInfo/ipfsPinProjectInfo.ts",
     "update": "bun carbonmark/src/scripts/updateProjectInfo/updateProjectInfo.ts",
-    "local-update": "ts-node carbonmark/src/scripts/updateProjectInfo/localUpdate.ts"
+    "local-update": "bun carbonmark/src/scripts/updateProjectInfo/localUpdate.ts"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.56.0",

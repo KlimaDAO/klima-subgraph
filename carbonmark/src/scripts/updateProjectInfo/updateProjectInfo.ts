@@ -2,11 +2,13 @@ import { ipfsPinProjectInfo } from './ipfsPinProjectInfo'
 import ethers from 'ethers'
 
 // Project info facet
-const carbonmarkAddress = '0x875EB08884a634FF01b007902f5A6f382eD43830'
+const carbonmarkAddress = '0x953654889E278d3DcddeF4475C350A1ae82aa631'
 const abi = ['function updateProjectInfo(string memory newHash)']
 
 // set up signer
-const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:8545')
+const provider = new ethers.providers.JsonRpcProvider(
+  'https://polygon-mumbai.infura.io/v3/e44c8e037cfc4b0ba488b653b3740823'
+)
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!)
 const signer = wallet.connect(provider)
 

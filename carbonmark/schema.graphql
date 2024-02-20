@@ -18,16 +18,11 @@ type User @entity {
 
 type ProjectInfo @entity {
   id: ID!
-  hash: String!
-}
-
-type ProjectInfoContent @entity {
-  id: ID!
+  tokenAddress: Bytes!
   projectId: String!
-  certification: String
-  year: String
+  vintage: String!
   description: String
-  standard: String
+  methodology: String
   projectType: String
   country: String
 }

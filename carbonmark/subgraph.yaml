@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Carbonmark
-    network: matic
+    network: mumbai
     source:
-      address: '0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821'
+      address: '0x999d003eCa0c8bd3237Cdb50967a047521d99622'
       abi: Carbonmark
-      startBlock: 0
+      startBlock: 46118280
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -34,6 +34,26 @@ dataSources:
           handler: handleListingFilled
         - event: ListingCancelled(bytes32)
           handler: handleListingCancelled
+  - kind: ethereum/contract
+    name: ProjectInfoFacet
+    network: mumbai
+    source:
+      address: '0x953654889E278d3DcddeF4475C350A1ae82aa631'
+      abi: ProjectInfoFacet
+      startBlock: 46118280
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/Carbonmark.ts
+      entities:
+        - ProjectInfo
+      abis:
+        - name: ProjectInfoFacet
+          file: ../lib/abis/ProjectInfoFacet.json
+      eventHandlers:
+        - event: ProjectInfoUpdated(string)
+          handler: handleProjectInfoUpdated
 templates:
   - name: ProjectInfo
     kind: file/ipfs

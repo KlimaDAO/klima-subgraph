@@ -1,8 +1,10 @@
-import { localPin } from './localPin'
-import ethers from 'ethers'
+import { localPin } from './localPin.js'
+import { ethers } from 'ethers'
+import dotenv from 'dotenv'
+dotenv.config()
 
 // Project info facet
-const carbonmarkAddress = '0x875EB08884a634FF01b007902f5A6f382eD43830'
+const carbonmarkAddress = '0x96e697b3Fa13B8F2E665204a8E1420b265a101cd'
 const abi = ['function updateProjectInfo(string memory newHash)']
 
 // set up signer
@@ -16,15 +18,15 @@ const updateProjectInfo = async () => {
   const path = 'carbonmark/src/Projects.ts'
 
   // upload and pin the project info to IPFS
-  const res = await localPin(path)
+  // const res = await localPin(path)
 
   // call setter on facet
-  const tx = await carbonmarkContract.updateProjectInfo(res)
+  const tx = await carbonmarkContract.updateProjectInfo('QmXy2FEgty2r9fA1u67ZTqMXQX3nX1TpdUY8HwU5HZYzBp')
 
   const receipt = await provider.waitForTransaction(tx.hash)
 
   console.log('new PROJECT_INFO successfuly stored on ProjectInfo facet: ', receipt.transactionHash)
-  console.log('ipfs hash: ', res)
+  // console.log('ipfs hash: ', res)
 }
 
 updateProjectInfo()

@@ -16,15 +16,26 @@ type User @entity {
   purchases: [Purchase!] @derivedFrom(field: "user")
 }
 
-type ProjectInfo @entity {
+type IpfsProjectInfoVersion @entity {
   id: ID!
-  tokenAddress: Bytes!
-  projectId: String!
-  vintage: String!
-  description: String
-  methodology: String
-  projectType: String
-  country: String
+  updatedAt: BigInt!
+}
+
+type AllIpfsProject @entity {
+  id: ID!
+  projects: [IpfsIndividualProject!]
+}
+
+type IpfsIndividualProject @entity {
+  id: ID!
+  ipfsVersion: String!
+  projectAddress: Bytes!
+  projectID: String!
+  vintage: BigInt!
+  name: String!
+  methodology: String!
+  category: String!
+  country: String!
 }
 
 type Project @entity {

@@ -1,6 +1,5 @@
 import { ListingCancelled, ListingCreated, ListingFilled, ListingUpdated } from '../generated/Carbonmark/Carbonmark'
-import { ProjectInfoUpdated } from '../generated/templates/ProjectInfo/ProjectInfoFacet'
-import { Project, ProjectInfo } from '../generated/schema'
+import { ProjectInfoUpdated } from '../generated/ProjectInfoFacet/ProjectInfoFacet'
 import {
   loadOrCreateActivity,
   loadOrCreateListing,
@@ -12,44 +11,27 @@ import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { ERC20 } from '../generated/Carbonmark/ERC20'
 import { ERC1155 } from '../generated/Carbonmark/ERC1155'
-import { Bytes, dataSource, log, json } from '@graphprotocol/graph-ts'
+import { Bytes, log, DataSourceContext, DataSourceTemplate } from '@graphprotocol/graph-ts'
+import { IpfsProjectInfoVersion } from '../generated/schema'
+import { IpfsContent as IpfsContentTemplate } from '../generated/templates'
 
-export function handleProjectInfoUpdated(content: Bytes): void {
-  const cid = dataSource.stringParam()
-  log.info('Processing content for CID: ', [cid])
+export function handleProjectInfoUpdated(event: ProjectInfoUpdated): void {
+  let arrayInfoHash = event.params.projectInfoHash
 
-  // Parse the JSON bytes into an array of objects
-  const projectsArray = json.fromBytes(content).toArray()
+  let ipfsProjectInfo = new IpfsProjectInfoVersion(arrayInfoHash)
+  ipfsProjectInfo.updatedAt = event.block.timestamp
+  ipfsProjectInfo.save()
 
-  for (let i = 0; i < projectsArray.length; i++) {
-    const projectObject = projectsArray[i].toObject()
-    const projectId = projectObject.get('projectId')
-    const vintage = projectObject.get('vintage')
-    const description = projectObject.get('description')
-    const methodology = projectObject.get('methodology')
-    const projectType = projectObject.get('projectType')
-    const country = projectObject.get('country')
+  // IpfsContentTemplate.create(arrayInfoHash)
 
-    // Construct a unique ID for each ProjectInfo entity
-    // This example concatenates the CID with the loop index. Adjust as necessary.
-    let projectInfoId = cid + '-' + i.toString()
-    let projectInfo = new ProjectInfo(projectInfoId)
+  let context = new DataSourceContext()
 
-    if (projectId && vintage && description && methodology && projectType && country) {
-      projectInfo.projectId = projectId.toString()
-      projectInfo.vintage = vintage.toString()
-      projectInfo.description = description.toString()
-      projectInfo.methodology = methodology.toString()
-      projectInfo.projectType = projectType.toString()
-      projectInfo.country = country.toString()
+  let projectInfoHashBytes = Bytes.fromUTF8(arrayInfoHash)
 
-      projectInfo.save()
-      log.info('Saved ProjectInfo entity with ID: ', [projectInfoId])
-    } else {
-      log.warning('Missing data in project object at index: ', [i.toString()])
-    }
-  }
+  context.setBytes('IpfsContent', projectInfoHashBytes)
+  DataSourceTemplate.createWithContext('IpfsContent', [arrayInfoHash], context)
 }
+
 export function handleListingCreated(event: ListingCreated): void {
   // Ensure the user entity exists
   loadOrCreateUser(event.params.account)

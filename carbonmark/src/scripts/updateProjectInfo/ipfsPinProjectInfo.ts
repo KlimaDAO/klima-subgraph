@@ -6,9 +6,11 @@ dotenv.config()
 export const ipfsPinProjectInfo = async (): Promise<PinataPinResponse> => {
   const pinata = new pinataSDK({ pinataJWTKey: process.env.PINATA_JWT })
   try {
-    const file = fs.createReadStream('carbonmark/src/Projects.ts')
+    const file = fs.createReadStream('carbonmark/src/ProjectsIPFS.ts')
 
     const res = await pinata.pinFileToIPFS(file, { pinataMetadata: { name: 'PROJECT_INFO' } })
+
+
     return res
   } catch (error) {
     return error

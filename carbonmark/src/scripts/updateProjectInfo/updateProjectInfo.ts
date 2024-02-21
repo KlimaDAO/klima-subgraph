@@ -18,6 +18,8 @@ const updateProjectInfo = async () => {
   // upload and pin the project info to IPFS
   const res = await ipfsPinProjectInfo()
 
+  console.log('file successfully pinned', res.IpfsHash)
+
   // call setter on facet
   const tx = await carbonmarkContract.updateProjectInfo(res.IpfsHash)
 

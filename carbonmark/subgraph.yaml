@@ -10,7 +10,7 @@ dataSources:
     source:
       address: '0x999d003eCa0c8bd3237Cdb50967a047521d99622'
       abi: Carbonmark
-      startBlock: 46118280
+      startBlock: 46154975
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -40,14 +40,16 @@ dataSources:
     source:
       address: '0x953654889E278d3DcddeF4475C350A1ae82aa631'
       abi: ProjectInfoFacet
-      startBlock: 46118280
+      startBlock: 46154975
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/Carbonmark.ts
       entities:
-        - ProjectInfo
+        - IpfsProjectInfoVersion
+        - IpfsContent
+        - AllIpfsProject
       abis:
         - name: ProjectInfoFacet
           file: ../lib/abis/ProjectInfoFacet.json
@@ -55,15 +57,15 @@ dataSources:
         - event: ProjectInfoUpdated(string)
           handler: handleProjectInfoUpdated
 templates:
-  - name: ProjectInfo
+  - name: IpfsContent
     kind: file/ipfs
     mapping:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/Carbonmark.ts
-      handler: handleProjectInfo
+      file: ./src/ProjectInfo.ts
+      handler: handleCreateProjects
       entities:
-        - ProjectInfo
+        - AllIpfsProject
       abis:
         - name: ProjectInfoFacet
           file: ../lib/abis/ProjectInfoFacet.json

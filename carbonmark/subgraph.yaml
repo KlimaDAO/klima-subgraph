@@ -8,9 +8,9 @@ dataSources:
     name: Carbonmark
     network: mumbai
     source:
-      address: '0x2eC7BDca325FFbD66AEb146500cDba5f9F979a84'
+      address: '0xBB90c37F04B0DAE2316A81b51cFFfD819Df47f96'
       abi: Carbonmark
-      startBlock: 46199180
+      startBlock: 46222180
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -38,9 +38,9 @@ dataSources:
     name: ProjectInfoFacet
     network: mumbai
     source:
-      address: '0x868b25ae76a515258Eb7dE83729172E964c13c93'
+      address: '0x264A841528B6f44440507dc188e920B68dBd1E33'
       abi: ProjectInfoFacet
-      startBlock: 46199180
+      startBlock: 46222180
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -49,12 +49,16 @@ dataSources:
       entities:
         - IpfsProjectInfoVersion
         - IpfsContent
+        # this needs to come out
+        - Project
       abis:
         - name: ProjectInfoFacet
           file: ../lib/abis/ProjectInfoFacet.json
       eventHandlers:
         - event: ProjectInfoUpdated(string)
           handler: handleProjectInfoUpdated
+        - event: TestEvent()
+          handler: handleTestEvent
 templates:
   - name: IpfsContent
     kind: file/ipfs
@@ -66,6 +70,8 @@ templates:
       entities:
         - AllIpfsProject
         - Project
+        - Category
+        - Country
       abis:
         - name: ProjectInfoFacet
           file: ../lib/abis/ProjectInfoFacet.json

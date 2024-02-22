@@ -1,4 +1,4 @@
-export const PROJECT_INFO = [
+[
   [
     "0x004090eef602e024b2a6cb7f0c1edda992382994",
     "VCS-725",
@@ -8396,4 +8396,4 @@ export const PROJECT_INFO = [
     "Renewable Energy",
     "Spain"
   ]
-];
+]

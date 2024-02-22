@@ -1,42 +1,58 @@
-import { Activity, Category, Country, Listing, Project, Purchase, User } from '../generated/schema'
+import { Activity, Category, Country, IpfsProjectInfo, Listing, Project, Purchase, User } from '../generated/schema'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
-import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
-import { PROJECT_INFO } from './Projects'
+import { Address, BigInt, Bytes, ipfs, log, json, JSONValueKind, dataSource } from '@graphprotocol/graph-ts'
+import { ProjectInfoFacet } from '../generated/ProjectInfoFacet/ProjectInfoFacet'
 
-export function loadOrCreateProject(token: Address): Project {
-  // Find the project + vintage ID from token address
-  let tokenAddress = token.toHexString()
-  let id = ''
-  let registry = ''
-  let projectIndex = 0
-  for (let i = 0; i < PROJECT_INFO.length; i++) {
-    if (tokenAddress == PROJECT_INFO[i][0]) {
-      id = PROJECT_INFO[i][1] + '-' + PROJECT_INFO[i][2]
-      registry = PROJECT_INFO[i][1].split('-')[0]
-      projectIndex = i
-      break
+export function loadOrCreateProject(token: Address): Project | null {
+
+
+  const address = Address.fromString('0x264A841528B6f44440507dc188e920B68dBd1E33')
+
+  let facet = ProjectInfoFacet.bind(address)
+  // get hash from contract to load project array
+  let hash = facet.getProjectInfoHash()
+
+  let ipfsData = IpfsProjectInfo.load(hash)
+
+  if (ipfsData === null) {
+    log.error('IPFS data entity not found for hash: {}', [hash])
+    return null
+  }
+
+  if (ipfsData !== null && ipfsData.projectList) {
+    let projects = ipfsData.projectList.load()
+
+    for (let i = 0; i < projects.length; i++) {
+      let projectData = projects[i]
+      
+
+      let project = Project.load(token.toHexString())
+
+      if (project == null) {
+        project = new Project(token.toHexString())
+        project.key = projectData.key
+        project.name = projectData.name
+        project.methodology = projectData.methodology
+        project.vintage = BigInt.fromString(projectData.vintage.toString())
+        project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
+        project.registry = projectData.registry
+        project.category = projectData.category
+        project.country = projectData.country
+
+        createCountry(project.country)
+        createCategory(project.category)
+        project.save()
+
+       
+      }
+      return project
     }
+  } else {
+    log.error('IPFS data not found or projectList is undefined for hash: {}', [hash])
+    return null
   }
-
-  let project = Project.load(id)
-
-  if (project == null) {
-    project = new Project(id)
-    project.key = PROJECT_INFO[projectIndex][1]
-    project.name = PROJECT_INFO[projectIndex][3]
-    project.methodology = PROJECT_INFO[projectIndex][4]
-    project.vintage = BigInt.fromString(PROJECT_INFO[projectIndex][2])
-    project.projectAddress = token
-    project.registry = registry
-    project.category = PROJECT_INFO[projectIndex][5]
-    project.country = PROJECT_INFO[projectIndex][6]
-    project.save()
-
-    createCountry(project.country)
-    createCategory(project.category)
-  }
-  return project
+  return null
 }
 
 export function loadOrCreateUser(id: Address): User {

@@ -21,7 +21,8 @@
     "test": "graph test",
     "pin": "bun carbonmark/src/scripts/updateProjectInfo/ipfsPinProjectInfo.ts",
     "update": "bun carbonmark/src/scripts/updateProjectInfo/updateProjectInfo.ts",
-    "faux": "bun carbonmark/src/scripts/updateProjectInfo/triggerTestEvent.ts"
+    "faux": "bun carbonmark/src/scripts/updateProjectInfo/triggerTestEvent.ts",
+    "formatJson": "bun carbonmark/src/utils/formatProjectsToJson.ts"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.56.0",

@@ -17,7 +17,7 @@ function readEvaluateAndSaveJSON(inputFilePath: string, outputFilePath: string) 
 }
 
 // Define the path to your existing project file and the output JSON file
-const inputFilePath = '../ProjectsIPFS.ts'; // Adjust this path as needed
+const inputFilePath = '../Projects.ts'; // Adjust this path as needed
 const outputFilePath = '../CorrectedProjectsIPFS.json';
 
 // Execute the function

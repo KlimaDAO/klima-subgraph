@@ -71,7 +71,8 @@ export function handleCreateProjects(content: Bytes): void {
 
         createCountry(project.country)
         createCategory(project.category)
-
+        project.save()
+    
 
         context.setBytes('projectID', Bytes.fromHexString(project.id))
 

@@ -104,5 +104,5 @@ type IpfsProjectInfoVersion @entity {
 
 type AllIpfsProject @entity {
   id: ID!
-  status: String!
+  projects: [Project!]!
 }

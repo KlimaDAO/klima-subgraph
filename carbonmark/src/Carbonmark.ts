@@ -11,24 +11,14 @@ import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { ERC20 } from '../generated/Carbonmark/ERC20'
 import { ERC1155 } from '../generated/Carbonmark/ERC1155'
-import { Bytes, log, DataSourceContext, DataSourceTemplate, dataSource } from '@graphprotocol/graph-ts'
+import { Bytes, log, DataSourceContext, DataSourceTemplate, dataSource, ipfs, json, BigInt, JSONValueKind } from '@graphprotocol/graph-ts'
 import { IpfsProjectInfoVersion } from '../generated/schema'
 import { IpfsContent as IpfsContentTemplate } from '../generated/templates'
 import { Project } from '../generated/schema'
+import { createCategory, createCountry } from './Entities'
 
 export function handleTestEvent(event: TestEvent): void {
   log.info('Test event fired: {}', [event.transaction.hash.toHexString()])
-
-  let context = dataSource.context()
-  let projectIDBytes = context.getBytes('projectID')
-  let projectIDHex = projectIDBytes.toHexString()
-
-  // Now, use projectIDHex to load the project entity
-  let project = Project.load(projectIDHex)
-  if (project === null) {
-    log.error('Failed to load project with ID: {}', [projectIDHex])
-    return
-  }
 
   // if (ctx == null) {
   //   log.info('Context is null: {}', [event.transaction.hash.toHexString()])
@@ -37,12 +27,12 @@ export function handleTestEvent(event: TestEvent): void {
 
   //   log.info('IpfsContent nope: {}', [ipfsContent.toHexString()])
 
-  // let project = Project.load('0x0044c5a5a6f626b673224a3c0d71e851ad3d5153')
-  // if (project == null) {
-  //   log.info('Project not found: {}', ['0x0044c5a5a6f626b673224a3c0d71e851ad3d5153'])
-  // } else {
-  //   log.info('Project found: {}', ['0x0044c5a5a6f626b673224a3c0d71e851ad3d5153'])
-  // }
+  let project = Project.load('0x0044c5a5a6f626b673224a3c0d71e851ad3d5153')
+  if (project == null) {
+    log.info('Project not found: {}', ['0x0044c5a5a6f626b673224a3c0d71e851ad3d5153'])
+  } else {
+    log.info('Project found: {}', ['0x0044c5a5a6f626b673224a3c0d71e851ad3d5153'])
+  }
 }
 
 export function handleProjectInfoUpdated(event: ProjectInfoUpdated): void {
@@ -54,13 +44,81 @@ export function handleProjectInfoUpdated(event: ProjectInfoUpdated): void {
 
   log.info('ProjectInfoUpdated fired: {}', [arrayInfoHash])
   // IpfsContentTemplate.create(arrayInfoHash)
+  let ipfsData = ipfs.cat(arrayInfoHash)
 
-  let context = new DataSourceContext()
+  if (ipfsData === null) {
+    return log.error('No data found for hash: {}', [arrayInfoHash])
+  }
 
-  let projectInfoHashBytes = Bytes.fromUTF8(arrayInfoHash)
+  let result = json.try_fromBytes(ipfsData)
 
-  context.setBytes('IpfsContent', projectInfoHashBytes)
-  DataSourceTemplate.createWithContext('IpfsContent', [arrayInfoHash], context)
+  let data = result.value
+  if (data.kind === JSONValueKind.ARRAY) {
+    let projectsArray = data.toArray()
+
+    for (let i = 0; i < projectsArray.length; i++) {
+      let projectData = projectsArray[i].toArray()
+
+      // // debug logging, can eventually come out
+      // let projectLogMessage = `Project ${i}: [`
+
+      // for (let j = 0; j < projectData.length; j++) {
+      //   let element = projectData[j]
+
+      //   let elementValue = ''
+      //   if (element.kind == JSONValueKind.STRING) {
+      //     elementValue = element.toString()
+      //   } else if (element.kind == JSONValueKind.NUMBER) {
+      //     elementValue = element.toI64().toString()
+      //   } else {
+      //     elementValue = '<complex type or unsupported>'
+      //   }
+
+      //   projectLogMessage += elementValue
+
+      //   if (j < projectData.length - 1) {
+      //     projectLogMessage += ', '
+      //   }
+      // }
+
+      // projectLogMessage += ']'
+
+      let registry = ''
+      // check if project exists from previous upload
+      let project = Project.load(projectData[0].toString())
+
+      if (project == null) {
+        project = new Project(projectData[0].toString())
+        project.key = projectData[1].toString()
+        project.name = projectData[3].toString()
+        project.methodology = projectData[4].toString()
+        project.vintage = BigInt.fromString(projectData[2].toString())
+        project.projectAddress = Bytes.fromHexString(projectData[0].toString())
+        project.registry = registry
+        project.category = projectData[5].toString()
+        project.country = projectData[6].toString()
+        project.save()
+
+        createCountry(project.country)
+        createCategory(project.category)
+        project.save()
+    
+      }
+    }
+  } else {
+    log.info('Parsed content of different kind (not array): {}', [data.kind.toString()])
+  }
+
+  // let result = json.fromBytes(data)
+
+  // log.info('JSON parsing succeeded: {}', [result.toString()])
+
+  // let context = new DataSourceContext()
+
+  // let projectInfoHashBytes = Bytes.fromUTF8(arrayInfoHash)
+
+  // context.setBytes('IpfsContent', projectInfoHashBytes)
+  // DataSourceTemplate.createWithContext('IpfsContent', [arrayInfoHash], context)
 }
 
 export function handleListingCreated(event: ListingCreated): void {

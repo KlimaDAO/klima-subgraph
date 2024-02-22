@@ -1,5 +1,8 @@
 specVersion: 0.0.4
 description: Carbonmark
+features:
+  - fullTextSearch
+  - ipfsOnEthereumContracts
 repository: https://github.com/KlimaDAO/klima-subgraph
 schema:
   file: ./schema.graphql

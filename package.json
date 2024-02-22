@@ -18,11 +18,7 @@
     "clean": "rm -rf ./generated && rm -rf ./build",
     "codegen": "graph codegen",
     "build": "graph build",
-    "test": "graph test",
-    "pin": "bun carbonmark/src/scripts/updateProjectInfo/ipfsPinProjectInfo.ts",
-    "update": "bun carbonmark/src/scripts/updateProjectInfo/updateProjectInfo.ts",
-    "faux": "bun carbonmark/src/scripts/updateProjectInfo/triggerTestEvent.ts",
-    "formatJson": "bun carbonmark/src/utils/formatProjectsToJson.ts"
+    "test": "graph test"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.56.0",
@@ -31,7 +27,6 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
-    "@pinata/sdk": "2.1.0",
     "dotenv": "16.4.4",
     "ethers": "5"
   }

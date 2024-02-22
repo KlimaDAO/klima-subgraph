@@ -22,15 +22,15 @@ export function handleProjectInfoUpdated(event: ProjectInfoUpdated): void {
   ipfsProjectInfo.updatedAt = event.block.timestamp
   ipfsProjectInfo.save()
 
+  log.info('ProjectInfoUpdated fired: {}', [arrayInfoHash])
+  // IpfsContentTemplate.create(arrayInfoHash)
 
-  IpfsContentTemplate.create(arrayInfoHash)
+  let context = new DataSourceContext()
 
-  // let context = new DataSourceContext()
+  let projectInfoHashBytes = Bytes.fromUTF8(arrayInfoHash)
 
-  // let projectInfoHashBytes = Bytes.fromUTF8(arrayInfoHash)
-
-  // context.setBytes('IpfsContent', projectInfoHashBytes)
-  // DataSourceTemplate.createWithContext('IpfsContent', [arrayInfoHash], context)
+  context.setBytes('IpfsContent', projectInfoHashBytes)
+  DataSourceTemplate.createWithContext('IpfsContent', [arrayInfoHash], context)
 }
 
 export function handleListingCreated(event: ListingCreated): void {

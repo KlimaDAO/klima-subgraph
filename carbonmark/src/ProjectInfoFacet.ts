@@ -3,6 +3,7 @@ import { ProjectInfoUpdated, TestEvent, ProjectInfoFacet } from '../generated/Pr
 import { IpfsProjectInfo, Project } from '../generated/schema'
 import { createCategory, createCountry } from './Entities'
 
+// this is for debugging only and will be removed
 export function handleTestEvent(event: TestEvent): void {
   log.info('Test event fired: {}', [event.transaction.hash.toHexString()])
 
@@ -29,7 +30,6 @@ export function handleTestEvent(event: TestEvent): void {
     let projects = ipfsData.projectList.load()
     log.info('Project count: {}', [projects.length.toString()])
     for (let i = 0; i < projects.length; i++) {
-      log.info('dip {}', [i.toString()])
       let projectData = projects[i]
       let project = Project.load(projectData.id)
       if (project == null) {

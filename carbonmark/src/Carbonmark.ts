@@ -1,5 +1,5 @@
 import { ListingCancelled, ListingCreated, ListingFilled, ListingUpdated } from '../generated/Carbonmark/Carbonmark'
-import { ProjectInfoUpdated } from '../generated/ProjectInfoFacet/ProjectInfoFacet'
+import { ProjectInfoUpdated, TestEvent } from '../generated/ProjectInfoFacet/ProjectInfoFacet'
 import {
   loadOrCreateActivity,
   loadOrCreateListing,
@@ -11,9 +11,39 @@ import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { ERC20 } from '../generated/Carbonmark/ERC20'
 import { ERC1155 } from '../generated/Carbonmark/ERC1155'
-import { Bytes, log, DataSourceContext, DataSourceTemplate } from '@graphprotocol/graph-ts'
+import { Bytes, log, DataSourceContext, DataSourceTemplate, dataSource } from '@graphprotocol/graph-ts'
 import { IpfsProjectInfoVersion } from '../generated/schema'
 import { IpfsContent as IpfsContentTemplate } from '../generated/templates'
+import { Project } from '../generated/schema'
+
+export function handleTestEvent(event: TestEvent): void {
+  log.info('Test event fired: {}', [event.transaction.hash.toHexString()])
+
+  let context = dataSource.context()
+  let projectIDBytes = context.getBytes('projectID')
+  let projectIDHex = projectIDBytes.toHexString()
+
+  // Now, use projectIDHex to load the project entity
+  let project = Project.load(projectIDHex)
+  if (project === null) {
+    log.error('Failed to load project with ID: {}', [projectIDHex])
+    return
+  }
+
+  // if (ctx == null) {
+  //   log.info('Context is null: {}', [event.transaction.hash.toHexString()])
+  // }
+  // let ipfsContent = ctx.getBytes('IpfsContent')
+
+  //   log.info('IpfsContent nope: {}', [ipfsContent.toHexString()])
+
+  // let project = Project.load('0x0044c5a5a6f626b673224a3c0d71e851ad3d5153')
+  // if (project == null) {
+  //   log.info('Project not found: {}', ['0x0044c5a5a6f626b673224a3c0d71e851ad3d5153'])
+  // } else {
+  //   log.info('Project found: {}', ['0x0044c5a5a6f626b673224a3c0d71e851ad3d5153'])
+  // }
+}
 
 export function handleProjectInfoUpdated(event: ProjectInfoUpdated): void {
   let arrayInfoHash = event.params.projectInfoHash
@@ -37,6 +67,7 @@ export function handleListingCreated(event: ListingCreated): void {
   // Ensure the user entity exists
   loadOrCreateUser(event.params.account)
   loadOrCreateUser(event.transaction.from)
+
   let project = loadOrCreateProject(event.params.token)
 
   let listing = loadOrCreateListing(event.params.id.toHexString())

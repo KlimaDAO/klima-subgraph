@@ -20,6 +20,7 @@
     "outputs": [{ "name": "", "type": "string", "internalType": "string" }],
     "stateMutability": "view"
   },
+  { "type": "function", "name": "testFunction", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
   {
     "type": "function",
     "name": "updateProjectInfo",
@@ -32,5 +33,6 @@
     "name": "ProjectInfoUpdated",
     "inputs": [{ "name": "projectInfoHash", "type": "string", "indexed": false, "internalType": "string" }],
     "anonymous": false
-  }
+  },
+  { "type": "event", "name": "TestEvent", "inputs": [], "anonymous": false }
 ]

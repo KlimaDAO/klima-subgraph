@@ -7,7 +7,7 @@ const abi = ['function updateProjectInfo(string memory newHash)']
 
 // set up signer
 const provider = new ethers.providers.JsonRpcProvider(
-  'https://polygon-mumbai.infura.io/v3/e44c8e037cfc4b0ba488b653b3740823'
+  `https://polygon-mumbai.infura.io/v3/${process.env.MUMBAI_INFURA_API_KEY}`
 )
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!)
 const signer = wallet.connect(provider)

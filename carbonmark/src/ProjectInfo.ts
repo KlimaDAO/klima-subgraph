@@ -3,12 +3,17 @@ import { IpfsProjectInfoVersion } from '../generated/schema'
 import { AllIpfsProject } from '../generated/schema'
 
 export function handleCreateProjects(content: Bytes): void {
-  log.info('zip {}', [dataSource.stringParam()])
+  log.info('handleCreateProjects fired {}', [dataSource.stringParam()])
   let hash = dataSource.stringParam()
-  let context = dataSource.context();
-  let id = context.getBytes('IpfsContent');
-  let ipfsProjectInfo = new AllIpfsProject(id.toString())
-  const value = json.fromBytes(content).toArray()
+  let allIpfsProject = new AllIpfsProject(hash)
+  allIpfsProject.status = 'created'
+  allIpfsProject.save()
+  const result = json.try_fromBytes(content)
+  if (result.isError) {
+    log.error('source {} error {}', [hash, result.error.toString()])
+    return
+  }
+  log.info('fix {}', [result.value.toArray().toString()])
 
   // if (value) {
   //   log.info('value {}', [value.toString()])

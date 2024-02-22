@@ -49,7 +49,6 @@ dataSources:
       entities:
         - IpfsProjectInfoVersion
         - IpfsContent
-        - AllIpfsProject
       abis:
         - name: ProjectInfoFacet
           file: ../lib/abis/ProjectInfoFacet.json

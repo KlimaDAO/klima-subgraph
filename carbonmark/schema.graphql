@@ -16,28 +16,6 @@ type User @entity {
   purchases: [Purchase!] @derivedFrom(field: "user")
 }
 
-type IpfsProjectInfoVersion @entity {
-  id: ID!
-  updatedAt: BigInt!
-}
-
-type AllIpfsProject @entity {
-  id: ID!
-  projects: [IpfsIndividualProject!]
-}
-
-type IpfsIndividualProject @entity {
-  id: ID!
-  ipfsVersion: String!
-  projectAddress: Bytes!
-  projectID: String!
-  vintage: BigInt!
-  name: String!
-  methodology: String!
-  category: String!
-  country: String!
-}
-
 type Project @entity {
   id: ID!
   key: String!
@@ -117,4 +95,14 @@ type Purchase @entity {
   #relationships
   user: User!
   listing: Listing!
+}
+
+type IpfsProjectInfoVersion @entity {
+  id: ID!
+  updatedAt: BigInt!
+}
+
+type AllIpfsProject @entity {
+  id: ID!
+  status: String!
 }

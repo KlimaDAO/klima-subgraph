@@ -2,7 +2,7 @@ import { ipfsPinProjectInfo } from './ipfsPinProjectInfo'
 import ethers from 'ethers'
 
 // Project info facet
-const carbonmarkAddress = '0x953654889E278d3DcddeF4475C350A1ae82aa631'
+const projectInfoFacetAddress = '0x868b25ae76a515258Eb7dE83729172E964c13c93'
 const abi = ['function updateProjectInfo(string memory newHash)']
 
 // set up signer
@@ -13,20 +13,20 @@ const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!)
 const signer = wallet.connect(provider)
 
 const updateProjectInfo = async () => {
-  const carbonmarkContract = new ethers.Contract(carbonmarkAddress, abi, signer)
+  const carbonmarkContract = new ethers.Contract(projectInfoFacetAddress, abi, signer)
 
   // upload and pin the project info to IPFS
-  const res = await ipfsPinProjectInfo()
+  const hash = await ipfsPinProjectInfo()
 
-  console.log('file successfully pinned', res.IpfsHash)
+  console.log('file successfully pinned', hash)
 
   // call setter on facet
-  const tx = await carbonmarkContract.updateProjectInfo(res.IpfsHash)
+  const tx = await carbonmarkContract.updateProjectInfo(hash)
 
   const receipt = await provider.waitForTransaction(tx.hash)
 
   console.log('new PROJECT_INFO successfuly stored on ProjectInfo facet: ', receipt.transactionHash)
-  console.log('ipfs hash: ', res.IpfsHash)
+  console.log('ipfs hash: ', hash)
 }
 
 updateProjectInfo()

@@ -1,24 +1,67 @@
-import { Bytes, dataSource, log, json } from '@graphprotocol/graph-ts'
+import { Bytes, dataSource, log, json, JSONValueKind, DataSourceContext } from '@graphprotocol/graph-ts'
 import { IpfsProjectInfoVersion } from '../generated/schema'
 import { AllIpfsProject } from '../generated/schema'
+import { Project } from '../generated/schema'
 
 export function handleCreateProjects(content: Bytes): void {
-  log.info('handleCreateProjects fired {}', [dataSource.stringParam()])
-  let hash = dataSource.stringParam()
-  let allIpfsProject = new AllIpfsProject(hash)
-  allIpfsProject.status = 'created'
-  allIpfsProject.save()
-  const result = json.try_fromBytes(content)
-  if (result.isError) {
-    log.error('source {} error {}', [hash, result.error.toString()])
-    return
-  }
-  log.info('fix {}', [result.value.toArray().toString()])
+  let result = json.try_fromBytes(content)
 
-  // if (value) {
-  //   log.info('value {}', [value.toString()])
-  // }
-  // ipfsProjectInfo.save()
+  if (result.isError) {
+    log.error('JSON parsing error {}', [dataSource.stringParam()])
+    return
+  } else {
+    log.info('JSON parsing succeeded {}', [dataSource.stringParam()])
+  }
+
+  let data = result.value
+
+  if (data.kind === JSONValueKind.ARRAY) {
+    let projectsArray = data.toArray()
+
+    for (let i = 0; i < projectsArray.length; i++) {
+      let projectArray = projectsArray[i].toArray()
+
+      let projectLogMessage = `Project ${i}: [`
+
+      for (let j = 0; j < projectArray.length; j++) {
+        let element = projectArray[j]
+
+        let elementValue = ''
+        if (element.kind == JSONValueKind.STRING) {
+          elementValue = element.toString()
+        } else if (element.kind == JSONValueKind.NUMBER) {
+          elementValue = element.toI64().toString()
+        } else {
+          elementValue = '<complex type or unsupported>'
+        }
+
+        projectLogMessage += elementValue
+
+        if (j < projectArray.length - 1) {
+          projectLogMessage += ', '
+        }
+      }
+
+      projectLogMessage += ']'
+
+      // let project = new Project(id.toString())
+      // project.key = PROJECT_INFO[projectIndex][1]
+      // project.name = PROJECT_INFO[projectIndex][3]
+      // project.methodology = PROJECT_INFO[projectIndex][4]
+      // project.vintage = BigInt.fromString(PROJECT_INFO[projectIndex][2])
+      // project.projectAddress = token
+      // project.registry = registry
+      // project.category = PROJECT_INFO[projectIndex][5]
+      // project.country = PROJECT_INFO[projectIndex][6]
+      // project.save()
+  
+      // createCountry(project.country)
+      // createCategory(project.category)
+    }
+  } else {
+    log.info('Parsed content of different kind (not array): {}', [data.kind.toString()])
+  }
+
   // let id = ''
   // let registry = ''
   // let projectIndex = 0
@@ -34,19 +77,19 @@ export function handleCreateProjects(content: Bytes): void {
   // let project = Project.load(id)
 
   // if (project == null) {
-  //   project = new Project(id.toString())
-  //   project.key = PROJECT_INFO[projectIndex][1]
-  //   project.name = PROJECT_INFO[projectIndex][3]
-  //   project.methodology = PROJECT_INFO[projectIndex][4]
-  //   project.vintage = BigInt.fromString(PROJECT_INFO[projectIndex][2])
-  //   project.projectAddress = token
-  //   project.registry = registry
-  //   project.category = PROJECT_INFO[projectIndex][5]
-  //   project.country = PROJECT_INFO[projectIndex][6]
-  //   project.save()
+    // project = new Project(id.toString())
+    // project.key = PROJECT_INFO[projectIndex][1]
+    // project.name = PROJECT_INFO[projectIndex][3]
+    // project.methodology = PROJECT_INFO[projectIndex][4]
+    // project.vintage = BigInt.fromString(PROJECT_INFO[projectIndex][2])
+    // project.projectAddress = token
+    // project.registry = registry
+    // project.category = PROJECT_INFO[projectIndex][5]
+    // project.country = PROJECT_INFO[projectIndex][6]
+    // project.save()
 
-  //   createCountry(project.country)
-  //   createCategory(project.category)
+    // createCountry(project.country)
+    // createCategory(project.category)
   // }
   // return project
 }

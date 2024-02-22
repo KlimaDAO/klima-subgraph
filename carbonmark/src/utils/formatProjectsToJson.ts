@@ -16,9 +16,9 @@ function readEvaluateAndSaveJSON(inputFilePath: string, outputFilePath: string) 
   console.log(`Converted JSON has been saved to ${outputFilePath}`);
 }
 
-// Define the path to your existing project file and the output JSON file
-const inputFilePath = '../Projects.ts'; // Adjust this path as needed
+// run from carbonmark/ with yarn formatJson
+const inputFilePath = 'src/Projects.ts'; 
 const outputFilePath = '../CorrectedProjectsIPFS.json';
 
-// Execute the function
+
 readEvaluateAndSaveJSON(inputFilePath, outputFilePath);

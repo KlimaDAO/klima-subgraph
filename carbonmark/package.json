@@ -17,7 +17,11 @@
     "deploy-staging": "graph deploy --ipfs https://api.staging.thegraph.com/ipfs/ --node https://api.staging.thegraph.com/deploy/ carbonmark",
     "deploy-hosted": "graph deploy --product hosted-service $npm_config_path",
     "deploy-tufnel": "graph deploy --product hosted-service psparacino/sepolia-smart-invoices",
-    "deploy-test": "yarn codegen && yarn build && yarn deploy-tufnel"
+    "deploy-test": "yarn codegen && yarn build && yarn deploy-tufnel",
+    "pin": "bun src/scripts/updateProjectInfo/ipfsPinProjectInfo.ts",
+    "update": "bun src/scripts/updateProjectInfo/updateProjectInfo.ts",
+    "faux": "bun src/scripts/updateProjectInfo/triggerTestEvent.ts",
+    "formatJson": "bun src/utils/formatProjectsToJson.ts"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.56.0",

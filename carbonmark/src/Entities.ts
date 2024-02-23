@@ -6,52 +6,51 @@ import { ProjectInfoFacet } from '../generated/ProjectInfoFacet/ProjectInfoFacet
 
 export function loadOrCreateProject(token: Address): Project | null {
 
+  // const address = Address.fromString('0x264A841528B6f44440507dc188e920B68dBd1E33')
 
-  const address = Address.fromString('0x264A841528B6f44440507dc188e920B68dBd1E33')
+  // let facet = ProjectInfoFacet.bind(address)
+  // // get hash from contract to load project array
+  // let hash = facet.getProjectInfoHash()
 
-  let facet = ProjectInfoFacet.bind(address)
-  // get hash from contract to load project array
-  let hash = facet.getProjectInfoHash()
+  // let ipfsData = IpfsProjectInfo.load(hash)
 
-  let ipfsData = IpfsProjectInfo.load(hash)
+  // if (ipfsData === null) {
+  //   log.error('IPFS data entity not found for hash: {}', [hash])
+  //   return null
+  // }
 
-  if (ipfsData === null) {
-    log.error('IPFS data entity not found for hash: {}', [hash])
-    return null
-  }
+  // if (ipfsData !== null && ipfsData.projectList) {
+  //   let projects = ipfsData.projectList.load()
 
-  if (ipfsData !== null && ipfsData.projectList) {
-    let projects = ipfsData.projectList.load()
-
-    for (let i = 0; i < projects.length; i++) {
-      let projectData = projects[i]
+  //   for (let i = 0; i < projects.length; i++) {
+  //     let projectData = projects[i]
       
 
-      let project = Project.load(token.toHexString())
+  //     let project = Project.load(token.toHexString())
 
-      if (project == null) {
-        project = new Project(token.toHexString())
-        project.key = projectData.key
-        project.name = projectData.name
-        project.methodology = projectData.methodology
-        project.vintage = BigInt.fromString(projectData.vintage.toString())
-        project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
-        project.registry = projectData.registry
-        project.category = projectData.category
-        project.country = projectData.country
+  //     if (project == null) {
+  //       project = new Project(token.toHexString())
+  //       project.key = projectData.key
+  //       project.name = projectData.name
+  //       project.methodology = projectData.methodology
+  //       project.vintage = BigInt.fromString(projectData.vintage.toString())
+  //       project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
+  //       project.registry = projectData.registry
+  //       project.category = projectData.category
+  //       project.country = projectData.country
 
-        createCountry(project.country)
-        createCategory(project.category)
-        project.save()
+  //       createCountry(project.country)
+  //       createCategory(project.category)
+  //       project.save()
 
        
-      }
-      return project
-    }
-  } else {
-    log.error('IPFS data not found or projectList is undefined for hash: {}', [hash])
-    return null
-  }
+  //     }
+  //     return project
+  //   }
+  // } else {
+  //   log.error('IPFS data not found or projectList is undefined for hash: {}', [hash])
+  //   return null
+  // }
   return null
 }
 

@@ -13,7 +13,7 @@ dataSources:
     source:
       address: '0xBB90c37F04B0DAE2316A81b51cFFfD819Df47f96'
       abi: Carbonmark
-      startBlock: 46230170
+      startBlock: 46265820
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -43,7 +43,7 @@ dataSources:
     source:
       address: '0x264A841528B6f44440507dc188e920B68dBd1E33'
       abi: ProjectInfoFacet
-      startBlock: 46230170
+      startBlock: 46265820
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -51,6 +51,7 @@ dataSources:
       file: ./src/ProjectInfoFacet.ts
       entities:
         - IpfsProjectInfo
+        - IpfsContent
         - Project
       abis:
         - name: ProjectInfoFacet
@@ -60,3 +61,18 @@ dataSources:
           handler: handleProjectInfoUpdated
         - event: TestEvent()
           handler: handleTestEvent
+templates:
+  - name: IpfsContent
+    kind: file/ipfs
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/ProjectInfo.ts
+      handler: handleCreateProjects
+      entities:
+        - Project
+        - Category
+        - Country
+      abis:
+        - name: ProjectInfoFacet
+          file: ../lib/abis/ProjectInfoFacet.json

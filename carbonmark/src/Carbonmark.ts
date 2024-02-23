@@ -1,5 +1,4 @@
 import { ListingCancelled, ListingCreated, ListingFilled, ListingUpdated } from '../generated/Carbonmark/Carbonmark'
-import { ProjectInfoUpdated, TestEvent } from '../generated/ProjectInfoFacet/ProjectInfoFacet'
 import {
   loadOrCreateActivity,
   loadOrCreateListing,

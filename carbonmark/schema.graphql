@@ -100,6 +100,5 @@ type Project @entity {
 
 type IpfsProjectInfo @entity {
   id: ID!
-  updatedAt: BigInt!
   projectList: [Project!]! @derivedFrom(field: "ipfsProjectInfo")
 }

@@ -242,7 +242,7 @@ export function handleSwap(event: SwapEvent): void {
     }
   }
 
-  if (event.address == KLIMA_BCT_PAIR) {
+  if (event.address == KLIMA_BCT_PAIR || event.address == KLIMA_CCO2_PAIR) {
     let swap = Swap.load(hourlyId)
     if (price != BigDecimalZero) {
       usdprice = PriceUtil.getKLIMA_USDRate().div(price)

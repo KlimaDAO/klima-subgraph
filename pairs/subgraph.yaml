@@ -1,4 +1,9 @@
 specVersion: 0.0.5
+features:
+  - grafting
+graft:
+  base: QmQwRS6qqzxLHxxvWdLyiEN9X8uA6j4cgmsSUANiYvT7eQ
+  block: 51938520
 schema:
   file: ./schema.graphql
 dataSources:

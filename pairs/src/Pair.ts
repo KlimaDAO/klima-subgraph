@@ -237,6 +237,9 @@ export function handleSwap(event: SwapEvent): void {
     if (event.block.number.ge(KLIMA_MCO2_PAIR_BLOCK)) {
       updatePairPrice(KLIMA_MCO2_PAIR, price, hour_timestamp)
     }
+    if (event.block.number.ge(KLIMA_CCO2_PAIR_BLOCK)) {
+      updatePairPrice(KLIMA_CCO2_PAIR, price, hour_timestamp)
+    }
   }
 
   if (event.address == KLIMA_BCT_PAIR) {

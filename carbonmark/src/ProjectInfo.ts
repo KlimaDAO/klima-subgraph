@@ -7,50 +7,50 @@ import { createCategory, createCountry } from './Entities'
 export function handleTestEvent(event: TestEvent): void {
   log.info('Test event fired: {}', [event.transaction.hash.toHexString()])
 
-  // let network = dataSource.network()
-  // let projectInfoFacetAddress = netWorkAddresses[network]["projectInfoFacet"]
-  // const address = Address.fromString(projectInfoFacetAddress)
+  // // let network = dataSource.network()
+  // // let projectInfoFacetAddress = netWorkAddresses[network]["projectInfoFacet"]
+  // // const address = Address.fromString(projectInfoFacetAddress)
 
-  const address = Address.fromString('0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775')
+  // const address = Address.fromString('0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775')
 
-  let infoContract = ProjectInfo.bind(address)
+  // let infoContract = ProjectInfo.bind(address)
 
-  let hash = infoContract.getProjectInfoHash()
+  // let hash = infoContract.getProjectInfoHash()
 
-  log.info('IPFS hash: {}', [hash])
+  // log.info('IPFS hash: {}', [hash])
 
-  let ipfsData = IpfsProjectInfo.load(hash)
+  // let ipfsData = IpfsProjectInfo.load(hash)
 
-  if (ipfsData === null) {
-    log.error('IPFS data not found for hash: {}', [hash])
-    return
-  }
+  // if (ipfsData === null) {
+  //   log.error('IPFS data not found for hash: {}', [hash])
+  //   return
+  // }
 
-  if (ipfsData !== null && ipfsData.projectList) {
-    let projects = ipfsData.projectList.load()
-    log.info('Project count: {}', [projects.length.toString()])
-    for (let i = 0; i < projects.length; i++) {
-      let projectData = projects[i]
-      let project = Project.load(projectData.id)
-      if (project == null) {
-        project = new Project(projectData.id)
-        project.key = projectData.key
-        project.name = projectData.name
-        project.methodology = projectData.methodology
-        project.vintage = BigInt.fromString(projectData.vintage.toString())
-        project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
-        project.registry = 'TEST THIS'
-        project.category = projectData.category
-        project.country = projectData.country
+  // if (ipfsData !== null && ipfsData.projectList) {
+  //   let projects = ipfsData.projectList.load()
+  //   log.info('Project count: {}', [projects.length.toString()])
+  //   for (let i = 0; i < projects.length; i++) {
+  //     let projectData = projects[i]
+  //     let project = Project.load(projectData.id)
+  //     if (project == null) {
+  //       project = new Project(projectData.id)
+  //       project.key = projectData.key
+  //       project.name = projectData.name
+  //       project.methodology = projectData.methodology
+  //       project.vintage = BigInt.fromString(projectData.vintage.toString())
+  //       project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
+  //       project.registry = 'TEST THIS'
+  //       project.category = projectData.category
+  //       project.country = projectData.country
 
-        createCountry(project.country)
-        createCategory(project.category)
-        project.save()
-      }
-    }
-  } else {
-    log.error('IPFS data not found or projectList is undefined for hash: {}', [hash])
-  }
+  //       createCountry(project.country)
+  //       createCategory(project.category)
+  //       project.save()
+  //     }
+  //   }
+  // } else {
+  //   log.error('IPFS data not found or projectList is undefined for hash: {}', [hash])
+  // }
 }
 
 export function handleProjectInfoUpdated(event: ProjectInfoUpdated): void {

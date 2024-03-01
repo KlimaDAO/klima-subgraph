@@ -8,7 +8,7 @@ export const ipfsPinProjectInfo = async (): Promise<string> => {
   try {
     const formData = new FormData()
 
-    formData.append('file', fs.createReadStream('src/CorrectedProjectsIPFS.json'))
+    formData.append('file', fs.createReadStream('src/Projects/CorrectedProjectsIPFS.json'))
     // this pins directly to the ipfs graph node so it's available on the hosted service
     try {
       const pinResponse = await axios.post(`https://api.thegraph.com/ipfs/api/v0/add`, formData, {
@@ -37,3 +37,4 @@ export const ipfsPinProjectInfo = async (): Promise<string> => {
     return error
   }
 };
+

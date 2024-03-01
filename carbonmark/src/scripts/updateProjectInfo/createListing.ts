@@ -32,7 +32,7 @@ const createListing = async () => {
   }
 
   const tokenId = '2'
-  const amount = '5'
+  const amount = '4'
   const unitPrice = ethers.utils.parseUnits('0.1', 6)
   const minFillAmount = 1
   const deadline = Math.floor(Date.now() / 1000) + 20000

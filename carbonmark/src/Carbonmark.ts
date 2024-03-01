@@ -13,6 +13,7 @@ import { ERC1155 } from '../generated/Carbonmark/ERC1155'
 import { Bytes, log } from '@graphprotocol/graph-ts'
 
 export function handleListingCreated(event: ListingCreated): void {
+  log.info('ListingCreated: {}', [event.params.id.toHexString()])
   // Ensure the user entity exists
   loadOrCreateUser(event.params.account)
   loadOrCreateUser(event.transaction.from)

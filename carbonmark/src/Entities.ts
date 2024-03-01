@@ -1,61 +1,50 @@
 import { Activity, Category, Country, IpfsProjectInfo, Listing, Project, Purchase, User } from '../generated/schema'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
-import { Address, BigInt, Bytes, ipfs, log, json, JSONValueKind, dataSource } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
 import { ProjectInfo } from '../generated/ProjectInfo/ProjectInfo'
 
 export function loadOrCreateProject(token: Address): Project | null {
   // this vintage can't be used though as it's not in any event. need better way get to get vintage for 1155 tokens
   let project = Project.load(token.toHexString())
 
-  // project will be null if this the first time project is called as the project entity was created in an ipfs handler
-  if (project !== null) {
-    log.info('Project: {}', [project.name])
-  }
-
-  const address = Address.fromString('0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775');
-
+  const address = Address.fromString('0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775')
   let contract = ProjectInfo.bind(address)
-
   let hash = contract.getProjectInfoHash()
-
   let ipfsData = IpfsProjectInfo.load(hash)
 
   if (ipfsData == null) {
     log.error('IPFS data not found for hash: {}', [hash])
     return null
   }
-  // the first call will create all the on-chain entities
-  if (ipfsData !== null && ipfsData.projectList) {
-    let projects = ipfsData.projectList.load()
 
-    for (let i = 0; i < projects.length; i++) {
-      let projectData = projects[i]
-      let project = Project.load(projectData.id)
-      // remove the -ipfs from the id to create on-chain accessible entity
-      let projectId = projectData.id.split('-')[0]
+  let projects = ipfsData.projectList.load()
+  for (let i = 0; i < projects.length; i++) {
+    let projectData = projects[i]
 
-      if (project == null) {
-        project = new Project(projectId)
+    // remove the -ipfs from the id to create on-chain accessible entity
+    let projectId = projectData.id.split('-')[0]
 
-        project = new Project(projectData.id)
-        project.key = projectData.key
-        project.name = projectData.name
-        project.methodology = projectData.methodology
-        project.vintage = BigInt.fromString(projectData.vintage.toString())
-        project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
-        project.registry = 'REGISTRY'
-        project.category = projectData.category
-        project.country = projectData.country
+    if (projectId == token.toHexString()) {
+      project = new Project(projectId)
 
-        createCountry(project.country)
-        createCategory(project.category)
-        project.save()
-      }
+      project.key = projectData.key
+      project.name = projectData.name
+      project.methodology = projectData.methodology
+      project.vintage = BigInt.fromString(projectData.vintage.toString())
+      project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
+      project.registry = projectData.registry
+      project.category = projectData.category
+      project.country = projectData.country
+
+      createCountry(project.country)
+      createCategory(project.category)
+      project.save()
+      // returns project. alternately we can create all projects here
+      return project
     }
-  } else {
-    log.error('IPFS data not found or projectList is undefined for hash: {}', [hash])
   }
+
   return project
 }
 

@@ -1,5 +1,5 @@
 import { log, ipfs, json, JSONValueKind, BigInt, Bytes, Address, ValueKind, dataSource } from '@graphprotocol/graph-ts'
-import { ProjectInfoUpdated, TestEvent, ProjectInfoFacet } from '../generated/ProjectInfoFacet/ProjectInfoFacet'
+import { ProjectInfoUpdated, TestEvent, ProjectInfo} from '../generated/ProjectInfo/ProjectInfo';
 import { IpfsProjectInfo, Project } from '../generated/schema'
 import { createCategory, createCountry } from './Entities'
 
@@ -11,11 +11,11 @@ export function handleTestEvent(event: TestEvent): void {
   // let projectInfoFacetAddress = netWorkAddresses[network]["projectInfoFacet"]
   // const address = Address.fromString(projectInfoFacetAddress)
 
-  const address = Address.fromString('0x264A841528B6f44440507dc188e920B68dBd1E33')
+  const address = Address.fromString('0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775')
 
-  let facet = ProjectInfoFacet.bind(address)
+  let infoContract = ProjectInfo.bind(address)
 
-  let hash = facet.getProjectInfoHash()
+  let hash = infoContract.getProjectInfoHash()
 
   log.info('IPFS hash: {}', [hash])
 

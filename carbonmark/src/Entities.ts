@@ -1,15 +1,15 @@
 import { Activity, Category, Country, IpfsProjectInfo, Listing, Project, Purchase, User } from '../generated/schema'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
-import { Address, BigInt, Bytes, ipfs, log, json, JSONValueKind, dataSource } from '@graphprotocol/graph-ts'
-import { ProjectInfoFacet } from '../generated/ProjectInfoFacet/ProjectInfoFacet'
+import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
+import { ProjectInfo} from '../generated/ProjectInfo/ProjectInfo'
 
 export function loadOrCreateProject(token: Address): Project | null {
 
 
-  const address = Address.fromString('0x264A841528B6f44440507dc188e920B68dBd1E33')
+  const address = Address.fromString('0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775')
 
-  let facet = ProjectInfoFacet.bind(address)
+  let facet = ProjectInfo.bind(address)
   // get hash from contract to load project array
   let hash = facet.getProjectInfoHash()
 

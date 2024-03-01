@@ -2,7 +2,7 @@ import { ipfsPinProjectInfo } from './ipfsPinProjectInfo'
 import ethers from 'ethers'
 
 // Project info facet
-const projectInfoFacetAddress = '0x264A841528B6f44440507dc188e920B68dBd1E33'
+const projectInfoAddress = '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775'
 const abi = ['function updateProjectInfo(string memory newHash)']
 
 // set up signer
@@ -13,7 +13,7 @@ const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!)
 const signer = wallet.connect(provider)
 
 const updateProjectInfo = async () => {
-  const carbonmarkContract = new ethers.Contract(projectInfoFacetAddress, abi, signer)
+  const carbonmarkContract = new ethers.Contract(projectInfoAddress, abi, signer)
 
   // upload and pin the project info to IPFS
   const hash = await ipfsPinProjectInfo()

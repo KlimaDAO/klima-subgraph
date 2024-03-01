@@ -1,7 +1,6 @@
 import { Bytes, dataSource, log, json } from '@graphprotocol/graph-ts'
 import { JSONValueKind, BigInt } from '@graphprotocol/graph-ts'
 import { Project } from '../generated/schema'
-import { createCategory, createCountry } from './Entities'
 
 export function handleCreateProjects(content: Bytes): void {
   let hash = dataSource.stringParam()
@@ -16,12 +15,13 @@ export function handleCreateProjects(content: Bytes): void {
 
       let vintage = projectData[2].toString()
       let registry = projectData[1].toString().split('-')[0]
-      // in order to not collide with the on-chain entity, add -ipfs to the id here in order to remove in the on-chain entity
+      /**
+       * in order to not collide with the on-chain entity,
+       * add -ipfs to the id here in order to designate as ipfs entity and to remove in the on-chain entity
+       */
       let projectId = projectData[0].toString() + '-' + 'ipfs'
 
       let project = Project.load(projectId)
-
-      log.info('Project ID: {}', [projectId])
 
       if (project == null) {
         project = new Project(projectId)

@@ -98,6 +98,7 @@ type Project @entity {
   ipfsProjectInfo: IpfsProjectInfo @relation
 }
 
+
 type IpfsProjectInfo @entity {
   id: ID!
   projectList: [Project!]! @derivedFrom(field: "ipfsProjectInfo")

@@ -5,53 +5,58 @@ import { Address, BigInt, Bytes, ipfs, log, json, JSONValueKind, dataSource } fr
 import { ProjectInfo } from '../generated/ProjectInfo/ProjectInfo'
 
 export function loadOrCreateProject(token: Address): Project | null {
+  // this vintage can't be used though as it's not in any event. need better way get to get vintage for 1155 tokens
+  let project = Project.load(token.toHexString())
 
-  // const address = Address.fromString('0x264A841528B6f44440507dc188e920B68dBd1E33')
+  // project will be null if this the first time project is called as the project entity was created in an ipfs handler
+  if (project !== null) {
+    log.info('Project: {}', [project.name])
+  }
 
-  // let facet = ProjectInfoFacet.bind(address)
-  // // get hash from contract to load project array
-  // let hash = facet.getProjectInfoHash()
+  const address = Address.fromString('0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775');
 
-  // let ipfsData = IpfsProjectInfo.load(hash)
+  let contract = ProjectInfo.bind(address)
 
-  // if (ipfsData === null) {
-  //   log.error('IPFS data entity not found for hash: {}', [hash])
-  //   return null
-  // }
+  let hash = contract.getProjectInfoHash()
 
-  // if (ipfsData !== null && ipfsData.projectList) {
-  //   let projects = ipfsData.projectList.load()
+  let ipfsData = IpfsProjectInfo.load(hash)
 
-  //   for (let i = 0; i < projects.length; i++) {
-  //     let projectData = projects[i]
-      
+  if (ipfsData == null) {
+    log.error('IPFS data not found for hash: {}', [hash])
+    return null
+  }
+  // the first call will create all the on-chain entities
+  if (ipfsData !== null && ipfsData.projectList) {
+    let projects = ipfsData.projectList.load()
 
-  //     let project = Project.load(token.toHexString())
+    for (let i = 0; i < projects.length; i++) {
+      let projectData = projects[i]
+      let project = Project.load(projectData.id)
+      // remove the -ipfs from the id to create on-chain accessible entity
+      let projectId = projectData.id.split('-')[0]
 
-  //     if (project == null) {
-  //       project = new Project(token.toHexString())
-  //       project.key = projectData.key
-  //       project.name = projectData.name
-  //       project.methodology = projectData.methodology
-  //       project.vintage = BigInt.fromString(projectData.vintage.toString())
-  //       project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
-  //       project.registry = projectData.registry
-  //       project.category = projectData.category
-  //       project.country = projectData.country
+      if (project == null) {
+        project = new Project(projectId)
 
-  //       createCountry(project.country)
-  //       createCategory(project.category)
-  //       project.save()
+        project = new Project(projectData.id)
+        project.key = projectData.key
+        project.name = projectData.name
+        project.methodology = projectData.methodology
+        project.vintage = BigInt.fromString(projectData.vintage.toString())
+        project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
+        project.registry = 'REGISTRY'
+        project.category = projectData.category
+        project.country = projectData.country
 
-       
-  //     }
-  //     return project
-  //   }
-  // } else {
-  //   log.error('IPFS data not found or projectList is undefined for hash: {}', [hash])
-  //   return null
-  // }
-  return null
+        createCountry(project.country)
+        createCategory(project.category)
+        project.save()
+      }
+    }
+  } else {
+    log.error('IPFS data not found or projectList is undefined for hash: {}', [hash])
+  }
+  return project
 }
 
 export function loadOrCreateUser(id: Address): User {

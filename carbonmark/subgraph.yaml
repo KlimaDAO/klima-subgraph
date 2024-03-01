@@ -11,9 +11,9 @@ dataSources:
     name: Carbonmark
     network: mumbai
     source:
-      address: '0xBB90c37F04B0DAE2316A81b51cFFfD819Df47f96'
+      address: '0xD973F90a4C49607EABeFdb2C45d4F39436c7e7fA'
       abi: Carbonmark
-      startBlock: 46510307
+      startBlock: 46541176
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -24,6 +24,8 @@ dataSources:
       abis:
         - name: Carbonmark
           file: ../lib/abis/Carbonmark.json
+        - name: ProjectInfo
+          file: ../lib/abis/ProjectInfo.json
         - name: ERC20
           file: ../lib/abis/ERC20.json
         - name: ERC1155
@@ -43,7 +45,7 @@ dataSources:
     source:
       address: '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775'
       abi: ProjectInfo
-      startBlock: 46510307
+      startBlock: 46541176
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

@@ -18,7 +18,7 @@ function readEvaluateAndSaveJSON(inputFilePath: string, outputFilePath: string) 
 
 // run from carbonmark/ with yarn formatJson
 const inputFilePath = 'src/Projects/Projects.ts'; 
-const outputFilePath = '../CorrectedProjectsIPFS.json';
+const outputFilePath = 'src/Projects/CorrectedProjectsIPFS.json';
 
 
 readEvaluateAndSaveJSON(inputFilePath, outputFilePath);

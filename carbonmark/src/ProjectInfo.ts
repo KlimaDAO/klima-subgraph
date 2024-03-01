@@ -16,10 +16,12 @@ export function handleCreateProjects(content: Bytes): void {
 
       let vintage = projectData[2].toString()
       let registry = projectData[1].toString().split('-')[0]
-
-      let projectId = projectData[0].toString() + '-' + vintage
+      // in order to not collide with the on-chain entity, add -ipfs to the id here in order to remove in the on-chain entity
+      let projectId = projectData[0].toString() + '-' + 'ipfs'
 
       let project = Project.load(projectId)
+
+      log.info('Project ID: {}', [projectId])
 
       if (project == null) {
         project = new Project(projectId)
@@ -33,9 +35,9 @@ export function handleCreateProjects(content: Bytes): void {
         project.country = projectData[6].toString()
         project.ipfsProjectInfo = hash
         project.save()
-
-        createCountry(project.country)
-        createCategory(project.category)
+        // created in loadOrCreateProject. otherwise the null check doesn't catch but the store will reject
+        // createCountry(project.country)
+        // createCategory(project.category)
       }
     }
   } else {

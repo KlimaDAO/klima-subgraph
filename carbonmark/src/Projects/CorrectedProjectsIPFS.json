@@ -18,6 +18,15 @@
     "China"
   ],
   [
+    "0x00d9852eebe5c1d7a0141b4eab7574d9798c9d4b",
+    "VCS-493",
+    "2008",
+    "5 MW Brahm Ganga Hydro – Electric Project at Kullu district of Himachal Pradesh, India",
+    "AMS-I.D.",
+    "Renewable Energy",
+    "India"
+  ],
+  [
     "0x0115ab6d9a0fd6de3a9a339115c8f2bd0e3deed6",
     "VCS-498",
     "2011",
@@ -8386,5 +8395,14 @@
     "ACM0017",
     "Renewable Energy",
     "Spain"
+  ],
+  [
+    "0x51298f2f1142ecb129a2db5e6afd24f34f2e53f1",
+    "ICR-3000",
+    "2094",
+    "Mumbai subgraph test",
+    "ACM0017",
+    "Positive Vibes",
+    "Luxembourg"
   ]
 ]

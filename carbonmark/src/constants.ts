@@ -5,6 +5,6 @@ export const netWorkAddresses  = {
     },
     mumbai: {
       marketplace: '0xBB90c37F04B0DAE2316A81b51cFFfD819Df47f96',
-      projectInfoFacet: '0x264A841528B6f44440507dc188e920B68dBd1E33',
+      projectInfoFacet: '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775',
     },
   };

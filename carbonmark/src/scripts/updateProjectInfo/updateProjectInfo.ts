@@ -2,7 +2,7 @@ import { ipfsPinProjectInfo } from './ipfsPinProjectInfo'
 import ethers from 'ethers'
 
 // Project info facet
-const projectInfoFacetAddress = '0x264A841528B6f44440507dc188e920B68dBd1E33'
+const projectInfoFacetAddress = '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775'
 const abi = ['function updateProjectInfo(string memory newHash)']
 
 // set up signer

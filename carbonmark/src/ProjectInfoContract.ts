@@ -1,5 +1,5 @@
 import { log, ipfs, json, JSONValueKind, BigInt, Bytes, Address, ValueKind, dataSource } from '@graphprotocol/graph-ts'
-import { ProjectInfoUpdated, TestEvent, ProjectInfoFacet } from '../generated/ProjectInfoFacet/ProjectInfoFacet'
+import { ProjectInfoUpdated, ProjectInfo, TestEvent } from '../generated/ProjectInfo/ProjectInfo'
 import { IpfsProjectInfo, Project } from '../generated/schema'
 import { createCategory, createCountry } from './Entities'
 import { IpfsContent as IpfsContentTemplate } from '../generated/templates'
@@ -9,14 +9,17 @@ export function handleTestEvent(event: TestEvent): void {
   log.info('Test event fired: {}', [event.transaction.hash.toHexString()])
 
   // this vintage can't be used though as it's not in any event. need better way get to get vintage for 1155 tokens
-  let test = Project.load('0x01181906308e8be2594677c66ed312434ddb97d0-2015')
+  let test = Project.load('0x0044c5a5a6f626b673224a3c0d71e851ad3d5153-2013')
   // test will be null as the project entity was created in an ipfs handler
+  if (test !== null) {
+    log.info('fix: {}', [test.name])
+  }
 
-  const address = Address.fromString('0x264A841528B6f44440507dc188e920B68dBd1E33')
+  const address = Address.fromString('0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775')
 
-  let facet = ProjectInfoFacet.bind(address)
+  let contract = ProjectInfo.bind(address)
 
-  let hash = facet.getProjectInfoHash()
+  let hash = contract.getProjectInfoHash()
 
   let ipfsData = IpfsProjectInfo.load(hash)
 
@@ -33,21 +36,21 @@ export function handleTestEvent(event: TestEvent): void {
       let projectData = projects[i]
       let project = Project.load(projectData.id)
       log.info('Project ID: {}', [projectData.id])
-      // if (project == null) {
-      //   project = new Project(projectData.id)
-      //   project.key = projectData.key
-      //   project.name = projectData.name
-      //   project.methodology = projectData.methodology
-      //   project.vintage = BigInt.fromString(projectData.vintage.toString())
-      //   project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
-      //   project.registry = 'TEST THIS'
-      //   project.category = projectData.category
-      //   project.country = projectData.country
+      if (project == null) {
+        project = new Project(projectData.id)
+        project.key = projectData.key
+        project.name = projectData.name
+        project.methodology = projectData.methodology
+        project.vintage = BigInt.fromString(projectData.vintage.toString())
+        project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
+        project.registry = 'TEST THIS'
+        project.category = projectData.category
+        project.country = projectData.country
 
-      //   createCountry(project.country)
-      //   createCategory(project.category)
-      //   project.save()
-      // }
+        createCountry(project.country)
+        createCategory(project.category)
+        project.save()
+      }
     }
   } else {
     log.error('IPFS data not found or projectList is undefined for hash: {}', [hash])

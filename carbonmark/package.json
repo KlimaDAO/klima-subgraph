@@ -21,7 +21,7 @@
     "pin": "bun src/scripts/updateProjectInfo/ipfsPinProjectInfo.ts",
     "update": "bun src/scripts/updateProjectInfo/updateProjectInfo.ts",
     "faux": "bun src/scripts/updateProjectInfo/triggerTestEvent.ts",
-    "formatJson": "bun src/utils/formatProjectsToJson.ts"
+    "formatJson": "bun src/Projects/utils/formatProjectsToJson.ts"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.56.0",

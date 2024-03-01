@@ -2,7 +2,7 @@ import { Activity, Category, Country, IpfsProjectInfo, Listing, Project, Purchas
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Address, BigInt, Bytes, ipfs, log, json, JSONValueKind, dataSource } from '@graphprotocol/graph-ts'
-import { ProjectInfoFacet } from '../generated/ProjectInfoFacet/ProjectInfoFacet'
+import { ProjectInfo } from '../generated/ProjectInfo/ProjectInfo'
 
 export function loadOrCreateProject(token: Address): Project | null {
 

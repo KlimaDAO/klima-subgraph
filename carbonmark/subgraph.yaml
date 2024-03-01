@@ -13,7 +13,7 @@ dataSources:
     source:
       address: '0xBB90c37F04B0DAE2316A81b51cFFfD819Df47f96'
       abi: Carbonmark
-      startBlock: 46265820
+      startBlock: 46510307
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -38,24 +38,24 @@ dataSources:
         - event: ListingCancelled(bytes32)
           handler: handleListingCancelled
   - kind: ethereum/contract
-    name: ProjectInfoFacet
+    name: ProjectInfo
     network: mumbai
     source:
-      address: '0x264A841528B6f44440507dc188e920B68dBd1E33'
-      abi: ProjectInfoFacet
-      startBlock: 46265820
+      address: '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775'
+      abi: ProjectInfo
+      startBlock: 46510307
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/ProjectInfoFacet.ts
+      file: ./src/ProjectInfoContract.ts
       entities:
         - IpfsProjectInfo
         - IpfsContent
         - Project
       abis:
-        - name: ProjectInfoFacet
-          file: ../lib/abis/ProjectInfoFacet.json
+        - name: ProjectInfo
+          file: ../lib/abis/ProjectInfo.json
       eventHandlers:
         - event: ProjectInfoUpdated(string)
           handler: handleProjectInfoUpdated
@@ -74,5 +74,5 @@ templates:
         - Category
         - Country
       abis:
-        - name: ProjectInfoFacet
-          file: ../lib/abis/ProjectInfoFacet.json
+        - name: ProjectInfo
+          file: ../lib/abis/ProjectInfo.json

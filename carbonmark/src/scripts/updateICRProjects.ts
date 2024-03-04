@@ -1,6 +1,6 @@
 import axios from 'axios'
 import fs from 'fs'
-import { PROJECT_INFO } from '../Projects'
+import { PROJECT_INFO } from '../Projects/Projects.ts'
 
 require('dotenv').config()
 

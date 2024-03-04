@@ -7,8 +7,9 @@ const abi = ['function updateProjectInfo(string memory newHash)']
 
 // set up signer
 const provider = new ethers.providers.JsonRpcProvider(
-  `https://polygon-mumbai.infura.io/v3/${process.env.MUMBAI_INFURA_API_KEY}`
+  `https://polygon-mumbai.g.alchemy.com/v2/${process.env.MUMBAI_ALCHEMY_API_KEY}`
 )
+
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!)
 const signer = wallet.connect(provider)
 

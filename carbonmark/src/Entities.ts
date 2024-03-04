@@ -5,8 +5,15 @@ import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
 import { ProjectInfo } from '../generated/ProjectInfo/ProjectInfo'
 
 export function loadOrCreateProject(token: Address): Project | null {
+  //do we need to access the correct vintage as well?
+  // otherwise it will just return the first matching token address with whatever vintage
   // this vintage can't be used though as it's not in any event. need better way get to get vintage for 1155 tokens
   let project = Project.load(token.toHexString())
+
+  if (project != null) {
+    log.info('Project found {}', [project.id])
+    return project
+  }
 
   const address = Address.fromString('0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775')
   let contract = ProjectInfo.bind(address)
@@ -21,7 +28,6 @@ export function loadOrCreateProject(token: Address): Project | null {
   let projects = ipfsData.projectList.load()
   for (let i = 0; i < projects.length; i++) {
     let projectData = projects[i]
-
     // remove the -ipfs from the id to create on-chain accessible entity
     let projectId = projectData.id.split('-')[0]
 
@@ -40,12 +46,12 @@ export function loadOrCreateProject(token: Address): Project | null {
       createCountry(project.country)
       createCategory(project.category)
       project.save()
-      // returns project. alternately we can create all projects here
       return project
     }
   }
 
-  return project
+  log.info('No project matches the provided token: {}', [token.toHexString()])
+  return null
 }
 
 export function loadOrCreateUser(id: Address): User {

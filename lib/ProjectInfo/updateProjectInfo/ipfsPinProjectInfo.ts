@@ -7,8 +7,9 @@ dotenv.config()
 export const ipfsPinProjectInfo = async (): Promise<string> => {
   try {
     const formData = new FormData()
-    formData.append('file', fs.createReadStream('src/Projects/CorrectedProjectsIPFS.json'))
+    formData.append('file', fs.createReadStream('lib/ProjectInfo/CorrectedProjectsIPFS.json'))
     // this pins directly to the ipfs graph node so it's available on the hosted service
+    // currently other nodes don't seem to be be supported atm
     try {
       const pinResponse = await axios.post(`https://api.thegraph.com/ipfs/api/v0/add`, formData, {
         headers: {

@@ -39,7 +39,6 @@ const createListing = async () => {
   console.log('User 1155 token balance: ', userBalance.toString())
 
   //  test params
-
   const tokenId = 2
   const amount = 1
   const unitPrice = ethers.utils.parseUnits('0.5', 6)

@@ -34,10 +34,8 @@ export function handleCreateProjects(content: Bytes): void {
         project.category = projectData[5].toString()
         project.country = projectData[6].toString()
         project.ipfsProjectInfo = hash
+        project.shortDescription = "placeholder short description"
         project.save()
-        // created in loadOrCreateProject. otherwise the null check doesn't catch but the store will reject
-        // createCountry(project.country)
-        // createCategory(project.category)
       }
     }
   } else {

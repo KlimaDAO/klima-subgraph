@@ -49,7 +49,7 @@ dataSources:
     name: ProjectInfo
     network: mumbai
     source:
-      address: '0x000000000000000000000000000000000000DEAD'
+      address: '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775'
       abi: ProjectInfo
       startBlock: 46541534
     mapping:
@@ -60,7 +60,6 @@ dataSources:
       entities:
         - IpfsProjectInfo
         - IpfsContent
-        - Project
       abis:
         - name: ProjectInfo
           file: ../lib/abis/ProjectInfo.json

@@ -1,22 +1,29 @@
 import { Activity, Category, Country, IpfsProjectInfo, Listing, Project, Purchase, User } from '../generated/schema'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
-import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, dataSource, log } from '@graphprotocol/graph-ts'
 import { ProjectInfo } from '../generated/ProjectInfo/ProjectInfo'
 
 export function loadOrCreateProject(token: Address): Project | null {
-  //do we need to access the correct vintage as well?
+  // do we need to access the correct vintage as well?
   // otherwise it will just return the first matching token address with whatever vintage
   // this vintage can't be used though as it's not in any event. need better way get to get vintage for 1155 tokens
   let project = Project.load(token.toHexString())
+  let network = dataSource.network()
 
   if (project != null) {
     log.info('Project found {}', [project.id])
     return project
   }
+  let projectInfoAddress: string
 
-  const address = Address.fromString('0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775')
-  let contract = ProjectInfo.bind(address)
+  if (network == 'polygon') {
+    projectInfoAddress = '0x...'
+  } else {
+    projectInfoAddress = '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775'
+  }
+
+  const contract = ProjectInfo.bind(Address.fromString(projectInfoAddress))
 
   let hash: string
 
@@ -28,7 +35,7 @@ export function loadOrCreateProject(token: Address): Project | null {
   }
 
   hash = hashResult.value
-  
+
   let ipfsData = IpfsProjectInfo.load(hash)
 
   if (ipfsData == null) {
@@ -53,6 +60,8 @@ export function loadOrCreateProject(token: Address): Project | null {
       project.registry = projectData.registry
       project.category = projectData.category
       project.country = projectData.country
+      project.shortDescription = projectData.shortDescription
+      project.ipfsProjectInfo = hash
 
       createCountry(project.country)
       createCategory(project.category)

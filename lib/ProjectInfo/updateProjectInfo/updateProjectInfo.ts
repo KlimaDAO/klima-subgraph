@@ -18,12 +18,15 @@ const updateProjectInfo = async () => {
   console.log('file successfully pinned', hash)
 
   // call setter on facet
-  const tx = await projectInfoContract.updateProjectInfo(hash)
+  try {
+    const tx = await projectInfoContract.updateProjectInfo(hash)
+    const receipt = await provider.waitForTransaction(tx.hash)
 
-  const receipt = await provider.waitForTransaction(tx.hash)
-
-  console.log('new PROJECT_INFO successfuly stored on ProjectInfo facet: ', receipt.transactionHash)
-  console.log('ipfs hash: ', hash)
+    console.log('new PROJECT_INFO successfuly stored on ProjectInfo facet: ', receipt.transactionHash)
+    console.log('ipfs hash: ', hash)
+  } catch (e) {
+    console.error('error updating project info', e.error.error.error.message)
+  }
 }
 
 updateProjectInfo()

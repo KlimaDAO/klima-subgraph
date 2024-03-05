@@ -19,11 +19,12 @@ export function handleCreateProjects(content: Bytes): void {
        * in order to not collide with the on-chain entity,
        * add -ipfs to the id here in order to designate as ipfs entity and to remove in the on-chain entity
        */
-      let projectId = projectData[0].toString() + '-' + 'ipfs'
+
+      let projectId = projectData[0].toString() + '-' + hash
 
       let project = Project.load(projectId)
 
-      if (project == null) {
+      if (project === null) {
         project = new Project(projectId)
         project.key = projectData[1].toString()
         project.name = projectData[3].toString()
@@ -34,11 +35,15 @@ export function handleCreateProjects(content: Bytes): void {
         project.category = projectData[5].toString()
         project.country = projectData[6].toString()
         project.ipfsProjectInfo = hash
-        project.shortDescription = "placeholder short description"
+        project.shortDescription = 'placeholder short description'
+        project.ipfsProjectInfo = hash
         project.save()
+        
       }
     }
+    return
   } else {
     log.info('Parsed content of different kind (not array): {}', [data.kind.toString()])
+    return
   }
 }

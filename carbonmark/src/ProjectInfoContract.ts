@@ -10,16 +10,19 @@ export function handleTestEvent(event: TestEvent): void {
 
 export function handleProjectInfoUpdated(event: ProjectInfoUpdated): void {
   let hash = event.params.projectInfoHash
-  log.info('ProjectInfoUpdated fired: {}', [hash])
+  log.info('ProjectInfoUpdated fired {}', [hash])
 
   const projectInfo = IpfsProjectInfo.load(hash)
 
   if (projectInfo === null) {
     let info = new IpfsProjectInfo(hash)
     info.save()
-    log.info('IpfsProjectInfo created: {}', [hash])
 
     IpfsContentTemplate.create(hash)
-    return
+    log.info('IpfsProjectInfo created {}', [hash])
+  }
+
+  if (projectInfo !== null) {
+    log.info('IpfsProjectInfo already exists: {}', [hash])
   }
 }

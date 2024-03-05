@@ -17,7 +17,18 @@ export function loadOrCreateProject(token: Address): Project | null {
 
   const address = Address.fromString('0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775')
   let contract = ProjectInfo.bind(address)
-  let hash = contract.getProjectInfoHash()
+
+  let hash: string
+
+  let hashResult = contract.try_getProjectInfoHash()
+
+  if (hashResult.reverted) {
+    // default fallbackHash
+    hash = 'QmPuufEbe6ByzzmpgwAeUWtNud2rxdB156asaCZv5qNgYR'
+  }
+
+  hash = hashResult.value
+  
   let ipfsData = IpfsProjectInfo.load(hash)
 
   if (ipfsData == null) {

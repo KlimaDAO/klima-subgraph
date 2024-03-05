@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 0.0.8
 description: Carbonmark
 features:
   - fullTextSearch
@@ -11,7 +11,7 @@ dataSources:
     name: Carbonmark
     network: mumbai
     source:
-      address: '0xa018Acc1dC12Be57872B12642F84b95Dc5A1E582'
+      address: '0xD83aE95CC40B69a1053326D6b21C5731e616FD94'
       abi: Carbonmark
       startBlock: 46541534
     mapping:
@@ -21,6 +21,8 @@ dataSources:
       file: ./src/Carbonmark.ts
       entities:
         - Carbonmark
+        - IpfsProjectInfo
+        - IpfsContent
       abis:
         - name: Carbonmark
           file: ../lib/abis/Carbonmark.json
@@ -39,11 +41,15 @@ dataSources:
           handler: handleListingFilled
         - event: ListingCancelled(bytes32)
           handler: handleListingCancelled
+      blockHandlers:
+        - handler: handleInitializeProjects
+          filter:
+            kind: once
   - kind: ethereum/contract
     name: ProjectInfo
     network: mumbai
     source:
-      address: '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775'
+      address: '0x000000000000000000000000000000000000DEAD'
       abi: ProjectInfo
       startBlock: 46541534
     mapping:

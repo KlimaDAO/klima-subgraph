@@ -1,6 +1,6 @@
 import ethers from 'ethers'
 
-const marketplaceContractAddress = '0xa018Acc1dC12Be57872B12642F84b95Dc5A1E582'
+const marketplaceContractAddress = '0xD83aE95CC40B69a1053326D6b21C5731e616FD94'
 const marketplaceAbi = [
   'function createListing(address token, uint256 tokenId, uint256 amount, uint256 unitPrice, uint256 minFillAmount, uint256 deadline) external returns (bytes32 id)',
 ]

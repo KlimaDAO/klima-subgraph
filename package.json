@@ -18,7 +18,15 @@
     "clean": "rm -rf ./generated && rm -rf ./build",
     "codegen": "graph codegen",
     "build": "graph build",
-    "test": "graph test"
+    "test": "graph test",
+    "pin": "bun lib/ProjectInfo/updateProjectInfo/ipfsPinProjectInfo.ts",
+    "update-mumbai": "bun lib/ProjectInfo/updateProjectInfo/updateProjectInfo.ts -- mumbai",
+    "update-polygon": "bun lib/ProjectInfo/updateProjectInfo/updateProjectInfo.ts -- polygon",
+    "faux-mumbai": "ts-node lib/ProjectInfo/updateProjectInfo/triggerTestEvent.ts --mumbai",
+    "faux-polygon": "bun lib/ProjectInfo/updateProjectInfo/triggerTestEvent.ts -- polygon",
+    "formatJson": "ts-node lib/ProjectInfo/utils/formatProjectsToJson.ts",
+    "create1155Listing-mumbai": "bun carbonmark/src/updateProjectInfo/create1155Listing.ts -- mumbai",
+    "create1155Listing-polygon": "bun carbonmark/src/updateProjectInfo/create1155Listing.ts -- polygon"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.56.0",

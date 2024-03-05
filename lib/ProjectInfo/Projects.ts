@@ -1,4 +1,4 @@
-export const PROJECT_INFO = [
+[
   [
     "0x004090eef602e024b2a6cb7f0c1edda992382994",
     "VCS-725",
@@ -8395,5 +8395,15 @@ export const PROJECT_INFO = [
     "ACM0017",
     "Renewable Energy",
     "Spain"
-  ]
-];
+  ],
+  // mumbai project
+  [
+    "0x51298f2f1142ecb129a2db5e6afd24f34f2e53f1",
+    "ICR-3000",
+    "2094",
+    "Mumbai subgraph test",
+    "ACM0017",
+    "Positive Vibes",
+    "Luxembourg"
+  ],
+]

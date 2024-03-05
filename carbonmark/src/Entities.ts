@@ -1,42 +1,77 @@
-import { Activity, Category, Country, Listing, Project, Purchase, User } from '../generated/schema'
+import { Activity, Category, Country, IpfsProjectInfo, Listing, Project, Purchase, User } from '../generated/schema'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
-import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
-import { PROJECT_INFO } from './Projects'
+import { Address, BigInt, Bytes, dataSource, log } from '@graphprotocol/graph-ts'
+import { ProjectInfo } from '../generated/ProjectInfo/ProjectInfo'
 
-export function loadOrCreateProject(token: Address): Project {
-  // Find the project + vintage ID from token address
-  let tokenAddress = token.toHexString()
-  let id = ''
-  let registry = ''
-  let projectIndex = 0
-  for (let i = 0; i < PROJECT_INFO.length; i++) {
-    if (tokenAddress == PROJECT_INFO[i][0]) {
-      id = PROJECT_INFO[i][1] + '-' + PROJECT_INFO[i][2]
-      registry = PROJECT_INFO[i][1].split('-')[0]
-      projectIndex = i
-      break
+export function loadOrCreateProject(token: Address): Project | null {
+  // do we need to access the correct vintage as well?
+  // otherwise it will just return the first matching token address with whatever vintage
+  // this vintage can't be used though as it's not in any event. need better way get to get vintage for 1155 tokens
+  let project = Project.load(token.toHexString())
+  let network = dataSource.network()
+
+  if (project != null) {
+    log.info('Project found {}', [project.id])
+    return project
+  }
+  let projectInfoAddress: string
+
+  if (network == 'polygon') {
+    projectInfoAddress = '0x...'
+  } else {
+    projectInfoAddress = '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775'
+  }
+
+  const contract = ProjectInfo.bind(Address.fromString(projectInfoAddress))
+
+  let hash: string
+
+  let hashResult = contract.try_getProjectInfoHash()
+
+  if (hashResult.reverted) {
+    // default fallbackHash
+    hash = 'QmPuufEbe6ByzzmpgwAeUWtNud2rxdB156asaCZv5qNgYR'
+  }
+
+  hash = hashResult.value
+
+  let ipfsData = IpfsProjectInfo.load(hash)
+
+  if (ipfsData == null) {
+    log.error('IPFS data not found for hash: {}', [hash])
+    return null
+  }
+
+  let projects = ipfsData.projectList.load()
+  for (let i = 0; i < projects.length; i++) {
+    let projectData = projects[i]
+    // remove the -ipfs from the id to create on-chain accessible entity
+    let projectId = projectData.id.split('-')[0]
+
+    if (projectId == token.toHexString()) {
+      project = new Project(projectId)
+
+      project.key = projectData.key
+      project.name = projectData.name
+      project.methodology = projectData.methodology
+      project.vintage = BigInt.fromString(projectData.vintage.toString())
+      project.projectAddress = Bytes.fromHexString(projectData.projectAddress.toHexString())
+      project.registry = projectData.registry
+      project.category = projectData.category
+      project.country = projectData.country
+      project.shortDescription = projectData.shortDescription
+      project.ipfsProjectInfo = hash
+
+      createCountry(project.country)
+      createCategory(project.category)
+      project.save()
+      return project
     }
   }
 
-  let project = Project.load(id)
-
-  if (project == null) {
-    project = new Project(id)
-    project.key = PROJECT_INFO[projectIndex][1]
-    project.name = PROJECT_INFO[projectIndex][3]
-    project.methodology = PROJECT_INFO[projectIndex][4]
-    project.vintage = BigInt.fromString(PROJECT_INFO[projectIndex][2])
-    project.projectAddress = token
-    project.registry = registry
-    project.category = PROJECT_INFO[projectIndex][5]
-    project.country = PROJECT_INFO[projectIndex][6]
-    project.save()
-
-    createCountry(project.country)
-    createCategory(project.category)
-  }
-  return project
+  log.info('No project matches the provided token: {}', [token.toHexString()])
+  return null
 }
 
 export function loadOrCreateUser(id: Address): User {
@@ -101,7 +136,7 @@ export function loadOrCreatePurchase(id: Bytes): Purchase {
   return purchase
 }
 
-function createCountry(id: string): void {
+export function createCountry(id: string): void {
   let country = Country.load(id)
   if (country == null) {
     country = new Country(id)
@@ -109,7 +144,7 @@ function createCountry(id: string): void {
   }
 }
 
-function createCategory(id: string): void {
+export function createCategory(id: string): void {
   let category = Category.load(id)
   if (category == null) {
     category = new Category(id)

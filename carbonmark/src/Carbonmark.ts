@@ -11,12 +11,30 @@ import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { ERC20 } from '../generated/Carbonmark/ERC20'
 import { ERC1155 } from '../generated/Carbonmark/ERC1155'
 import { Bytes, log } from '@graphprotocol/graph-ts'
+import { ethereum } from '@graphprotocol/graph-ts'
+import { IpfsProjectInfo } from '../generated/schema'
+import { IpfsContent as IpfsContentTemplate } from '../generated/templates'
+
+export function handleInitializeProjects(block: ethereum.Block): void {
+  log.info('Initializing projects in blockHandler', [])
+  let fallbackHash = 'QmPuufEbe6ByzzmpgwAeUWtNud2rxdB156asaCZv5qNgYR'
+  let info = new IpfsProjectInfo(fallbackHash)
+  info.save()
+
+  IpfsContentTemplate.create(fallbackHash)
+}
 
 export function handleListingCreated(event: ListingCreated): void {
+  log.info('ListingCreated: {}', [event.params.id.toHexString()])
   // Ensure the user entity exists
   loadOrCreateUser(event.params.account)
   loadOrCreateUser(event.transaction.from)
+
   let project = loadOrCreateProject(event.params.token)
+  if (project == null) {
+    log.error('Project not found for token: {}', [event.params.token.toHexString()])
+    return
+  }
 
   let listing = loadOrCreateListing(event.params.id.toHexString())
 

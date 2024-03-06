@@ -15,10 +15,10 @@ export function loadOrCreateProject(token: Address): Project | null {
     log.info('Project found {}', [project.id])
     return project
   }
-  let projectInfoAddress: string
 
-  if (network == 'polygon') {
-    projectInfoAddress = '0x...'
+  let projectInfoAddress: string
+  if (network === 'polygon') {
+    projectInfoAddress = '0x820DBba4e7621fB7dddDFd8A56dd2E9657CE34BC'
   } else {
     projectInfoAddress = '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775'
   }
@@ -32,24 +32,40 @@ export function loadOrCreateProject(token: Address): Project | null {
   if (hashResult.reverted) {
     // default fallbackHash
     hash = 'QmPuufEbe6ByzzmpgwAeUWtNud2rxdB156asaCZv5qNgYR'
+  } else {
+    hash = hashResult.value
   }
-
-  hash = hashResult.value
+  log.info('used hash: {}', [hash])
 
   let ipfsData = IpfsProjectInfo.load(hash)
 
-  if (ipfsData == null) {
+  if (ipfsData === null) {
     log.error('IPFS data not found for hash: {}', [hash])
     return null
   }
 
+  log.info('IPFS data found for hash: {}', [hash])
+
   let projects = ipfsData.projectList.load()
+
+  if (projects.length === 0) {
+    log.error('No projects found in IPFS data for hash: {}', [hash])
+    return null
+  } else {
+    log.info('zzz {}', [projects.length.toString()])
+  }
+
+  let testId: string = ''
+
   for (let i = 0; i < projects.length; i++) {
     let projectData = projects[i]
     // remove the -ipfs from the id to create on-chain accessible entity
+    // stil need to check against vintage as well
     let projectId = projectData.id.split('-')[0]
+    testId = projectId
+    log.info('combo test {}', [projectId])
 
-    if (projectId == token.toHexString()) {
+    if (projectId.toLowerCase() === token.toHexString().toLowerCase()) {
       project = new Project(projectId)
 
       project.key = projectData.key
@@ -66,11 +82,12 @@ export function loadOrCreateProject(token: Address): Project | null {
       createCountry(project.country)
       createCategory(project.category)
       project.save()
+      log.info("successfully created project: {}", [project.id])
       return project
     }
   }
 
-  log.info('No project matches the provided token: {}', [token.toHexString()])
+  log.info('No project matches the provided token: {} testId', [token.toHexString(), testId])
   return null
 }
 
@@ -103,7 +120,8 @@ export function loadOrCreateListing(id: string): Listing {
     listing.createdAt = ZERO_BI
     listing.updatedAt = ZERO_BI
     listing.tokenSymbol = ''
-    listing.tokenStandard = ''
+    // initialize with ERC20 as default
+    listing.tokenStandard = 'ERC20'
     listing.save()
   }
   return listing

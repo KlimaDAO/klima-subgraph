@@ -88,7 +88,7 @@
   },
   {
     "type": "function",
-    "name": "revokeOwnerRole",
+    "name": "revokeAdminRole",
     "inputs": [{ "name": "account", "type": "address", "internalType": "address" }],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -117,7 +117,6 @@
     "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
     "stateMutability": "view"
   },
-  { "type": "function", "name": "testFunction", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
   {
     "type": "function",
     "name": "updateProjectInfo",
@@ -161,7 +160,6 @@
     ],
     "anonymous": false
   },
-  { "type": "event", "name": "TestEvent", "inputs": [], "anonymous": false },
   { "type": "error", "name": "AccessControlBadConfirmation", "inputs": [] },
   {
     "type": "error",

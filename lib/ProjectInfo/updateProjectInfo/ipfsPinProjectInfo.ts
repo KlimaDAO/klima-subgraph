@@ -2,6 +2,7 @@ import fs from 'fs'
 import dotenv from 'dotenv'
 import FormData from 'form-data'
 import axios from 'axios'
+import { ipfs } from '@graphprotocol/graph-ts'
 dotenv.config()
 
 export const ipfsPinProjectInfo = async (): Promise<string> => {
@@ -37,3 +38,5 @@ export const ipfsPinProjectInfo = async (): Promise<string> => {
     return error
   }
 }
+
+

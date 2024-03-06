@@ -1,12 +1,8 @@
 import { log } from '@graphprotocol/graph-ts'
-import { ProjectInfoUpdated, TestEvent } from '../generated/ProjectInfo/ProjectInfo'
+import { ProjectInfoUpdated } from '../generated/ProjectInfo/ProjectInfo'
 import { IpfsProjectInfo } from '../generated/schema'
 import { IpfsContent as IpfsContentTemplate } from '../generated/templates'
 
-// this is for debugging only and will be removed
-export function handleTestEvent(event: TestEvent): void {
-  log.info('Test event fired: {}', [event.transaction.hash.toHexString()])
-}
 
 export function handleProjectInfoUpdated(event: ProjectInfoUpdated): void {
   let hash = event.params.projectInfoHash

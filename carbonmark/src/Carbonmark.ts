@@ -31,7 +31,7 @@ export function handleListingCreated(event: ListingCreated): void {
   loadOrCreateUser(event.transaction.from)
 
   let project = loadOrCreateProject(event.params.token)
-  if (project == null) {
+  if (project === null) {
     log.error('Project not found for token: {}', [event.params.token.toHexString()])
     return
   }

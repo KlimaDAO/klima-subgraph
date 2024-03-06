@@ -11,7 +11,7 @@ dataSources:
     name: Carbonmark
     network: matic
     source:
-      address: '0xD83aE95CC40B69a1053326D6b21C5731e616FD94'
+      address: '0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821'
       abi: Carbonmark
       startBlock: 49503672
     mapping:
@@ -49,7 +49,7 @@ dataSources:
     name: ProjectInfo
     network: matic
     source:
-      address: '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775'
+      address: '0x820DBba4e7621fB7dddDFd8A56dd2E9657CE34BC'
       abi: ProjectInfo
       startBlock: 49503672
     mapping:
@@ -66,8 +66,6 @@ dataSources:
       eventHandlers:
         - event: ProjectInfoUpdated(string)
           handler: handleProjectInfoUpdated
-        - event: TestEvent()
-          handler: handleTestEvent
 templates:
   - name: IpfsContent
     kind: file/ipfs

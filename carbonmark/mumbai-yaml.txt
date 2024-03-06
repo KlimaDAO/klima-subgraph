@@ -9,7 +9,7 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Carbonmark
-    network: matic
+    network: mumbai
     source:
       address: '0xD83aE95CC40B69a1053326D6b21C5731e616FD94'
       abi: Carbonmark
@@ -47,7 +47,7 @@ dataSources:
             kind: once
   - kind: ethereum/contract
     name: ProjectInfo
-    network: matic
+    network: mumbai
     source:
       address: '0xd412DEc7cc5dCdb41bCD51a1DAb684494423A775'
       abi: ProjectInfo

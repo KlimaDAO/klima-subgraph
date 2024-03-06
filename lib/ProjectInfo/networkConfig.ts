@@ -6,12 +6,12 @@ export const networkConfig = {
     rpcUrl: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
     addresses: {
       marketplace: {
-        address: '0x...',
-        startBlock: 46541534,
+        address: '0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821',
+        startBlock: 49503672,
       },
       projectInfo: {
-        address: '0x...',
-        startBlock: 46541534,
+        address: '0x820DBba4e7621fB7dddDFd8A56dd2E9657CE34BC',
+        startBlock: 49503672,
       },
     },
   },

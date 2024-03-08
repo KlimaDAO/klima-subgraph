@@ -1,12 +1,13 @@
-import { log, Bytes, BigInt } from '@graphprotocol/graph-ts'
+import { log, Bytes, BigInt, store } from '@graphprotocol/graph-ts'
 import {
   ProjectAdded as ProjectAddedEvent,
   ProjectRemoved as ProjectRemovedEvent,
 } from '../generated/ProjectManager/ProjectManager'
-import {Project } from '../generated/schema'
+import { Project } from '../generated/schema'
 import { createCategory, createCountry } from './Entities'
 
 export function handleProjectAdded(event: ProjectAddedEvent): void {
+  log.info('handleProjectAdded fired {}', [event.params.id.toHexString()])
   const projectAddress = event.params.id.toHexString()
   let project = Project.load(projectAddress)
 
@@ -27,9 +28,15 @@ export function handleProjectAdded(event: ProjectAddedEvent): void {
     createCountry(project.country)
     createCategory(project.category)
   }
-
 }
 
 export function handleProjectRemoved(event: ProjectRemovedEvent): void {
-  log.info('gone baybee', [])
+  log.info('handleProjectRemoved fired {}', [event.params.id.toHexString()])
+  let project = Project.load(event.params.id.toHexString())
+  if (project != null) {
+    store.remove('Project', event.params.id.toHexString())
+    log.info('handleProjectRemoved: project successfully removed {}', [event.params.id.toHexString()])
+  } else {
+    log.info('handleProjectRemoved: project not found {}', [event.params.id.toHexString()])
+  }
 }

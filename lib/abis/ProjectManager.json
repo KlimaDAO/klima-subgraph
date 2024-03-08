@@ -1,0 +1,212 @@
+[
+  { "type": "constructor", "inputs": [], "stateMutability": "nonpayable" },
+  {
+    "type": "function",
+    "name": "DEFAULT_ADMIN_ROLE",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bytes32", "internalType": "bytes32" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "UPDATER_ROLE",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bytes32", "internalType": "bytes32" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "addAdmin",
+    "inputs": [{ "name": "account", "type": "address", "internalType": "address" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "addProject",
+    "inputs": [
+      {
+        "name": "project",
+        "type": "tuple",
+        "internalType": "struct ProjectManager.Project",
+        "components": [
+          { "name": "id", "type": "address", "internalType": "address" },
+          { "name": "projectId", "type": "string", "internalType": "string" },
+          { "name": "vintages", "type": "string[]", "internalType": "string[]" },
+          { "name": "name", "type": "string", "internalType": "string" },
+          { "name": "methodologies", "type": "string[]", "internalType": "string[]" },
+          { "name": "category", "type": "string", "internalType": "string" },
+          { "name": "country", "type": "string", "internalType": "string" },
+          { "name": "description", "type": "string", "internalType": "string" }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "addProjectBatch",
+    "inputs": [
+      {
+        "name": "projects",
+        "type": "tuple[]",
+        "internalType": "struct ProjectManager.Project[]",
+        "components": [
+          { "name": "id", "type": "address", "internalType": "address" },
+          { "name": "projectId", "type": "string", "internalType": "string" },
+          { "name": "vintages", "type": "string[]", "internalType": "string[]" },
+          { "name": "name", "type": "string", "internalType": "string" },
+          { "name": "methodologies", "type": "string[]", "internalType": "string[]" },
+          { "name": "category", "type": "string", "internalType": "string" },
+          { "name": "country", "type": "string", "internalType": "string" },
+          { "name": "description", "type": "string", "internalType": "string" }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getRoleAdmin",
+    "inputs": [{ "name": "role", "type": "bytes32", "internalType": "bytes32" }],
+    "outputs": [{ "name": "", "type": "bytes32", "internalType": "bytes32" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "grantRole",
+    "inputs": [
+      { "name": "role", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "account", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "grantUpdaterRole",
+    "inputs": [{ "name": "account", "type": "address", "internalType": "address" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "hasRole",
+    "inputs": [
+      { "name": "role", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "account", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "removeProject",
+    "inputs": [{ "name": "id", "type": "address", "internalType": "address" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "renounceRole",
+    "inputs": [
+      { "name": "role", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "callerConfirmation", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "revokeAdminRole",
+    "inputs": [{ "name": "account", "type": "address", "internalType": "address" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "revokeRole",
+    "inputs": [
+      { "name": "role", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "account", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "revokeUpdaterRole",
+    "inputs": [{ "name": "account", "type": "address", "internalType": "address" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "supportsInterface",
+    "inputs": [{ "name": "interfaceId", "type": "bytes4", "internalType": "bytes4" }],
+    "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "ProjectAdded",
+    "inputs": [
+      { "name": "id", "type": "address", "indexed": false, "internalType": "address" },
+      { "name": "projectId", "type": "string", "indexed": false, "internalType": "string" },
+      { "name": "vintages", "type": "string[]", "indexed": false, "internalType": "string[]" },
+      { "name": "name", "type": "string", "indexed": false, "internalType": "string" },
+      { "name": "methodologies", "type": "string[]", "indexed": false, "internalType": "string[]" },
+      { "name": "category", "type": "string", "indexed": false, "internalType": "string" },
+      { "name": "country", "type": "string", "indexed": false, "internalType": "string" },
+      { "name": "description", "type": "string", "indexed": false, "internalType": "string" }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ProjectRemoved",
+    "inputs": [{ "name": "id", "type": "address", "indexed": false, "internalType": "address" }],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RoleAdminChanged",
+    "inputs": [
+      { "name": "role", "type": "bytes32", "indexed": true, "internalType": "bytes32" },
+      { "name": "previousAdminRole", "type": "bytes32", "indexed": true, "internalType": "bytes32" },
+      { "name": "newAdminRole", "type": "bytes32", "indexed": true, "internalType": "bytes32" }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RoleGranted",
+    "inputs": [
+      { "name": "role", "type": "bytes32", "indexed": true, "internalType": "bytes32" },
+      { "name": "account", "type": "address", "indexed": true, "internalType": "address" },
+      { "name": "sender", "type": "address", "indexed": true, "internalType": "address" }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RoleRevoked",
+    "inputs": [
+      { "name": "role", "type": "bytes32", "indexed": true, "internalType": "bytes32" },
+      { "name": "account", "type": "address", "indexed": true, "internalType": "address" },
+      { "name": "sender", "type": "address", "indexed": true, "internalType": "address" }
+    ],
+    "anonymous": false
+  },
+  { "type": "error", "name": "AccessControlBadConfirmation", "inputs": [] },
+  {
+    "type": "error",
+    "name": "AccessControlUnauthorizedAccount",
+    "inputs": [
+      { "name": "account", "type": "address", "internalType": "address" },
+      { "name": "neededRole", "type": "bytes32", "internalType": "bytes32" }
+    ]
+  }
+]

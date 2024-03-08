@@ -21,6 +21,7 @@
     "test": "graph test",
     "addProject-mumbai": "bun lib/projects/addProject.ts -- mumbai",
     "addProject-polygon": "bun lib/projects/addProject.ts -- polygon",
+    "removeProject-mumbai": "bun lib/projects/removeProject.ts -- mumbai",
     "formatJson": "ts-node lib/ProjectInfo/utils/formatProjectsToJson.ts"
   },
   "devDependencies": {

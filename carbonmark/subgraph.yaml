@@ -48,6 +48,8 @@ dataSources:
       file: ./src/ProjectManager.ts
       entities:
         - Project
+        - Country
+        - Category
       abis:
         - name: ProjectManager
           file: ../lib/abis/ProjectManager.json

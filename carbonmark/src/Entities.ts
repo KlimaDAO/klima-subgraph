@@ -119,7 +119,7 @@ function createCountry(id: string): void {
   }
 }
 
-function createCategory(id: string): void {
+export function createCategory(id: string): void {
   let category = Category.load(id)
   if (category == null) {
     category = new Category(id)

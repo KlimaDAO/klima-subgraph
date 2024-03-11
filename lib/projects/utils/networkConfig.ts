@@ -23,7 +23,7 @@ export const networkConfig = {
         startBlock: 46541534,
       },
       projectManager: {
-        address: '0xb4e216C6d49EC6144996a6DF30B4E4C25B8772B1',
+        address: '0x740A9839B5F4800F803A7373B2673479f4C52aE1',
         startBlock: 46541534,
       },
     },

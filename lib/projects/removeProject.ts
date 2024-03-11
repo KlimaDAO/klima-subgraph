@@ -12,9 +12,9 @@ const projectInfoFacetAddress = addresses.projectManager.address
 const projectManagerContract = getContract(projectInfoFacetAddress, ProjectManagerAbi)
 
 const removeProject = async () => {
-  // upload and pin the project info to IPFS
 
-  const projectAddress = '0x000000000000000000000000000000000000DEAD'
+
+  const projectAddress = "VCS-10-2014"
 
   // call to emit ProjectAdded event
   try {

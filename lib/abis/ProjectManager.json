@@ -104,7 +104,7 @@
   {
     "type": "function",
     "name": "removeProject",
-    "inputs": [{ "name": "id", "type": "address", "internalType": "address" }],
+    "inputs": [{ "name": "id", "type": "string", "internalType": "string" }],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
@@ -167,7 +167,7 @@
   {
     "type": "event",
     "name": "ProjectRemoved",
-    "inputs": [{ "name": "id", "type": "address", "indexed": false, "internalType": "address" }],
+    "inputs": [{ "name": "id", "type": "string", "indexed": false, "internalType": "string" }],
     "anonymous": false
   },
   {

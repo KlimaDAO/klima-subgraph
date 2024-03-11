@@ -33,12 +33,13 @@ export function handleProjectAdded(event: ProjectAddedEvent): void {
 }
 
 export function handleProjectRemoved(event: ProjectRemovedEvent): void {
-  log.info('handleProjectRemoved fired {}', [event.params.id.toHexString()])
-  let project = Project.load(event.params.id.toHexString())
+  const projectId = event.params.id
+  log.info('handleProjectRemoved fired {}', [projectId])
+  let project = Project.load(projectId)
   if (project != null) {
-    store.remove('Project', event.params.id.toHexString())
-    log.info('handleProjectRemoved: project successfully removed {}', [event.params.id.toHexString()])
+    store.remove('Project', projectId)
+    log.info('handleProjectRemoved: project successfully removed {}', [projectId])
   } else {
-    log.info('handleProjectRemoved: project not found {}', [event.params.id.toHexString()])
+    log.info('handleProjectRemoved: project not found {}', [projectId])
   }
 }

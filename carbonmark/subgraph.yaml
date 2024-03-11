@@ -38,7 +38,7 @@ dataSources:
     name: ProjectManager
     network: mumbai
     source:
-      address: '0xb4e216C6d49EC6144996a6DF30B4E4C25B8772B1'
+      address: '0x740A9839B5F4800F803A7373B2673479f4C52aE1'
       abi: ProjectManager
       startBlock: 46814830
     mapping:
@@ -56,6 +56,6 @@ dataSources:
       eventHandlers:
         - event: ProjectAdded(address,string,string[],string,string[],string,string,string)
           handler: handleProjectAdded
-        - event: ProjectRemoved(address)
+        - event: ProjectRemoved(string)
           handler: handleProjectRemoved
         

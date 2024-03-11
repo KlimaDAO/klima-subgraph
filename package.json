@@ -18,7 +18,11 @@
     "clean": "rm -rf ./generated && rm -rf ./build",
     "codegen": "graph codegen",
     "build": "graph build",
-    "test": "graph test"
+    "test": "graph test",
+    "addProjects-mumbai": "bun lib/projects/addProjects.ts --mumbai",
+    "addProjects-polygon": "bun lib/projects/addProjects.ts --polygon",
+    "removeProject-mumbai": "bun lib/projects/removeProject.ts --mumbai",
+    "formatJson": "ts-node lib/ProjectInfo/utils/formatProjectsToJson.ts"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.56.0",

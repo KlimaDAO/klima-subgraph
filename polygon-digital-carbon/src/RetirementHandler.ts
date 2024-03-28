@@ -1,4 +1,4 @@
-import { Address } from '@graphprotocol/graph-ts'
+import { Address, log } from '@graphprotocol/graph-ts'
 import { KLIMA_INFINITY_DIAMOND, MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { C3OffsetNFT, VCUOMinted } from '../generated/C3-Offset/C3OffsetNFT'
@@ -78,6 +78,8 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
   incrementAccountRetirements(senderAddress)
 }
 
+
+// this will also need to handle the async case of Jcredits
 export function handleVCUOMinted(event: VCUOMinted): void {
   // Currently the NFT minting is required and happens within every offset or offsetFor transaction made against a C3T
   // This event only emits who receives the NFT and the token ID, although the data is stored.

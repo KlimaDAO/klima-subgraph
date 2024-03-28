@@ -5,6 +5,9 @@ enum Registry {
   GOLD_STANDARD
   PURO_EARTH
   ICR
+  ECO
+  JPN
+  JCS
 }
 
 enum RetireSource {
@@ -28,6 +31,11 @@ enum ProvenanceType {
   ORIGINATION
   TRANSFER
   RETIREMENT
+}
+
+enum BridgeStatus {
+  PENDING
+  COMPLETED
 }
 
 type ProvenanceRecord @entity {
@@ -366,6 +374,15 @@ type ToucanBatch @entity {
 
   "Creation Transaction hash"
   creationTransactionHash: Bytes!
+}
+
+type C3OffsetRequest @entity {
+  "Request ID"
+  id: ID!
+  index: BigInt!
+  status: BridgeStatus!
+  retire: Retire
+  provenance: ProvenanceRecord
 }
 
 ##############################

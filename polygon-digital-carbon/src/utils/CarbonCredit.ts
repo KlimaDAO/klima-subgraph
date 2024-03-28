@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
 import { stdYearFromTimestampNew as stdYearFromTimestamp } from '../../../lib/utils/Dates'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 import { C3ProjectToken } from '../../generated/templates/C3ProjectToken/C3ProjectToken'
@@ -75,6 +75,8 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
   let registry = ''
   if (attributes.registry == 'VCS') registry = 'VERRA'
   else if (attributes.registry == 'GS') registry = 'GOLD_STANDARD'
+  else if (attributes.registry == 'ECO') registry = 'ECO'
+  else if (attributes.registry == 'JPN' || 'JCS') registry = 'JPN'
 
   let project = loadOrCreateCarbonProject(registry, attributes.registry + '-' + attributes.project_id)
 

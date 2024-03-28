@@ -1,7 +1,7 @@
 import { Address, BigInt, Bytes, ethereum, log, store } from '@graphprotocol/graph-ts'
 import { MCO2_ERC20_CONTRACT, TOUCAN_CROSS_CHAIN_MESSENGER, ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Transfer } from '../generated/BCT/ERC20'
-import { loadCarbonCredit, loadOrCreateCarbonCredit, updateICRCredit } from './utils/CarbonCredit'
+import { loadOrCreateCarbonCredit, updateICRCredit } from './utils/CarbonCredit'
 import { Retired, Retired1 as Retired_1_4_0 } from '../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
 import {
   TransferSingle,
@@ -15,11 +15,16 @@ import { ZERO_BI } from '../../lib/utils/Decimals'
 import { loadOrCreateAccount } from './utils/Account'
 import { saveICRRetirement, saveToucanRetirement, saveToucanRetirement_1_4_0 } from './RetirementHandler'
 import { saveBridge } from './utils/Bridge'
-import { CarbonCredit, CrossChainBridge } from '../generated/schema'
+import { CarbonCredit, CrossChainBridge, C3OffsetRequest } from '../generated/schema'
 import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/CarbonPool'
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
-import { recordProvenance } from './utils/Provenance'
+import { recordProvenance, updateProvenanceForRetirement } from './utils/Provenance'
+import { StartAsyncToken, EndAsyncToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'
+import { loadRetire, saveRetire } from './utils/Retire'
+import { saveKlimaRetire } from './utils/KlimaRetire'
+import { KLIMA_CARBON_RETIREMENTS_CONTRACT } from '../../lib/utils/Constants'
+import { KlimaCarbonRetirements } from '../generated/RetireC3Carbon/KlimaCarbonRetirements'
 
 export function handleCreditTransfer(event: Transfer): void {
   recordTransfer(
@@ -238,4 +243,85 @@ function recordTransfer(
 
     pool.save()
   }
+}
+
+// asyncToken handling
+
+export function handleStartAsyncToken(event: StartAsyncToken): void {
+  log.info('handleStartAsyncToken fired', [])
+
+  // Ignore retirements of zero value
+  if (event.params.amount == ZERO_BI) return
+
+  let credit = loadOrCreateCarbonCredit(event.address, 'C3', null)
+  // ensure accounts are created for all addresses
+
+  let sender = loadOrCreateAccount(event.params.account)
+  let senderAddress = event.params.account
+  loadOrCreateAccount(event.params.account)
+  loadOrCreateAccount(event.params.beneficiary)
+
+  let recordId = updateProvenanceForRetirement(credit.id)
+  let retireId = senderAddress.concatI32(sender.totalRetirements - 1)
+
+  saveRetire(
+    retireId,
+    event.address,
+    ZERO_ADDRESS,
+    'OTHER',
+    event.params.amount,
+    event.params.beneficiary,
+    '',
+    senderAddress,
+    '',
+    event.block.timestamp,
+    event.transaction.hash,
+    'C3'
+  )
+  // can use the index in the retireId but then there's no way to get the index to avoid the
+  // klimaRetire in handleCarbonRetired
+  let request = new C3OffsetRequest(retireId.toHexString())
+
+  request.status = 'PENDING'
+  request.index = event.params.index
+  request.retire = retireId
+  request.provenance = recordId
+
+  request.save()
+}
+
+export function handleEndAsyncToken(event: EndAsyncToken): void {
+  log.info('handleEndAsyncToken fired', [])
+  let account = loadOrCreateAccount(event.params.account)
+
+  let retireId = account.id.concatI32(account.totalRetirements - 1)
+  let request = C3OffsetRequest.load(retireId.toHexString())
+
+  let retire = loadRetire(retireId)
+
+  if (request == null) {
+    log.error('No request found for retireId: {}', [retireId.toHexString()])
+    return
+  } else {
+    if (request.status == 'PENDING') {
+      request.status = 'COMPLETED'
+      request.save()
+    }
+  }
+
+  if (request.index != event.params.index) {
+    log.error('Index mismatch for retireId: {}', [request.index.toString()])
+    return
+  }
+
+  retire.source = 'KLIMA'
+  retire.beneficiaryAddress = event.params.beneficiary
+  retire.retiringAddress = Bytes.fromUTF8(event.params._transferee)
+  retire.retirementMessage = event.params._reason
+  retire.save()
+
+  let klimaRetirements = KlimaCarbonRetirements.bind(KLIMA_CARBON_RETIREMENTS_CONTRACT)
+  let index = klimaRetirements.retirements(event.params.beneficiary).value0.minus(BigInt.fromI32(1))
+
+  saveKlimaRetire(event.params.beneficiary, retireId, index, event.params.amount, true)
 }

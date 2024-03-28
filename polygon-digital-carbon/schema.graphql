@@ -32,6 +32,11 @@ enum ProvenanceType {
   RETIREMENT
 }
 
+enum BridgeStatus {
+  PENDING
+  COMPLETED
+}
+
 type ProvenanceRecord @entity {
   "Token address - Holding address - increment"
   id: Bytes!
@@ -374,6 +379,15 @@ type ToucanBatch @entity {
 
   "Creation Transaction hash"
   creationTransactionHash: Bytes!
+}
+
+type C3OffsetRequest @entity {
+  "Request ID"
+  id: ID!
+  index: BigInt!
+  status: BridgeStatus!
+  retire: Retire
+  provenance: ProvenanceRecord
 }
 
 ##############################

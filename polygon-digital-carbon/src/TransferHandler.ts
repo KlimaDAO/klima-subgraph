@@ -20,7 +20,7 @@ import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/Carb
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
 import { recordProvenance, updateProvenanceForRetirement } from './utils/Provenance'
-import { StartAsyncToken, EndAsyncToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'
+import { StartAsyncToken, EndAsyncToken, C3ProjectToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'
 import { loadRetire, saveRetire } from './utils/Retire'
 import { saveKlimaRetire } from './utils/KlimaRetire'
 import { KLIMA_CARBON_RETIREMENTS_CONTRACT } from '../../lib/utils/Constants'
@@ -315,6 +315,12 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
 export function handleEndAsyncToken(event: EndAsyncToken): void {
   // load request and set status to completed
   log.info('handleEndAsyncToken fired', [])
+
+  let tokenContract = C3ProjectToken.bind(event.address)
+
+  let data = tokenContract.getAsyncData(event.params.index)
+
+  // && request.index == data.currentIndex
 
   log.info('asd Handler1 ; TxIndex1: {}; LogIndex: {} Block: {}', [
     event.transaction.index.toString(),

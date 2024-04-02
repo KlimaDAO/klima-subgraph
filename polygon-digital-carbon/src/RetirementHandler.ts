@@ -17,6 +17,7 @@ import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 import { recordProvenance, updateProvenanceForRetirement } from './utils/Provenance'
 import { saveRetire } from './utils/Retire'
 import { Account, C3OffsetRequest } from '../generated/schema'
+import { C3ProjectToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -85,7 +86,6 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
   incrementAccountRetirements(senderAddress)
 }
 
-
 export function handleVCUOMinted(event: VCUOMinted): void {
   // Currently the NFT minting is required and happens within every offset or offsetFor transaction made against a C3T
   // This event only emits who receives the NFT and the token ID, although the data is stored.
@@ -119,6 +119,7 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   let requestId = paramsSender.id.concatI32(paramsSender.totalRetirements).toHexString()
 
   let request = C3OffsetRequest.load(requestId)
+
 
   if (request != null && request.status == 'PENDING') {
     sender = paramsSender

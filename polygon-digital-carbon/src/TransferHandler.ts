@@ -11,8 +11,8 @@ import {
   ExAnteMinted,
 } from '../generated/templates/ICRProjectToken/ICRProjectToken'
 import { loadOrCreateHolding } from './utils/Holding'
-import { BIG_INT_1E18, ZERO_BI } from '../../lib/utils/Decimals'
-import { loadOrCreateAccount } from './utils/Account'
+import { ZERO_BI } from '../../lib/utils/Decimals'
+import { incrementAccountRetirements, loadOrCreateAccount } from './utils/Account'
 import { saveICRRetirement, saveToucanRetirement, saveToucanRetirement_1_4_0 } from './RetirementHandler'
 import { saveBridge } from './utils/Bridge'
 import { CarbonCredit, CrossChainBridge, C3OffsetRequest } from '../generated/schema'
@@ -271,15 +271,21 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
   if (event.params.amount == ZERO_BI) return
 
   let credit = loadOrCreateCarbonCredit(event.address, 'C3', null)
-  // ensure accounts are created for all addresses
 
-  let sender = loadOrCreateAccount(event.params.account)
-  let senderAddress = event.params.account
-  loadOrCreateAccount(event.params.account)
+  // ensure accounts are created for all addresses
   loadOrCreateAccount(event.params.beneficiary)
+  let sender = loadOrCreateAccount(event.transaction.from)
+  let senderAddress = Address.fromBytes(sender.id)
 
   let recordId = updateProvenanceForRetirement(credit.id)
-  let retireId = senderAddress.concatI32(sender.totalRetirements - 1)
+  let retireId = senderAddress.concatI32(sender.totalRetirements)
+
+  log.debug('asd Handler0 ; TxIndex0: {}; LogIndex: {} Block: {} retireIdStart: {} ', [
+    event.transaction.index.toString(),
+    event.logIndex.toString(),
+    event.block.number.toString(),
+    senderAddress.concatI32(sender.totalRetirements).toHexString(),
+  ])
 
   saveRetire(
     retireId,
@@ -295,8 +301,7 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
     event.transaction.hash,
     'C3'
   )
-  // can use the index in the retireId but then there's no way to get the index to avoid the
-  // klimaRetire in handleCarbonRetired
+
   let request = new C3OffsetRequest(retireId.toHexString())
 
   request.status = 'PENDING'
@@ -308,16 +313,23 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
 }
 
 export function handleEndAsyncToken(event: EndAsyncToken): void {
+  // load request and set status to completed
   log.info('handleEndAsyncToken fired', [])
+
+  log.info('asd Handler1 ; TxIndex1: {}; LogIndex: {} Block: {}', [
+    event.transaction.index.toString(),
+    event.logIndex.toString(),
+    event.block.number.toString(),
+  ])
   let account = loadOrCreateAccount(event.params.account)
 
-  let retireId = account.id.concatI32(account.totalRetirements - 1)
+  let retireId = account.id.concatI32(account.totalRetirements)
   let request = C3OffsetRequest.load(retireId.toHexString())
 
-  let retire = loadRetire(retireId)
+  // let retire = loadRetire(retireId)
 
   if (request == null) {
-    log.error('No request found for retireId: {}', [retireId.toHexString()])
+    log.error('No C3OffsetRequest found for retireId: {}', [retireId.toHexString()])
     return
   } else {
     if (request.status == 'PENDING') {
@@ -325,20 +337,4 @@ export function handleEndAsyncToken(event: EndAsyncToken): void {
       request.save()
     }
   }
-
-  if (request.index != event.params.index) {
-    log.error('Index mismatch for retireId: {}', [request.index.toString()])
-    return
-  }
-
-  retire.source = 'KLIMA'
-  retire.beneficiaryAddress = event.params.beneficiary
-  retire.retiringAddress = Bytes.fromUTF8(event.params._transferee)
-  retire.retirementMessage = event.params._reason
-  retire.save()
-
-  let klimaRetirements = KlimaCarbonRetirements.bind(KLIMA_CARBON_RETIREMENTS_CONTRACT)
-  let index = klimaRetirements.retirements(event.params.beneficiary).value0.minus(BigInt.fromI32(1))
-
-  saveKlimaRetire(event.params.beneficiary, retireId, index, event.params.amount, true)
 }

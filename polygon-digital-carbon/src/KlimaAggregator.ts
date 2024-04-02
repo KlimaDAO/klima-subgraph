@@ -4,7 +4,7 @@ import { C3Retired } from '../generated/RetireC3Carbon/RetireC3Carbon'
 import { CarbonRetired, CarbonRetired1 as CarbonRetiredTokenId } from '../generated/KlimaInfinity/KlimaInfinity'
 
 import { KlimaCarbonRetirements } from '../generated/RetireC3Carbon/KlimaCarbonRetirements'
-import { Address, BigInt, log } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
 import { loadOrCreateAccount } from './utils/Account'
 import { loadRetire } from './utils/Retire'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
@@ -106,9 +106,12 @@ export function handleC3Retired(event: C3Retired): void {
   )
 }
 
-// this will need to exit if the retrement is the beginning of an async retirment
-// there shuld be a continatuion of this is for EndTokenAsync
 export function handleCarbonRetired(event: CarbonRetired): void {
+  log.info('asd Handler2 ; TxIndex2: {}; LogIndex: {} Block: {}', [
+    event.transaction.index.toString(),
+    event.logIndex.toString(),
+    event.block.number.toString(),
+  ])
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
 
@@ -116,10 +119,27 @@ export function handleCarbonRetired(event: CarbonRetired): void {
   let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
 
   let sender = loadOrCreateAccount(event.transaction.from)
-  loadOrCreateAccount(event.params.retiringAddress)
+  let retiringAccount = loadOrCreateAccount(event.params.retiringAddress)
+  let retiringAddress = event.params.retiringAddress
   loadOrCreateAccount(event.params.beneficiaryAddress)
 
-  let retireId = sender.id.concatI32(sender.totalRetirements - 1)
+  log.info('qwe retireIdRetired: {}, retiringAddress: {}', [
+    sender.id.concatI32(sender.totalRetirements - 1).toHexString(),
+    retiringAddress.toHexString(),
+  ])
+
+  let retireId: Bytes
+
+  // check for C3OffsetRequest
+  let request = C3OffsetRequest.load(retiringAddress.concatI32(retiringAccount.totalRetirements).toHexString())
+
+  if (request != null && request.status == 'PENDING') {
+    retireId = retiringAddress.concatI32(retiringAccount.totalRetirements)
+  } else {
+    retireId = sender.id.concatI32(sender.totalRetirements - 1)
+  }
+  log.info('qwe retireId: {}, retiringAddress: {}', [retireId.toHexString(), retiringAddress.toHexString()])
+
   let retire = loadRetire(retireId)
 
   if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
@@ -127,20 +147,9 @@ export function handleCarbonRetired(event: CarbonRetired): void {
   retire.source = 'KLIMA'
   retire.beneficiaryAddress = event.params.beneficiaryAddress
   retire.beneficiaryName = event.params.beneficiaryString
-  retire.retiringAddress = event.params.retiringAddress
+  retire.retiringAddress = retiringAddress
   retire.retirementMessage = event.params.retirementMessage
   retire.save()
-
-  // check if there is a pending Jcredit request for this retireId
-  let requestId = C3OffsetRequest.load(retireId.toHexString())
-
-  if (requestId != null) {
-    if (requestId.status == 'PENDING') {
-      // this event will fire directly after startTokenAsync, but we need to wait for endTokenAsync to create a klimaRetire
-      // this might not be necessary though. This can maybe just happen in endTokenAsync or VCUOMinted
-      return
-    }
-  }
 
   saveKlimaRetire(
     event.params.beneficiaryAddress,

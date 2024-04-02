@@ -10,6 +10,7 @@ import { loadCarbonCredit, loadOrCreateCarbonCredit } from './utils/CarbonCredit
 import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 import { recordProvenance, updateProvenanceForRetirement } from './utils/Provenance'
 import { saveRetire } from './utils/Retire'
+import { Account, C3OffsetRequest } from '../generated/schema'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -79,11 +80,17 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
 }
 
 
-// this will also need to handle the async case of Jcredits
 export function handleVCUOMinted(event: VCUOMinted): void {
   // Currently the NFT minting is required and happens within every offset or offsetFor transaction made against a C3T
   // This event only emits who receives the NFT and the token ID, although the data is stored.
   // Update associated entities using a call to retrieve the retirement details.
+
+  log.debug('asd Handler3 ; TxIndex3: {}; LogIndex: {} Block: {}', [
+    event.transaction.index.toString(),
+    event.logIndex.toString(),
+    event.block.number.toString(),
+  ])
+  log.info('VCUO Minted: {} Sender: {}', [event.params.tokenId.toString(), event.params.sender.toHexString()])
 
   let retireContract = C3OffsetNFT.bind(event.address)
 
@@ -96,9 +103,28 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   credit.save()
 
   // Ensure account entities are created for all addresses
-  loadOrCreateAccount(event.params.sender)
-  let sender = loadOrCreateAccount(event.transaction.from)
-  let senderAddress = event.transaction.from
+  // ALERT: Changing this here.
+
+  let sender: Account
+  let senderAddress: Address
+
+  let paramsSender = loadOrCreateAccount(event.params.sender)
+
+  let requestId = paramsSender.id.concatI32(paramsSender.totalRetirements).toHexString()
+
+  let request = C3OffsetRequest.load(requestId)
+
+  if (request != null && request.status == 'PENDING') {
+    sender = paramsSender
+    senderAddress = Address.fromBytes(paramsSender.id)
+    loadOrCreateAccount(event.transaction.from)
+  } else {
+    sender = loadOrCreateAccount(event.transaction.from)
+    senderAddress = event.transaction.from
+    loadOrCreateAccount(event.params.sender)
+  }
+
+  // Ensure account entities are created for all addresses
 
   saveRetire(
     sender.id.concatI32(sender.totalRetirements),
@@ -113,6 +139,11 @@ export function handleVCUOMinted(event: VCUOMinted): void {
     event.block.timestamp,
     event.transaction.hash
   )
+  log.info('Retirement saved: {}, senderAddress {} hash: {}', [
+    event.params.tokenId.toString(),
+    senderAddress.toHexString(),
+    event.transaction.hash.toHexString(),
+  ])
 
   incrementAccountRetirements(senderAddress)
 }

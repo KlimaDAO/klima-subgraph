@@ -67,7 +67,7 @@ export function handleListingCreated(event: ListingCreated): void {
 }
 
 export function handleListingUpdated(event: ListingUpdated): void {
-  let blockNumber = event.block.number  
+  let blockNumber = event.block.number
   // User should already exist from creating the listing.
 
   let listing = loadOrCreateListing(event.params.id.toHexString())
@@ -77,6 +77,9 @@ export function handleListingUpdated(event: ListingUpdated): void {
 
   // always ensure the minFillAmount is updated
   listing.minFillAmount = event.params.newMinFillAmount
+
+  // only handling historical activity amounts for ICR migration
+  activity.amount = handleMigrationDecimals(project.registry, blockNumber, event.params.newAmount)
 
   if (event.params.oldAmount != event.params.newAmount) {
     listing.totalAmountToSell = event.params.newAmount

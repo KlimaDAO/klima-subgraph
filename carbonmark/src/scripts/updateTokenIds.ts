@@ -2,8 +2,6 @@ import axios from 'axios'
 import fs from 'fs'
 import { PROJECT_INFO } from '../Projects'
 
-require('dotenv').config()
-
 type Project = [
   address: string,
   projectID: string,
@@ -19,80 +17,69 @@ async function fetchTokenIds() {
   const { data } = await axios.post('https://api.thegraph.com/subgraphs/name/skjaldbaka17/carbon-registry-polygon', {
     query: `
     {
-        projects(first: 1000) {
-          exPosts {
-            tokenId
-            vintage
-            project {
-              projectAddress
-            }
-          }
-          exAntes {
-            tokenId
-            serialization
-            project {
-              projectAddress
-            }
-          }
+      exPosts {
+        tokenId
+        vintage
+        project {
+          projectAddress
         }
       }
+      exAntes {
+        tokenId
+        serialization
+        project {
+          projectAddress
+        }
+      }
+    }
+  
       `,
   })
-
-  return data.data.projects[0]
+  return {
+    exPosts: data.data.exPosts,
+    exAntes: data.data.exAntes,
+  }
 }
 
 async function updateProjectsTokenIds() {
-  const updated_PROJECT_INFO: Project[] = [...PROJECT_INFO] as Project[]
   const updatedProjects: Project[] = []
-  const limit = 1000
-  let totalFetched = 0
 
-  const tokenIds = await fetchTokenIds()
+  const { exPosts, exAntes } = await fetchTokenIds()
 
-  try {
-    while (true) {
+  PROJECT_INFO.forEach((project) => {
+    const exPost = exPosts.find((exPost) => {
+      return exPost.project.projectAddress.toLowerCase() === project[0].toLowerCase() && exPost.vintage === project[2]
+    })
+    const exAnte = exAntes.find((exAnte) => {
+      const parts = exAnte.serialization.split('-')
+      const vintage = parts[parts.length - 1]
 
-      const projects = PROJECT_INFO
-      totalFetched += projects.length
+      return exAnte.project.projectAddress.toLowerCase() === project[0].toLowerCase() && vintage === project[2]
+    })
 
-      for (const project of projects) {
-        const serialization = project.carbonCredits[0].serialization
-        const elements = serialization.split('-')
-        const registry = 'ICR'
-        const registryProjectId = elements[3]
+    if (exPost || exAnte) {
+      const tokenId = exPost ? exPost.tokenId : exAnte ? exAnte.tokenId : '0'
 
-    
-
-        for (const credit of project.carbonCredits) {
-          const newProject: Project = [
-            project.projectContracts[0].address,
-            registry + '-' + registryProjectId,
-            credit.vintage,
-            project.fullName,
-            project.methodology.id,
-            cmsInfo.methodologies[0].category,
-            cmsInfo.country,
-          ]
-
-          updatedProjects.push(newProject)
-        }
-      }
-      if (projects.length < limit) {
-        break
-      }
+      const updatedProject: Project = [
+        project[0],
+        project[1],
+        project[2],
+        project[3],
+        project[4],
+        project[5],
+        project[6],
+        tokenId,
+      ]
+      updatedProjects.push(updatedProject)
+    } else {
+      const updatedProject: Project = [...project, '0'] as Project
+      updatedProjects.push(updatedProject)
     }
-  } catch (error) {
-    console.error('Error fetching projects:', error)
-  }
-
-  updatedProjects.forEach((project) => {
-    updated_PROJECT_INFO.push(project)
   })
 
-  const newFileContents = `export const PROJECT_INFO = ${JSON.stringify(updated_PROJECT_INFO, null, 2)};`
+  const newFileContents = `export const PROJECT_INFO = ${JSON.stringify(updatedProjects, null, 2)};`
 
-  fs.writeFileSync('src/Projects.ts', newFileContents, 'utf8')
+  fs.writeFileSync('./Test.ts', newFileContents, 'utf8')
 }
 
 updateProjectsTokenIds()

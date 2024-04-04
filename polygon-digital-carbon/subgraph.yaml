@@ -9,7 +9,7 @@ graft:
   base: QmUTK4dB7CXVvN2XsX1temzZGcryQ59j8YKdQP5Z2AwzVZ
   block: 58282296
 dataSources:
-# # invalid block for mumbai start
+  # # invalid block for mumbai start
   - kind: ethereum/contract
     name: ToucanFactory
     network: mumbai
@@ -216,7 +216,7 @@ dataSources:
     name: C3ProjectTokenFactory
     network: mumbai
     source:
-      address: '0x3bC4FF4787C0F7Cd83EFB424176f559A00cf28c3'
+      address: '0x3bc4ff4787c0f7cd83efb424176f559a00cf28c3'
       abi: C3ProjectTokenFactory
       startBlock: 47284985
     mapping:
@@ -240,7 +240,7 @@ dataSources:
     name: UBO
     network: mumbai
     source:
-      address: '0x1C08ED3fF245dE937a6414C2C39E372f2640f5f8'
+      address: '0x1c08ed3ff245de937a6414c2c39e372f2640f5f8'
       abi: C3CarbonPool
       startBlock: 47284985
     mapping:
@@ -266,7 +266,7 @@ dataSources:
     name: NBO
     network: mumbai
     source:
-      address: '0x28D5158d45EC651133Fac4c858BeD65252Ed5b7b'
+      address: '0x28d5158d45ec651133fac4c858bed65252ed5b7b'
       abi: C3CarbonPool
       startBlock: 47284985
     mapping:
@@ -292,7 +292,7 @@ dataSources:
     name: C3-Offset
     network: mumbai
     source:
-      address: '0xF977c9328ED849d6CeE131A0B268028ED3404cb6'
+      address: '0xddafb3df0e464cd3252d50da405909185a7e1fbf'
       abi: C3OffsetNFT
       startBlock: 47284985
     mapping:
@@ -313,7 +313,7 @@ dataSources:
     name: ICRCarbonContractRegistry
     network: mumbai
     source:
-      address: '0x825CcCB05D82fcD0381E523116A03b9301E91C61'
+      address: '0x825cccb05d82fcd0381e523116a03b9301e91c61'
       abi: ICRCarbonContractRegistry
       startBlock: 47284985
     mapping:
@@ -339,7 +339,7 @@ dataSources:
     name: RetireToucanCarbon
     network: mumbai
     source:
-      address: '0xCefb61aF5325C0c100cBd77eb4c9F51d17B189Ca'
+      address: '0xcefb61af5325c0c100cbd77eb4c9f51d17b189ca'
       abi: RetireToucanCarbon
       startBlock: 47284985
     mapping:
@@ -388,7 +388,7 @@ dataSources:
     name: RetireC3Carbon
     network: mumbai
     source:
-      address: '0x7803fd5A4f5cDB814b3DF3d5fEe1374734Ad90FF'
+      address: '0x7803fd5a4f5cdb814b3df3d5fee1374734ad90ff'
       abi: RetireC3Carbon
       startBlock: 47284985
     mapping:

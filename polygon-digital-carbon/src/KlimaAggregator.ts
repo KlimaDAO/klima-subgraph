@@ -107,7 +107,8 @@ export function handleC3Retired(event: C3Retired): void {
 }
 
 export function handleCarbonRetired(event: CarbonRetired): void {
-  log.info('asd Handler2 ; TxIndex2: {}; LogIndex: {} Block: {}', [
+  log.info('asd handleCarbonRetired ; hash: {} TxIndex2: {}; LogIndex: {} Block: {}', [
+    event.transaction.hash.toHexString(),
     event.transaction.index.toString(),
     event.logIndex.toString(),
     event.block.number.toString(),

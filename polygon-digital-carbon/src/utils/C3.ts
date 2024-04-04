@@ -1,0 +1,15 @@
+import { BigInt } from '@graphprotocol/graph-ts'
+import { C3OffsetRequest } from '../../generated/schema'
+
+export function loadOrCreateC3OffsetBridgeRequest(requestId: string): C3OffsetRequest {
+  let request = C3OffsetRequest.load(requestId)
+
+  if (request == null) {
+    request = new C3OffsetRequest(requestId)
+    request.status = 'AWAITING'
+    request.index = BigInt.fromI32(0)
+    request.save()
+  }
+
+  return request;
+}

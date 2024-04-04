@@ -13,18 +13,34 @@ type Project = [
   tokenId: string
 ]
 
+type ExPost = {
+  tokenId: string
+  vintage: string
+  project: {
+    projectAddress: string
+  }
+}
+
+type ExAnte = {
+  tokenId: string
+  serialization: string
+  project: {
+    projectAddress: string
+  }
+}
+
 async function fetchTokenIds() {
   const { data } = await axios.post('https://api.thegraph.com/subgraphs/name/skjaldbaka17/carbon-registry-polygon', {
     query: `
     {
-      exPosts {
+      exPosts(first: 1000) {
         tokenId
         vintage
         project {
           projectAddress
         }
       }
-      exAntes {
+      exAntes(first: 1000) {
         tokenId
         serialization
         project {
@@ -35,6 +51,7 @@ async function fetchTokenIds() {
   
       `,
   })
+
   return {
     exPosts: data.data.exPosts,
     exAntes: data.data.exAntes,
@@ -42,44 +59,37 @@ async function fetchTokenIds() {
 }
 
 async function updateProjectsTokenIds() {
-  const updatedProjects: Project[] = []
-
   const { exPosts, exAntes } = await fetchTokenIds()
 
-  PROJECT_INFO.forEach((project) => {
-    const exPost = exPosts.find((exPost) => {
-      return exPost.project.projectAddress.toLowerCase() === project[0].toLowerCase() && exPost.vintage === project[2]
-    })
-    const exAnte = exAntes.find((exAnte) => {
-      const parts = exAnte.serialization.split('-')
-      const vintage = parts[parts.length - 1]
+  const updatedProjects = PROJECT_INFO.map((project) => {
+    const [projectAddress, , projectVintage, ...rest] = project
+    const lowerCaseAddress = projectAddress.toLowerCase()
 
-      return exAnte.project.projectAddress.toLowerCase() === project[0].toLowerCase() && vintage === project[2]
-    })
+    const foundExPost = exPosts.find(
+      (exPost: ExPost) =>
+        exPost.project.projectAddress.toLowerCase() === lowerCaseAddress && exPost.vintage === projectVintage
+    )
 
-    if (exPost || exAnte) {
-      const tokenId = exPost ? exPost.tokenId : exAnte ? exAnte.tokenId : '0'
-
-      const updatedProject: Project = [
-        project[0],
-        project[1],
-        project[2],
-        project[3],
-        project[4],
-        project[5],
-        project[6],
-        tokenId,
-      ]
-      updatedProjects.push(updatedProject)
+    if (foundExPost) {
+      return [...project.slice(0, -1), foundExPost.tokenId]
     } else {
-      const updatedProject: Project = [...project, '0'] as Project
-      updatedProjects.push(updatedProject)
+      const foundExAnte = exAntes.find((exAnte: ExAnte) => {
+        const anteVintage = exAnte.serialization.split('-').pop()
+        return exAnte.project.projectAddress.toLowerCase() === lowerCaseAddress && anteVintage === projectVintage
+      })
+
+      if (foundExAnte) {
+        return [...project.slice(0, -1), foundExAnte.tokenId]
+      }
     }
+
+    // console.log(`no match: ${projectAddress} ${projectVintage}`);
+    return [...project.slice(0, -1), '0']
   })
 
   const newFileContents = `export const PROJECT_INFO = ${JSON.stringify(updatedProjects, null, 2)};`
 
-  fs.writeFileSync('./Test.ts', newFileContents, 'utf8')
+  fs.writeFileSync('../Projects.ts', newFileContents, 'utf8')
 }
 
 updateProjectsTokenIds()

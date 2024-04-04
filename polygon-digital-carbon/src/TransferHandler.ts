@@ -277,10 +277,11 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
   let sender = loadOrCreateAccount(event.transaction.from)
   let senderAddress = Address.fromBytes(sender.id)
 
-  let recordId = updateProvenanceForRetirement(credit.id)
+  // let recordId = updateProvenanceForRetirement(credit.id)
   let retireId = senderAddress.concatI32(sender.totalRetirements)
 
-  log.debug('asd Handler0 ; TxIndex0: {}; LogIndex: {} Block: {} retireIdStart: {} ', [
+  log.info('asd handleStartAsyncToken ; hash: {} TxIndex0: {}; LogIndex: {} Block: {} retireIdStart: {} ', [
+    event.transaction.hash.toHexString(),
     event.transaction.index.toString(),
     event.logIndex.toString(),
     event.block.number.toString(),
@@ -301,17 +302,19 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
     event.transaction.hash,
     'C3'
   )
-
+  log.info("retireId: {}", [retireId.toHexString()])
   let request = new C3OffsetRequest(retireId.toHexString())
 
   request.status = 'PENDING'
   request.index = event.params.index
   request.retire = retireId
-  request.provenance = recordId
+  // request.provenance = recordId
 
   request.save()
-}
 
+  log.info('C3OffsetRequest saved: {}', [request.id])
+}
+// Fix: sender or account won't always be who initiated the retire and thus can't be used for an id
 export function handleEndAsyncToken(event: EndAsyncToken): void {
   // load request and set status to completed
   log.info('handleEndAsyncToken fired', [])
@@ -322,20 +325,21 @@ export function handleEndAsyncToken(event: EndAsyncToken): void {
 
   // && request.index == data.currentIndex
 
-  log.info('asd Handler1 ; TxIndex1: {}; LogIndex: {} Block: {}', [
+  log.info('asd handleEndAsyncToken ; hash; {} TxIndex1: {}; LogIndex: {} Block: {}', [
+    event.transaction.hash.toHexString(),
     event.transaction.index.toString(),
     event.logIndex.toString(),
     event.block.number.toString(),
   ])
-  let account = loadOrCreateAccount(event.params.account)
+  let sender = loadOrCreateAccount(event.transaction.from)
 
-  let retireId = account.id.concatI32(account.totalRetirements)
+  let retireId = sender.id.concatI32(sender.totalRetirements)
   let request = C3OffsetRequest.load(retireId.toHexString())
 
   // let retire = loadRetire(retireId)
 
   if (request == null) {
-    log.error('No C3OffsetRequest found for retireId: {}', [retireId.toHexString()])
+    log.error('No C3OffsetRequest found for retireId: {} hash: {}', [retireId.toHexString(), event.transaction.hash.toHexString()])
     return
   } else {
     if (request.status == 'PENDING') {

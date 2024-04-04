@@ -1,4 +1,4 @@
-import { Address, log } from '@graphprotocol/graph-ts'
+import { Address, BigInt, log } from '@graphprotocol/graph-ts'
 import { KLIMA_INFINITY_DIAMOND, MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { C3OffsetNFT, VCUOMinted } from '../generated/C3-Offset/C3OffsetNFT'
@@ -85,7 +85,8 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   // This event only emits who receives the NFT and the token ID, although the data is stored.
   // Update associated entities using a call to retrieve the retirement details.
 
-  log.debug('asd Handler3 ; TxIndex3: {}; LogIndex: {} Block: {}', [
+  log.info('asd handleVCUOMinted ; hash: {} TxIndex3: {}; LogIndex: {} Block: {}', [
+    event.transaction.hash.toHexString(),
     event.transaction.index.toString(),
     event.logIndex.toString(),
     event.block.number.toString(),
@@ -94,10 +95,22 @@ export function handleVCUOMinted(event: VCUOMinted): void {
 
   let retireContract = C3OffsetNFT.bind(event.address)
 
-  let projectAddress = retireContract.list(event.params.tokenId).getProjectAddress()
-  let retireAmount = retireContract.list(event.params.tokenId).getAmount()
+  let projectAddress: Address = ZERO_ADDRESS
+  let retireAmount: BigInt = BigInt.fromI32(0)
 
-  let credit = loadCarbonCredit(projectAddress)
+  let addressResponse = retireContract.try_list(event.params.tokenId)
+  let amountResponse = retireContract.try_list(event.params.tokenId)
+
+  if (!addressResponse.reverted) {
+    projectAddress = addressResponse.value.getProjectAddress()
+  }
+  if (!amountResponse.reverted) {
+    retireAmount = amountResponse.value.getAmount()
+  }
+
+  // let credit = loadCarbonCredit(projectAddress)
+  //  this was failing on this txn: https://mumbai.polygonscan.com/tx/0x6c50f6ce6a42ab71de3374eb6092ed3573062d9c5b9220960bf9fa662785240d#eventlog
+  let credit = loadOrCreateCarbonCredit(projectAddress, 'C3', null)
 
   credit.retired = credit.retired.plus(retireAmount)
   credit.save()
@@ -114,7 +127,6 @@ export function handleVCUOMinted(event: VCUOMinted): void {
 
   let request = C3OffsetRequest.load(requestId)
 
-
   if (request != null && request.status == 'PENDING') {
     sender = paramsSender
     senderAddress = Address.fromBytes(paramsSender.id)
@@ -126,6 +138,20 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   }
 
   // Ensure account entities are created for all addresses
+
+  log.info('retirelogvalues {} {} {} {} {} {} {} {} {} {} {}', [
+    sender.id.concatI32(sender.totalRetirements).toHexString(),
+    projectAddress.toHexString(),
+    ZERO_ADDRESS.toHexString(),
+    'OTHER',
+    retireAmount.toString(),
+    event.params.sender.toHexString(),
+    '',
+    senderAddress.toHexString(),
+    '',
+    event.block.timestamp.toString(),
+    event.transaction.hash.toHexString(),
+  ])
 
   saveRetire(
     sender.id.concatI32(sender.totalRetirements),

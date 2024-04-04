@@ -17,3 +17,10 @@ export function incrementAccountRetirements(accountAddress: Address): void {
   account.totalRetirements += 1
   account.save()
 }
+
+export function decrementAccountRetirements(accountAddress: Address): void {
+  let account = loadOrCreateAccount(accountAddress)
+
+  account.totalRetirements -= 1
+  account.save()
+} 

@@ -33,6 +33,7 @@ enum ProvenanceType {
 }
 
 enum BridgeStatus {
+  AWAITING
   PENDING
   COMPLETED
 }

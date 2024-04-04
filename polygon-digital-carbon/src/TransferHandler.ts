@@ -1,5 +1,5 @@
-import { Address, BigInt, Bytes, ethereum, log, store } from '@graphprotocol/graph-ts'
-import { MCO2_ERC20_CONTRACT, TOUCAN_CROSS_CHAIN_MESSENGER, ZERO_ADDRESS } from '../../lib/utils/Constants'
+import { Address, BigInt, Bytes, log, store } from '@graphprotocol/graph-ts'
+import { MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Transfer } from '../generated/BCT/ERC20'
 import { loadOrCreateCarbonCredit, updateICRCredit } from './utils/CarbonCredit'
 import { Retired, Retired1 as Retired_1_4_0 } from '../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
@@ -12,19 +12,16 @@ import {
 } from '../generated/templates/ICRProjectToken/ICRProjectToken'
 import { loadOrCreateHolding } from './utils/Holding'
 import { ZERO_BI } from '../../lib/utils/Decimals'
-import { incrementAccountRetirements, loadOrCreateAccount } from './utils/Account'
+import { decrementAccountRetirements, incrementAccountRetirements, loadOrCreateAccount } from './utils/Account'
 import { saveICRRetirement, saveToucanRetirement, saveToucanRetirement_1_4_0 } from './RetirementHandler'
 import { saveBridge } from './utils/Bridge'
 import { CarbonCredit, CrossChainBridge, C3OffsetRequest } from '../generated/schema'
 import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/CarbonPool'
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
-import { recordProvenance, updateProvenanceForRetirement } from './utils/Provenance'
-import { StartAsyncToken, EndAsyncToken, C3ProjectToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'
-import { loadRetire, saveRetire } from './utils/Retire'
-import { saveKlimaRetire } from './utils/KlimaRetire'
-import { KLIMA_CARBON_RETIREMENTS_CONTRACT } from '../../lib/utils/Constants'
-import { KlimaCarbonRetirements } from '../generated/RetireC3Carbon/KlimaCarbonRetirements'
+import { recordProvenance } from './utils/Provenance'
+import { StartAsyncToken, EndAsyncToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'
+import { saveRetire } from './utils/Retire'
 
 export function handleCreditTransfer(event: Transfer): void {
   recordTransfer(
@@ -246,14 +243,13 @@ function recordTransfer(
 }
 
 // asyncToken handling
-
 export function handleStartAsyncToken(event: StartAsyncToken): void {
   log.info('handleStartAsyncToken fired', [])
 
   // Ignore retirements of zero value
   if (event.params.amount == ZERO_BI) return
 
-  let credit = loadOrCreateCarbonCredit(event.address, 'C3', null)
+  loadOrCreateCarbonCredit(event.address, 'C3', null)
 
   // ensure accounts are created for all addresses
   loadOrCreateAccount(event.params.beneficiary)
@@ -262,14 +258,6 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
 
   // let recordId = updateProvenanceForRetirement(credit.id)
   let retireId = senderAddress.concatI32(sender.totalRetirements)
-
-  log.info('asd handleStartAsyncToken ; hash: {} TxIndex0: {}; LogIndex: {} Block: {} retireIdStart: {} ', [
-    event.transaction.hash.toHexString(),
-    event.transaction.index.toString(),
-    event.logIndex.toString(),
-    event.block.number.toString(),
-    senderAddress.concatI32(sender.totalRetirements).toHexString(),
-  ])
 
   saveRetire(
     retireId,
@@ -285,8 +273,13 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
     event.transaction.hash,
     'C3'
   )
-  log.info("retireId: {}", [retireId.toHexString()])
-  let request = new C3OffsetRequest(retireId.toHexString())
+
+  let eventAddress = event.address.toHexString()
+  let beneficiaryAddress = event.params.beneficiary.toHexString()
+
+  let requestId = `${eventAddress}-${beneficiaryAddress}-${event.params.index}`
+
+  let request = new C3OffsetRequest(requestId)
 
   request.status = 'PENDING'
   request.index = event.params.index
@@ -295,39 +288,35 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
 
   request.save()
 
-  log.info('C3OffsetRequest saved: {}', [request.id])
+  incrementAccountRetirements(senderAddress)
 }
-// Fix: sender or account won't always be who initiated the retire and thus can't be used for an id
+
 export function handleEndAsyncToken(event: EndAsyncToken): void {
   // load request and set status to completed
   log.info('handleEndAsyncToken fired', [])
 
-  let tokenContract = C3ProjectToken.bind(event.address)
-
-  let data = tokenContract.getAsyncData(event.params.index)
-
-  // && request.index == data.currentIndex
-
-  log.info('asd handleEndAsyncToken ; hash; {} TxIndex1: {}; LogIndex: {} Block: {}', [
-    event.transaction.hash.toHexString(),
-    event.transaction.index.toString(),
-    event.logIndex.toString(),
-    event.block.number.toString(),
-  ])
   let sender = loadOrCreateAccount(event.transaction.from)
 
   let retireId = sender.id.concatI32(sender.totalRetirements)
-  let request = C3OffsetRequest.load(retireId.toHexString())
 
-  // let retire = loadRetire(retireId)
+  let eventAddress = event.address.toHexString()
+  let beneficiaryAddress = event.params.beneficiary.toHexString()
+
+  let requestId = `${eventAddress}-${beneficiaryAddress}-${event.params.index}`
+  let request = C3OffsetRequest.load(requestId)
 
   if (request == null) {
-    log.error('No C3OffsetRequest found for retireId: {} hash: {}', [retireId.toHexString(), event.transaction.hash.toHexString()])
+    log.error('No C3OffsetRequest found for retireId: {} hash: {}', [
+      retireId.toHexString(),
+      event.transaction.hash.toHexString(),
+    ])
     return
   } else {
     if (request.status == 'PENDING') {
       request.status = 'COMPLETED'
       request.save()
+      /** decrement account retirements because the retire is double counted in VCUOMinted */
+      decrementAccountRetirements(Address.fromBytes(sender.id))
     }
   }
 }

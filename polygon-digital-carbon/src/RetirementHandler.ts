@@ -1,5 +1,4 @@
-import { Address, BigInt, log } from '@graphprotocol/graph-ts'
-import { KLIMA_INFINITY_DIAMOND, MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
+import {  MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { C3OffsetNFT, VCUOMinted } from '../generated/C3-Offset/C3OffsetNFT'
 import { CarbonOffset } from '../generated/MossCarbonOffset/CarbonChain'
@@ -10,8 +9,6 @@ import { loadCarbonCredit, loadOrCreateCarbonCredit } from './utils/CarbonCredit
 import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 import { recordProvenance, updateProvenanceForRetirement } from './utils/Provenance'
 import { saveRetire } from './utils/Retire'
-import { Account, C3OffsetRequest } from '../generated/schema'
-import { C3ProjectToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -85,73 +82,20 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   // This event only emits who receives the NFT and the token ID, although the data is stored.
   // Update associated entities using a call to retrieve the retirement details.
 
-  log.info('asd handleVCUOMinted ; hash: {} TxIndex3: {}; LogIndex: {} Block: {}', [
-    event.transaction.hash.toHexString(),
-    event.transaction.index.toString(),
-    event.logIndex.toString(),
-    event.block.number.toString(),
-  ])
-  log.info('VCUO Minted: {} Sender: {}', [event.params.tokenId.toString(), event.params.sender.toHexString()])
-
   let retireContract = C3OffsetNFT.bind(event.address)
 
-  let projectAddress: Address = ZERO_ADDRESS
-  let retireAmount: BigInt = BigInt.fromI32(0)
+  let projectAddress = retireContract.list(event.params.tokenId).getProjectAddress()
+  let retireAmount = retireContract.list(event.params.tokenId).getAmount()
 
-  let addressResponse = retireContract.try_list(event.params.tokenId)
-  let amountResponse = retireContract.try_list(event.params.tokenId)
-
-  if (!addressResponse.reverted) {
-    projectAddress = addressResponse.value.getProjectAddress()
-  }
-  if (!amountResponse.reverted) {
-    retireAmount = amountResponse.value.getAmount()
-  }
-
-  // let credit = loadCarbonCredit(projectAddress)
-  //  this was failing on this txn: https://mumbai.polygonscan.com/tx/0x6c50f6ce6a42ab71de3374eb6092ed3573062d9c5b9220960bf9fa662785240d#eventlog
   let credit = loadOrCreateCarbonCredit(projectAddress, 'C3', null)
 
   credit.retired = credit.retired.plus(retireAmount)
   credit.save()
 
   // Ensure account entities are created for all addresses
-  // ALERT: Changing this here.
-
-  let sender: Account
-  let senderAddress: Address
-
-  let paramsSender = loadOrCreateAccount(event.params.sender)
-
-  let requestId = paramsSender.id.concatI32(paramsSender.totalRetirements).toHexString()
-
-  let request = C3OffsetRequest.load(requestId)
-
-  if (request != null && request.status == 'PENDING') {
-    sender = paramsSender
-    senderAddress = Address.fromBytes(paramsSender.id)
-    loadOrCreateAccount(event.transaction.from)
-  } else {
-    sender = loadOrCreateAccount(event.transaction.from)
-    senderAddress = event.transaction.from
-    loadOrCreateAccount(event.params.sender)
-  }
-
-  // Ensure account entities are created for all addresses
-
-  log.info('retirelogvalues {} {} {} {} {} {} {} {} {} {} {}', [
-    sender.id.concatI32(sender.totalRetirements).toHexString(),
-    projectAddress.toHexString(),
-    ZERO_ADDRESS.toHexString(),
-    'OTHER',
-    retireAmount.toString(),
-    event.params.sender.toHexString(),
-    '',
-    senderAddress.toHexString(),
-    '',
-    event.block.timestamp.toString(),
-    event.transaction.hash.toHexString(),
-  ])
+  loadOrCreateAccount(event.params.sender)
+  let sender = loadOrCreateAccount(event.transaction.from)
+  let senderAddress = event.transaction.from
 
   saveRetire(
     sender.id.concatI32(sender.totalRetirements),
@@ -166,11 +110,6 @@ export function handleVCUOMinted(event: VCUOMinted): void {
     event.block.timestamp,
     event.transaction.hash
   )
-  log.info('Retirement saved: {}, senderAddress {} hash: {}', [
-    event.params.tokenId.toString(),
-    senderAddress.toHexString(),
-    event.transaction.hash.toHexString(),
-  ])
 
   incrementAccountRetirements(senderAddress)
 }

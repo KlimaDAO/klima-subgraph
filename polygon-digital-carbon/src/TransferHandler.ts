@@ -279,7 +279,7 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
     null,
     event.transaction.from,
     ZERO_ADDRESS,
-    'RETIRE',
+    'RETIREMENT',
     event.params.amount,
     event.block.timestamp
   )

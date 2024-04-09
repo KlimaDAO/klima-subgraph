@@ -1,5 +1,10 @@
 import { Address, BigInt, Bytes, ethereum, log, store } from '@graphprotocol/graph-ts'
-import { MCO2_ERC20_CONTRACT, TOUCAN_CROSS_CHAIN_MESSENGER, ZERO_ADDRESS } from '../../lib/utils/Constants'
+import {
+  ICR_MIGRATION_BLOCK,
+  MCO2_ERC20_CONTRACT,
+  TOUCAN_CROSS_CHAIN_MESSENGER,
+  ZERO_ADDRESS,
+} from '../../lib/utils/Constants'
 import { Transfer } from '../generated/BCT/ERC20'
 import { loadCarbonCredit, loadOrCreateCarbonCredit, updateICRCredit } from './utils/CarbonCredit'
 import { Retired, Retired1 as Retired_1_4_0 } from '../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
@@ -11,11 +16,11 @@ import {
   ExAnteMinted,
 } from '../generated/templates/ICRProjectToken/ICRProjectToken'
 import { loadOrCreateHolding } from './utils/Holding'
-import { ZERO_BI } from '../../lib/utils/Decimals'
+import { BIG_INT_1E18, ZERO_BI } from '../../lib/utils/Decimals'
 import { loadOrCreateAccount } from './utils/Account'
 import { saveICRRetirement, saveToucanRetirement, saveToucanRetirement_1_4_0 } from './RetirementHandler'
 import { saveBridge } from './utils/Bridge'
-import { CarbonCredit, CrossChainBridge } from '../generated/schema'
+import { CarbonCredit, CarbonProject, CrossChainBridge } from '../generated/schema'
 import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/CarbonPool'
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
@@ -156,6 +161,12 @@ function recordTransfer(
   // ICR issues new token IDs on the 1155 contract address for retirements that are not actual credit tokens
   if (credit == null) return
 
+  let project = CarbonProject.load(credit.project)
+  if (project != null) {
+    if (project.registry == 'ICR' && blockNumber < ICR_MIGRATION_BLOCK) {
+      amount = amount.times(BIG_INT_1E18)
+    }
+  }
   if (from == ZERO_ADDRESS) {
     credit.currentSupply = credit.currentSupply.plus(amount)
 

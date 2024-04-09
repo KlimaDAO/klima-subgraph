@@ -119,6 +119,7 @@ export const KLIMA_INFINITY_DIAMOND = Address.fromString('0x8cE54d9625371fb2a068
 // Other ecosystem addresses
 export const TOUCAN_REGEN_BRIDGE = Address.fromString('0xdC1Dfa22824Af4e423a558bbb6C53a31c3c11DCC')
 export const TOUCAN_CROSS_CHAIN_MESSENGER = Address.fromString('0xABaC3D6b281Bbe0Fc0F67b26247cB27994eaAcaf')
+export const ICR_MIGRATION_BLOCK = BigInt.fromI32(55190341)
 
 // Global constants
 export const KGS_PER_TONNE = BigDecimal.fromString('1000')

@@ -1,6 +1,7 @@
 import { Address, BigInt, Bytes, ethereum, log, store } from '@graphprotocol/graph-ts'
 import {
   ICR_MIGRATION_BLOCK,
+  ICR_MIGRATION_HASHES,
   MCO2_ERC20_CONTRACT,
   TOUCAN_CROSS_CHAIN_MESSENGER,
   ZERO_ADDRESS,
@@ -81,12 +82,19 @@ export function handleToucanRetired_1_4_0(event: Retired_1_4_0): void {
 }
 
 export function handle1155CreditTransfer(event: TransferSingle): void {
+  if (ICR_MIGRATION_HASHES.indexOf(event.transaction.hash.toHexString()) > 0) return
+
+  let amount = event.params.value
+  if (event.block.number < ICR_MIGRATION_BLOCK) {
+    amount = amount.times(BIG_INT_1E18)
+  }
+
   recordTransfer(
     event.address,
     event.params.id,
     event.params.from,
     event.params.to,
-    event.params.value,
+    amount,
     event.transaction.hash,
     event.transactionLogIndex.toI32(),
     event.block.timestamp,
@@ -95,13 +103,20 @@ export function handle1155CreditTransfer(event: TransferSingle): void {
 }
 
 export function handle1155CreditTransferBatch(event: TransferBatch): void {
+  if (ICR_MIGRATION_HASHES.indexOf(event.transaction.hash.toHexString()) > 0) return
+
   for (let i = 0; i < event.params.ids.length; i++) {
+    let amount = event.params.values[i]
+    if (event.block.number < ICR_MIGRATION_BLOCK) {
+      amount = amount.times(BIG_INT_1E18)
+    }
+
     recordTransfer(
       event.address,
       event.params.ids[i],
       event.params.from,
       event.params.to,
-      event.params.values[i],
+      amount,
       event.transaction.hash,
       event.transactionLogIndex.toI32(),
       event.block.timestamp,
@@ -160,14 +175,6 @@ function recordTransfer(
 
   // ICR issues new token IDs on the 1155 contract address for retirements that are not actual credit tokens
   if (credit == null) return
-
-  // Adjust for historical ICR decimals
-  let project = CarbonProject.load(credit.project)
-  if (project != null) {
-    if (project.registry == 'ICR' && blockNumber < ICR_MIGRATION_BLOCK) {
-      amount = amount.times(BIG_INT_1E18)
-    }
-  }
 
   if (from == ZERO_ADDRESS) {
     credit.currentSupply = credit.currentSupply.plus(amount)

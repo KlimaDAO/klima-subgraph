@@ -161,12 +161,14 @@ function recordTransfer(
   // ICR issues new token IDs on the 1155 contract address for retirements that are not actual credit tokens
   if (credit == null) return
 
+  // Adjust for historical ICR decimals
   let project = CarbonProject.load(credit.project)
   if (project != null) {
     if (project.registry == 'ICR' && blockNumber < ICR_MIGRATION_BLOCK) {
       amount = amount.times(BIG_INT_1E18)
     }
   }
+
   if (from == ZERO_ADDRESS) {
     credit.currentSupply = credit.currentSupply.plus(amount)
 

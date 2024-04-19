@@ -1,5 +1,11 @@
-import { Address, BigInt, Bytes, log, store } from '@graphprotocol/graph-ts'
-import { MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
+import { Address, BigInt, Bytes, ethereum, log, store } from '@graphprotocol/graph-ts'
+import {
+  ICR_MIGRATION_BLOCK,
+  ICR_MIGRATION_HASHES,
+  MCO2_ERC20_CONTRACT,
+  TOUCAN_CROSS_CHAIN_MESSENGER,
+  ZERO_ADDRESS,
+} from '../../lib/utils/Constants'
 import { Transfer } from '../generated/BCT/ERC20'
 import { loadOrCreateCarbonCredit, updateICRCredit } from './utils/CarbonCredit'
 import { Retired, Retired1 as Retired_1_4_0 } from '../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
@@ -11,7 +17,6 @@ import {
   ExAnteMinted,
 } from '../generated/templates/ICRProjectToken/ICRProjectToken'
 import { loadOrCreateHolding } from './utils/Holding'
-import { ZERO_BI } from '../../lib/utils/Decimals'
 import { decrementAccountRetirements, incrementAccountRetirements, loadOrCreateAccount } from './utils/Account'
 import {
   completeC3OffsetRequest,
@@ -22,6 +27,8 @@ import {
 } from './RetirementHandler'
 import { saveBridge } from './utils/Bridge'
 import { CarbonCredit, CrossChainBridge, C3OffsetRequest } from '../generated/schema'
+import { BIG_INT_1E18, ZERO_BI } from '../../lib/utils/Decimals'
+
 import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/CarbonPool'
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
@@ -84,12 +91,19 @@ export function handleToucanRetired_1_4_0(event: Retired_1_4_0): void {
 }
 
 export function handle1155CreditTransfer(event: TransferSingle): void {
+  if (ICR_MIGRATION_HASHES.indexOf(event.transaction.hash.toHexString()) > 0) return
+
+  let amount = event.params.value
+  if (event.block.number < ICR_MIGRATION_BLOCK) {
+    amount = amount.times(BIG_INT_1E18)
+  }
+
   recordTransfer(
     event.address,
     event.params.id,
     event.params.from,
     event.params.to,
-    event.params.value,
+    amount,
     event.transaction.hash,
     event.transactionLogIndex.toI32(),
     event.block.timestamp,
@@ -98,13 +112,20 @@ export function handle1155CreditTransfer(event: TransferSingle): void {
 }
 
 export function handle1155CreditTransferBatch(event: TransferBatch): void {
+  if (ICR_MIGRATION_HASHES.indexOf(event.transaction.hash.toHexString()) > 0) return
+
   for (let i = 0; i < event.params.ids.length; i++) {
+    let amount = event.params.values[i]
+    if (event.block.number < ICR_MIGRATION_BLOCK) {
+      amount = amount.times(BIG_INT_1E18)
+    }
+
     recordTransfer(
       event.address,
       event.params.ids[i],
       event.params.from,
       event.params.to,
-      event.params.values[i],
+      amount,
       event.transaction.hash,
       event.transactionLogIndex.toI32(),
       event.block.timestamp,

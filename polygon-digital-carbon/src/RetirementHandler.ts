@@ -1,5 +1,11 @@
-import { MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
-import { ZERO_BI } from '../../lib/utils/Decimals'
+import { Address } from '@graphprotocol/graph-ts'
+import {
+  ICR_MIGRATION_BLOCK,
+  KLIMA_INFINITY_DIAMOND,
+  MCO2_ERC20_CONTRACT,
+  ZERO_ADDRESS,
+} from '../../lib/utils/Constants'
+import { BIG_INT_1E18, ZERO_BI } from '../../lib/utils/Decimals'
 import { C3OffsetNFT, VCUOMinted } from '../generated/C3-Offset/C3OffsetNFT'
 import { CarbonOffset } from '../generated/MossCarbonOffset/CarbonChain'
 import { EndAsyncToken, StartAsyncToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'
@@ -160,7 +166,12 @@ export function handleMossRetirement(event: CarbonOffset): void {
 export function saveICRRetirement(event: RetiredVintage): void {
   let credit = loadOrCreateCarbonCredit(event.address, 'ICR', event.params.tokenId)
 
-  credit.retired = credit.retired.plus(event.params.amount)
+  let amount = event.params.amount
+  if (event.block.number < ICR_MIGRATION_BLOCK) {
+    amount = event.params.amount.times(BIG_INT_1E18)
+  }
+
+  credit.retired = credit.retired.plus(amount)
   credit.save()
 
   // Ensure account entities are created for all addresses
@@ -173,7 +184,7 @@ export function saveICRRetirement(event: RetiredVintage): void {
     credit.id,
     ZERO_ADDRESS,
     'OTHER',
-    event.params.amount,
+    amount,
     event.params.account,
     '',
     senderAddress,

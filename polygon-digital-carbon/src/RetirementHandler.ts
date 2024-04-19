@@ -1,6 +1,6 @@
 import {
   ICR_MIGRATION_BLOCK,
-  KLIMA_INFINITY_DIAMOND,
+
   MCO2_ERC20_CONTRACT,
   ZERO_ADDRESS,
 } from '../../lib/utils/Constants'

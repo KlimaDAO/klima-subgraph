@@ -204,7 +204,8 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
   // Ignore retirements of zero value
   if (event.params.amount == ZERO_BI) return
 
-  loadOrCreateCarbonCredit(event.address, 'C3', null)
+  let credit = loadOrCreateCarbonCredit(event.address, 'C3', null)
+  credit.save()
 
   // ensure accounts are created for all addresses
   loadOrCreateAccount(event.params.beneficiary)
@@ -215,7 +216,7 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
 
   saveRetire(
     retireId,
-    event.address,
+    credit.id,
     ZERO_ADDRESS,
     'OTHER',
     event.params.amount,

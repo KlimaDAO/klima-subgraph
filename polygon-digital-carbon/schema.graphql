@@ -6,7 +6,6 @@ enum Registry {
   PURO_EARTH
   ICR
   ECO
-  JPN
   JCS
 }
 

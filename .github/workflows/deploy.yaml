@@ -72,6 +72,12 @@ jobs:
           fi
         env:
           REF: ${{ github.ref }}
-      - name: Deploy Subgraph
+      - name: Deploy Digital-Carbon Subgraph to Studio
+        if: ${{ matrix.value == 'polygon-digital-carbon' }}
+        run: ../node_modules/.bin/graph deploy --studio --access-token ${{ secrets.STUDIO_ACCESS_TOKEN }} ${{ steps.staging_or_not.outputs.subgraph }}
+        working-directory: ${{ matrix.value }}
+      
+      - name: Deploy Other Subgraphs to Hosted Service
+        if: ${{ matrix.value != 'polygon-digital-carbon' }}
         run: ../node_modules/.bin/graph deploy --product hosted-service --deploy-key ${{ secrets.HOSTED_SERVICE_ACCESS_TOKEN }} klimadao/${{ steps.staging_or_not.outputs.subgraph }}
-        working-directory: '${{ matrix.value }}'
+        working-directory: ${{ matrix.value }}

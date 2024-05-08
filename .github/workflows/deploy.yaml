@@ -74,7 +74,7 @@ jobs:
           REF: ${{ github.ref }}
       - name: Deploy Digital-Carbon Subgraph to Studio
         if: ${{ matrix.value == 'polygon-digital-carbon' }}
-        run: ../node_modules/.bin/graph deploy --studio --access-token ${{ secrets.STUDIO_ACCESS_TOKEN }} ${{ steps.staging_or_not.outputs.subgraph }}
+        run: ../node_modules/.bin/graph deploy --studio --access-token ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY}} ${{ steps.staging_or_not.outputs.subgraph }}
         working-directory: '${{ matrix.value }}'
       
       - name: Deploy Other Subgraphs to Hosted Service

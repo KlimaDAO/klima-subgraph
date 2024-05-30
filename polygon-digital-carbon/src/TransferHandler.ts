@@ -11,7 +11,7 @@ import {
   ExAnteMinted,
 } from '../generated/templates/ICRProjectToken/ICRProjectToken'
 import { loadOrCreateHolding } from './utils/Holding'
-import { ZERO_BI } from '../../lib/utils/Decimals'
+import { ZERO_BI, BIG_INT_1E18 } from '../../lib/utils/Decimals'
 import { decrementAccountRetirements, incrementAccountRetirements, loadOrCreateAccount } from './utils/Account'
 import {
   completeC3OffsetRequest,
@@ -27,6 +27,7 @@ import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalanc
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
 import { recordProvenance } from './utils/Provenance'
 import { StartAsyncToken, EndAsyncToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'
+import { createICRTokenWithCall } from './utils/Token'
 import { saveRetire } from './utils/Retire'
 
 export function handleCreditTransfer(event: Transfer): void {

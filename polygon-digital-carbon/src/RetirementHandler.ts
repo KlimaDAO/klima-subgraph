@@ -5,9 +5,6 @@ import {
   ZERO_ADDRESS,
 } from '../../lib/utils/Constants'
 import { BIG_INT_1E18, ZERO_BI } from '../../lib/utils/Decimals'
-
-import { Address, BigInt, log } from '@graphprotocol/graph-ts'
-
 import { C3OffsetNFT, VCUOMinted } from '../generated/C3-Offset/C3OffsetNFT'
 import { CarbonOffset } from '../generated/MossCarbonOffset/CarbonChain'
 import { EndAsyncToken, StartAsyncToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'

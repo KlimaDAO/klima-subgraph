@@ -112,7 +112,8 @@ export const NFT_CO2COMPOUND_INIT_TIMESTAMP = BigInt.fromString('1638486000') //
 export const ZERO_ADDRESS = Address.fromString('0x0000000000000000000000000000000000000000')
 
 // Klima Infinity Addresses
-export const KLIMA_CARBON_RETIREMENTS_CONTRACT = Address.fromString('0xe6d0C3172bd2964bB632C00D45b1CF260d997dA5') //mumbai
+export const KLIMA_CARBON_RETIREMENTS_CONTRACT = Address.fromString('0xac298CD34559B9AcfaedeA8344a977eceff1C0Fd') // polygon
+export const AMOY_KLIMA_CARBON_RETIREMENTS_CONTRACT = Address.fromString('0x5505a7b6ced40a41882a38fc11e2f8bcab2b46f7') //amoy
 export const KLIMA_INFINITY_DIAMOND = Address.fromString('0x62d3897089C93A0fa2B0746A6975Ec4693c13cb8') //mumbai
 
 // Other ecosystem addresses

@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, store } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, log, store } from '@graphprotocol/graph-ts'
 import { ICR_MIGRATION_BLOCK, ICR_MIGRATION_HASHES, MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Transfer } from '../generated/BCT/ERC20'
 import { loadOrCreateCarbonCredit, updateICRCredit } from './utils/CarbonCredit'
@@ -12,7 +12,7 @@ import {
 } from '../generated/templates/ICRProjectToken/ICRProjectToken'
 import { loadOrCreateHolding } from './utils/Holding'
 import { ZERO_BI, BIG_INT_1E18 } from '../../lib/utils/Decimals'
-import { decrementAccountRetirements, incrementAccountRetirements, loadOrCreateAccount } from './utils/Account'
+import { loadOrCreateAccount } from './utils/Account'
 import {
   completeC3OffsetRequest,
   saveICRRetirement,
@@ -26,9 +26,7 @@ import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/Carb
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
 import { recordProvenance } from './utils/Provenance'
-import { StartAsyncToken, EndAsyncToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'
 import { createICRTokenWithCall } from './utils/Token'
-import { saveRetire } from './utils/Retire'
 
 export function handleCreditTransfer(event: Transfer): void {
   recordTransfer(
@@ -264,29 +262,4 @@ function recordTransfer(
 
     pool.save()
   }
-}
-
-// asyncToken handling
-
-export function handleStartAsyncToken(event: StartAsyncToken): void {
-  // Ignore retirements of zero value
-  if (event.params.amount == ZERO_BI) return
-
-  saveStartAsyncToken(event)
-
-  recordProvenance(
-    event.transaction.hash,
-    event.address,
-    null,
-    event.transaction.from,
-    ZERO_ADDRESS,
-    'RETIREMENT',
-    event.params.amount,
-    event.block.timestamp
-  )
-}
-
-export function handleEndAsyncToken(event: EndAsyncToken): void {
-  // load request and set status to completed
-  completeC3OffsetRequest(event)
 }

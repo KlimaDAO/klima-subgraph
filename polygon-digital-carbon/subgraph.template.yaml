@@ -229,6 +229,10 @@ dataSources:
       eventHandlers:
         - event: NewTokenProject(string,address)
           handler: handleNewC3T
+        - event: StartAsyncToken(address,address,address,uint256,string,string,uint256,uint256)
+          handler: handleStartAsyncToken
+        - event: EndAsyncToken(address,address,address,uint256,string,string,uint256,uint256,bool,uint256)
+          handler: handleEndAsyncToken
   - kind: ethereum/contract
     name: UBO
     network: {{network}}

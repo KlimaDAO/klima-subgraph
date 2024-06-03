@@ -6,6 +6,8 @@ enum Registry {
   PURO_EARTH
   ICR
   J_CREDIT
+  AMERICAN_CARBON_REGISTRY
+  ECO_REGISTRY
 }
 
 enum RetireSource {

@@ -7,7 +7,7 @@ import {
 import { BIG_INT_1E18, ZERO_BI } from '../../lib/utils/Decimals'
 import { C3OffsetNFT, VCUOMinted } from '../generated/C3-Offset/C3OffsetNFT'
 import { CarbonOffset } from '../generated/MossCarbonOffset/CarbonChain'
-import { EndAsyncToken, StartAsyncToken } from '../generated/templates/C3ProjectToken/C3ProjectToken'
+import { StartAsyncToken, EndAsyncToken } from '../generated/C3ProjectTokenFactory/C3ProjectTokenFactory'
 import { RetiredVintage } from '../generated/templates/ICRProjectToken/ICRProjectToken'
 import { Retired, Retired1 as Retired_1_4_0 } from '../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
 import { incrementAccountRetirements, loadOrCreateAccount, decrementAccountRetirements } from './utils/Account'
@@ -88,7 +88,7 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   // Currently the NFT minting is required and happens within every offset or offsetFor transaction made against a C3T
   // This event only emits who receives the NFT and the token ID, although the data is stored.
   // Update associated entities using a call to retrieve the retirement details.
-
+  log.info('fixt {}', [event.params.tokenId.toString()])
   let retireContract = C3OffsetNFT.bind(event.address)
 
   let projectAddress = retireContract.list(event.params.tokenId).getProjectAddress()
@@ -198,10 +198,12 @@ export function saveICRRetirement(event: RetiredVintage): void {
 }
 
 export function saveStartAsyncToken(event: StartAsyncToken): void {
+
+  log.info('start async event: {}', [event.params.amount.toString()])
   // Ignore retirements of zero value
   if (event.params.amount == ZERO_BI) return
 
-  let credit = loadOrCreateCarbonCredit(event.address, 'C3', null)
+  let credit = loadOrCreateCarbonCredit(event.params.fromToken, 'C3', null)
   credit.save()
 
   // ensure accounts are created for all addresses
@@ -210,6 +212,8 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
   let senderAddress = event.transaction.from
 
   let retireId = senderAddress.concatI32(sender.totalRetirements)
+
+  log.info('retireId 123: {} tokenAddress: {}', [retireId.toHexString(), event.params.fromToken.toHexString()])
 
   saveRetire(
     retireId,

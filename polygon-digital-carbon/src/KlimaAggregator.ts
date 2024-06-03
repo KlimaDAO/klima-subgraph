@@ -4,10 +4,10 @@ import { C3Retired } from '../generated/RetireC3Carbon/RetireC3Carbon'
 import { CarbonRetired, CarbonRetired1 as CarbonRetiredTokenId } from '../generated/KlimaInfinity/KlimaInfinity'
 
 import { KlimaCarbonRetirements } from '../generated/RetireC3Carbon/KlimaCarbonRetirements'
-import {  BigInt } from '@graphprotocol/graph-ts'
+import { BigInt, log, dataSource } from '@graphprotocol/graph-ts'
 import { loadOrCreateAccount } from './utils/Account'
 import { loadRetire } from './utils/Retire'
-import { ZERO_ADDRESS } from '../../lib/utils/Constants'
+import { AMOY_KLIMA_CARBON_RETIREMENTS_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { saveKlimaRetire } from './utils/KlimaRetire'
 import { KLIMA_CARBON_RETIREMENTS_CONTRACT } from '../../lib/utils/Constants'
 import { ZERO_BI } from '../../lib/utils/Decimals'
@@ -16,7 +16,7 @@ export function handleMossRetired(event: MossRetired): void {
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
 
-  let klimaRetirements = KlimaCarbonRetirements.bind(KLIMA_CARBON_RETIREMENTS_CONTRACT)
+  let klimaRetirements = KlimaCarbonRetirements.bind(AMOY_KLIMA_CARBON_RETIREMENTS_CONTRACT)
   let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
 
   let sender = loadOrCreateAccount(event.transaction.from)
@@ -47,7 +47,7 @@ export function handleToucanRetired(event: ToucanRetired): void {
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
 
-  let klimaRetirements = KlimaCarbonRetirements.bind(KLIMA_CARBON_RETIREMENTS_CONTRACT)
+  let klimaRetirements = KlimaCarbonRetirements.bind(AMOY_KLIMA_CARBON_RETIREMENTS_CONTRACT)
   let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
 
   let sender = loadOrCreateAccount(event.transaction.from)
@@ -78,7 +78,8 @@ export function handleC3Retired(event: C3Retired): void {
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
 
-  let klimaRetirements = KlimaCarbonRetirements.bind(KLIMA_CARBON_RETIREMENTS_CONTRACT)
+  // let klimaRetirements = KlimaCarbonRetirements.bind(KLIMA_CARBON_RETIREMENTS_CONTRACT)
+  let klimaRetirements = KlimaCarbonRetirements.bind(AMOY_KLIMA_CARBON_RETIREMENTS_CONTRACT)
   let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
 
   let sender = loadOrCreateAccount(event.transaction.from)
@@ -106,17 +107,28 @@ export function handleC3Retired(event: C3Retired): void {
 }
 
 export function handleCarbonRetired(event: CarbonRetired): void {
+  log.info('asdf: {} beneficary: {} retiring: {}', [
+    event.transaction.from.toHexString(),
+
+    event.params.beneficiaryAddress.toHexString(),
+    event.params.retiringAddress.toHexString(),
+  ])
+
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
 
-  let klimaRetirements = KlimaCarbonRetirements.bind(KLIMA_CARBON_RETIREMENTS_CONTRACT)
+  let klimaRetirements = KlimaCarbonRetirements.bind(AMOY_KLIMA_CARBON_RETIREMENTS_CONTRACT)
   let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
+
+  log.info('asdf1 index: {} tokenAddress {}', [index.toString(), event.params.carbonToken.toHexString()])
 
   let sender = loadOrCreateAccount(event.transaction.from)
   loadOrCreateAccount(event.params.retiringAddress)
   loadOrCreateAccount(event.params.beneficiaryAddress)
 
   let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
+
+  log.info('asdf2 retire: {}', [retire.id.toHexString()])
 
   if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
 
@@ -140,7 +152,7 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
 
-  let klimaRetirements = KlimaCarbonRetirements.bind(KLIMA_CARBON_RETIREMENTS_CONTRACT)
+  let klimaRetirements = KlimaCarbonRetirements.bind(AMOY_KLIMA_CARBON_RETIREMENTS_CONTRACT)
   let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
 
   let sender = loadOrCreateAccount(event.transaction.from)

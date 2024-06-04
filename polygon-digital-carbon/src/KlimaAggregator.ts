@@ -116,19 +116,19 @@ export function handleCarbonRetired(event: CarbonRetired): void {
 
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
+  let network = dataSource.network()
+  log.info('handleCarbonRetired network: {}', [network])
+  let retireContractAddress =
+    network == 'matic' ? KLIMA_CARBON_RETIREMENTS_CONTRACT : AMOY_KLIMA_CARBON_RETIREMENTS_CONTRACT
 
-  let klimaRetirements = KlimaCarbonRetirements.bind(AMOY_KLIMA_CARBON_RETIREMENTS_CONTRACT)
+  let klimaRetirements = KlimaCarbonRetirements.bind(retireContractAddress)
   let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
-
-  log.info('asdf1 index: {} tokenAddress {}', [index.toString(), event.params.carbonToken.toHexString()])
 
   let sender = loadOrCreateAccount(event.transaction.from)
   loadOrCreateAccount(event.params.retiringAddress)
   loadOrCreateAccount(event.params.beneficiaryAddress)
 
   let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
-
-  log.info('asdf2 retire: {}', [retire.id.toHexString()])
 
   if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
 

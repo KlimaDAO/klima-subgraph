@@ -21,7 +21,7 @@ import {
   saveToucanRetirement_1_4_0,
 } from './RetirementHandler'
 import { saveBridge } from './utils/Bridge'
-import { CarbonCredit, CrossChainBridge, C3OffsetRequest } from '../generated/schema'
+import { CarbonCredit, CrossChainBridge } from '../generated/schema'
 import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/CarbonPool'
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'

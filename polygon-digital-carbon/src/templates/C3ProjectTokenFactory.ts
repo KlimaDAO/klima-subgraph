@@ -22,7 +22,6 @@ export function handleNewC3T(event: NewTokenProject): void {
 // asyncToken handling
 
 export function handleStartAsyncToken(event: StartAsyncToken): void {
-  log.info('zed {}', [event.params.amount.toString()])
   // Ignore retirements of zero value
   if (event.params.amount == ZERO_BI) return
 

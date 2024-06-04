@@ -1,9 +1,4 @@
-import {
-  ICR_MIGRATION_BLOCK,
-
-  MCO2_ERC20_CONTRACT,
-  ZERO_ADDRESS,
-} from '../../lib/utils/Constants'
+import { ICR_MIGRATION_BLOCK, MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { BIG_INT_1E18, ZERO_BI } from '../../lib/utils/Decimals'
 import { C3OffsetNFT, VCUOMinted } from '../generated/C3-Offset/C3OffsetNFT'
 import { CarbonOffset } from '../generated/MossCarbonOffset/CarbonChain'
@@ -16,6 +11,7 @@ import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 import { loadRetire, saveRetire } from './utils/Retire'
 import { Address, log } from '@graphprotocol/graph-ts'
 import { loadOrCreateC3OffsetBridgeRequest } from './utils/C3'
+import { Token } from '../generated/schema'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -117,8 +113,15 @@ export function handleVCUOMinted(event: VCUOMinted): void {
     event.block.timestamp,
     event.transaction.hash
   )
+  // Do not increment retirements for C3T-JCS tokens as the retirement has already been counted in StartAsyncToken
+  let token = Token.load(projectAddress)
 
-  incrementAccountRetirements(senderAddress)
+  if (token != null && !token.symbol.startsWith('C3T-JCS')) {
+    incrementAccountRetirements(senderAddress)
+  }
+  if (token != null) {
+    log.info('token: {}', [token.symbol])
+  }
 }
 
 export function handleMossRetirement(event: CarbonOffset): void {
@@ -198,8 +201,6 @@ export function saveICRRetirement(event: RetiredVintage): void {
 }
 
 export function saveStartAsyncToken(event: StartAsyncToken): void {
-
-  log.info('start async event: {}', [event.params.amount.toString()])
   // Ignore retirements of zero value
   if (event.params.amount == ZERO_BI) return
 
@@ -212,8 +213,6 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
   let senderAddress = event.transaction.from
 
   let retireId = senderAddress.concatI32(sender.totalRetirements)
-
-  log.info('retireId 123: {} tokenAddress: {}', [retireId.toHexString(), event.params.fromToken.toHexString()])
 
   saveRetire(
     retireId,
@@ -230,7 +229,7 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
     'C3'
   )
 
-  let eventAddress = event.address.toHexString()
+  let eventAddress = event.params.fromToken.toHexString()
   let beneficiaryAddress = event.params.beneficiary.toHexString()
   let requestId = `${eventAddress}-${beneficiaryAddress}-${event.params.index}`
   let request = loadOrCreateC3OffsetBridgeRequest(requestId)
@@ -255,7 +254,7 @@ export function completeC3OffsetRequest(event: EndAsyncToken): void {
 
   let retireId = sender.id.concatI32(sender.totalRetirements)
 
-  let eventAddress = event.address.toHexString()
+  let eventAddress = event.params.fromToken.toHexString()
   let beneficiaryAddress = event.params.beneficiary.toHexString()
 
   let requestId = `${eventAddress}-${beneficiaryAddress}-${event.params.index}`
@@ -272,7 +271,7 @@ export function completeC3OffsetRequest(event: EndAsyncToken): void {
       request.status = 'COMPLETED'
       request.save()
       /** decrement account retirements because the retire is double counted in VCUOMinted */
-      decrementAccountRetirements(Address.fromBytes(sender.id))
+      // decrementAccountRetirements(Address.fromBytes(sender.id))
     }
   }
 }

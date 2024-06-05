@@ -239,6 +239,8 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
   request.retire = retireId
 
   let retire = loadRetire(retireId)
+  retire.c3OffsetRequest = requestId
+  retire.save()
 
   if (retire != null) {
     request.provenance = retire.provenance

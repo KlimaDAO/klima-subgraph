@@ -348,6 +348,8 @@ type Retire @entity {
   ### Additional attributes if applicable ###
 
   klimaRetire: KlimaRetire @derivedFrom(field: "retire")
+
+  c3OffsetRequest: C3OffsetRequest
 }
 
 type KlimaRetire @entity {

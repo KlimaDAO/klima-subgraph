@@ -13,6 +13,7 @@ export function createTokenWithCall(tokenAddress: Address): void {
   token.name = tokenContract.name()
   token.symbol = tokenContract.symbol()
   token.decimals = tokenContract.decimals()
+  token.isExAnte = false
   token.save()
 }
 

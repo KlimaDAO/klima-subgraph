@@ -27,6 +27,7 @@ export function loadOrCreateToken(tokenAddress: Address): Token {
     token.latestPriceUSDUpdated = ZERO_BI
     token.latestPricePerKLIMA = ZERO_BD
     token.latestPricePerKLIMAUpdated = ZERO_BI
+    token.isExAnte = false
 
     token.save()
   }

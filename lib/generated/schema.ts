@@ -57,6 +57,18 @@ export class Token extends Entity {
   set decimals(value: i32) {
     this.set('decimals', Value.fromI32(value))
   }
+  get isExAnte(): boolean {
+    let value = this.get("isExAnte");
+    if (!value || value.kind == ValueKind.NULL) {
+      return false;
+    } else {
+      return value.toBoolean();
+    }
+  }
+
+  set isExAnte(value: boolean) {
+    this.set("isExAnte", Value.fromBoolean(value));
+  }
 
   get latestPriceUSD(): BigDecimal {
     let value = this.get('latestPriceUSD')

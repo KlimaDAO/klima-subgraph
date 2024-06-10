@@ -11,7 +11,7 @@ import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 import { loadRetire, saveRetire } from './utils/Retire'
 import { Address, log } from '@graphprotocol/graph-ts'
 import { loadOrCreateC3OffsetBridgeRequest } from './utils/C3'
-import { Token } from '../generated/schema'
+import { C3OffsetRequest, Token } from '../generated/schema'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -113,6 +113,29 @@ export function handleVCUOMinted(event: VCUOMinted): void {
     event.block.timestamp,
     event.transaction.hash
   )
+
+  let retire = loadRetire(sender.id.concatI32(sender.totalRetirements))
+  let offSetRequest = retire.c3OffsetRequest
+
+  // for JCS tokens, fetch the tokenUri from the contract and save the ipfs hash
+  if (offSetRequest == null) {
+    log.info('No C3OffsetRequest found for retireId: {} hash: {}', [
+      retire.id.toHexString(),
+      event.transaction.hash.toHexString(),
+    ])
+  }
+  if (offSetRequest != null) {
+    let request = C3OffsetRequest.load(offSetRequest as string)
+
+    if (request != null) {
+      let tokenUri = retireContract.tokenURI(event.params.tokenId)
+      request.tokenUri = tokenUri
+      request.save()
+    }
+  }
+
+  retire.save()
+
   // Do not increment retirements for C3T-JCS tokens as the retirement has already been counted in StartAsyncToken
   let token = Token.load(projectAddress)
 

@@ -392,6 +392,7 @@ type C3OffsetRequest @entity {
   status: BridgeStatus!
   retire: Retire
   provenance: ProvenanceRecord
+  tokenUri: String
 }
 
 ##############################

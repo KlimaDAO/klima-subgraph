@@ -5,6 +5,7 @@ import { loadOrCreateHolding } from './Holding'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 import { loadOrCreateToucanBatch } from './ToucanBatch'
 import { ZERO_ADDRESS } from '../../../lib/utils/Constants'
+import { CarbonProject } from '../../generated/schema'
 
 export function recordProvenance(
   hash: Bytes,
@@ -113,7 +114,14 @@ export function recordProvenance(
 
 export function updateProvenanceForRetirement(creditId: Bytes): Bytes | null {
   let credit = loadCarbonCredit(creditId)
-  let id = creditId.concat(ZERO_ADDRESS).concatI32(credit.provenanceCount - 1)
+  let project = CarbonProject.load(credit.project)
+
+  if (project == null) return null
+
+  let id =
+    project.registry == 'J_CREDIT'
+      ? creditId.concat(Address.fromHexString(credit.tokenAddress.toHexString())).concatI32(credit.provenanceCount - 1)
+      : creditId.concat(ZERO_ADDRESS).concatI32(credit.provenanceCount - 1)
   let record = ProvenanceRecord.load(id)
   if (record == null) {
     return null

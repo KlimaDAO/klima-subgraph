@@ -81,8 +81,10 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
   else if (attributes.registry == 'ACR') registry = 'AMERICAN_CARBON_REGISTRY'
   else if (attributes.registry == 'ECO') registry = 'ECO_REGISTRY'
 
-  let projectID: string;
+  let projectID: string
 
+  /** the last two charactes of a JCS or JPN project ID are a suffix id of
+   * the vintage and do not relate to the project itself */
   if (attributes.registry == 'JCS' || attributes.registry == 'JPN') {
     projectID = attributes.project_id.slice(0, attributes.project_id.length - 2)
   } else {

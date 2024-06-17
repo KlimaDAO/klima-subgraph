@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 0.0.8
 description: Polygon Carbon
 repository: https://github.com/KlimaDAO/klima-subgraph
 schema:
@@ -224,6 +224,7 @@ dataSources:
       file: ./src/templates/C3ProjectTokenFactory.ts
       entities:
         - C3ProjectTokenFactory
+        - TokenURISafeguard
       abis:
         - name: C3ProjectTokenFactory
           file: ../lib/abis/C3ProjectTokenFactory.json
@@ -231,6 +232,8 @@ dataSources:
           file: ../lib/abis/C3ProjectToken.json
         - name: ERC20
           file: ../lib/abis/ERC20.json
+        - name: C3OffsetNFT
+          file: ../lib/abis/C3OffsetNFT.json
       eventHandlers:
         - event: NewTokenProject(string,address)
           handler: handleNewC3T
@@ -238,6 +241,11 @@ dataSources:
           handler: handleStartAsyncToken
         - event: EndAsyncToken(address,address,address,uint256,string,string,uint256,uint256,bool,uint256)
           handler: handleEndAsyncToken
+      blockHandlers:
+        - handler: handleTokenURISafeguard
+          filter:
+            kind: polling
+            every: 75 # approx every 2.5 minutes
   - kind: ethereum/contract
     name: UBO
     network: {{network}}

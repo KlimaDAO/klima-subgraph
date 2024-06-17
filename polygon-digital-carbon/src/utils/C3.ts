@@ -8,6 +8,8 @@ export function loadOrCreateC3OffsetBridgeRequest(requestId: string): C3OffsetRe
     request = new C3OffsetRequest(requestId)
     request.status = 'AWAITING'
     request.index = BigInt.fromI32(0)
+    request.c3OffsetNftIndex = BigInt.fromI32(0)
+    request.tokenURI = ''
     request.save()
   }
 

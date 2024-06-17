@@ -71,15 +71,25 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
 
   let attributes = carbonCreditERC20.getProjectInfo()
 
+  log.info('C3 Project Info: {}', [attributes.registry.toString()])
+
   // Map to enum values
   let registry = ''
   if (attributes.registry == 'VCS') registry = 'VERRA'
   else if (attributes.registry == 'GS') registry = 'GOLD_STANDARD'
-  else if (attributes.registry == 'JCS' || 'JPN') registry = 'J_CREDIT'
+  else if (attributes.registry == 'JCS' || attributes.registry == 'JPN') registry = 'J_CREDIT'
   else if (attributes.registry == 'ACR') registry = 'AMERICAN_CARBON_REGISTRY'
   else if (attributes.registry == 'ECO') registry = 'ECO_REGISTRY'
 
-  let project = loadOrCreateCarbonProject(registry, attributes.registry + '-' + attributes.project_id)
+  let projectID: string;
+
+  if (attributes.registry == 'JCS' || attributes.registry == 'JPN') {
+    projectID = attributes.project_id.slice(0, attributes.project_id.length - 2)
+  } else {
+    projectID = attributes.project_id
+  }
+
+  let project = loadOrCreateCarbonProject(registry, attributes.registry + '-' + projectID)
 
   carbonCredit.project = project.id
   let vintageParsed = BigInt.fromI64(Date.UTC(carbonCreditERC20.getVintage().toI32(), 0) / 1000)
@@ -89,6 +99,11 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
 
   project.methodologies = attributes.methodology
   project.category = MethodologyCategories.getMethodologyCategory(project.methodologies)
+  project.country = attributes.country
+  project.category = attributes.project_type
+  project.region = attributes.region
+  project.methodologies = attributes.methodology
+  project.name = attributes.name
   project.save()
   return carbonCredit
 }

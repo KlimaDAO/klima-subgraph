@@ -26,7 +26,7 @@
     },
     "MossCarbon": {
       "address": "0xaa7dbd1598251f856c12f63557a4c4397c253cea",
-      "startBlock": "23193932"
+      "startBlock": "7667754"
     },
     "MossCarbonOffset": {
       "address": "0xeDAEFCf60e12Bd331c092341D5b3d8901C1c05A8",
@@ -70,7 +70,7 @@
     },
     "sKlimaERC20V1": {
       "address": "0xb0C22d8D350C67420f06F48936654f567C73E8C8",
-      "startBlock": "20190686"
+      "startBlock": "7667754"
     }
   }
   

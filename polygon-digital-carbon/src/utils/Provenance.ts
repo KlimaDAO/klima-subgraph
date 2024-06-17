@@ -119,7 +119,7 @@ export function updateProvenanceForRetirement(creditId: Bytes): Bytes | null {
   if (project == null) return null
 
   let id =
-    project.registry == 'J_CREDIT'
+    (project.registry == 'J_CREDIT' || project.registry == 'ECO')
       ? creditId.concat(Address.fromHexString(credit.tokenAddress.toHexString())).concatI32(credit.provenanceCount - 1)
       : creditId.concat(ZERO_ADDRESS).concatI32(credit.provenanceCount - 1)
   let record = ProvenanceRecord.load(id)

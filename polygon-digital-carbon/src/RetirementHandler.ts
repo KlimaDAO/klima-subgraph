@@ -1,4 +1,9 @@
-import { ICR_MIGRATION_BLOCK, MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
+import {
+  C3_VERIFIED_CARBON_UNITS_OFFSET,
+  ICR_MIGRATION_BLOCK,
+  MCO2_ERC20_CONTRACT,
+  ZERO_ADDRESS,
+} from '../../lib/utils/Constants'
 import { BIG_INT_1E18, ZERO_BI } from '../../lib/utils/Decimals'
 import { C3OffsetNFT, VCUOMinted } from '../generated/C3-Offset/C3OffsetNFT'
 import { CarbonOffset } from '../generated/MossCarbonOffset/CarbonChain'
@@ -9,9 +14,9 @@ import { incrementAccountRetirements, loadOrCreateAccount, decrementAccountRetir
 import { loadCarbonCredit, loadOrCreateCarbonCredit } from './utils/CarbonCredit'
 import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 import { loadRetire, saveRetire } from './utils/Retire'
-import { Address, log } from '@graphprotocol/graph-ts'
+import { log } from '@graphprotocol/graph-ts'
 import { loadOrCreateC3OffsetBridgeRequest } from './utils/C3'
-import { C3OffsetRequest, Token } from '../generated/schema'
+import { Token, TokenURISafeguard } from '../generated/schema'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -84,11 +89,10 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   // Currently the NFT minting is required and happens within every offset or offsetFor transaction made against a C3T
   // This event only emits who receives the NFT and the token ID, although the data is stored.
   // Update associated entities using a call to retrieve the retirement details.
-  log.info('fixt {}', [event.params.tokenId.toString()])
-  let retireContract = C3OffsetNFT.bind(event.address)
+  let c3OffsetNftContract = C3OffsetNFT.bind(event.address)
 
-  let projectAddress = retireContract.list(event.params.tokenId).getProjectAddress()
-  let retireAmount = retireContract.list(event.params.tokenId).getAmount()
+  let projectAddress = c3OffsetNftContract.list(event.params.tokenId).getProjectAddress()
+  let retireAmount = c3OffsetNftContract.list(event.params.tokenId).getAmount()
 
   let credit = loadOrCreateCarbonCredit(projectAddress, 'C3', null)
 
@@ -100,6 +104,7 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   let sender = loadOrCreateAccount(event.transaction.from)
   let senderAddress = event.transaction.from
 
+  // this should probably also be under the conditoinal below
   saveRetire(
     sender.id.concatI32(sender.totalRetirements),
     projectAddress,
@@ -114,32 +119,10 @@ export function handleVCUOMinted(event: VCUOMinted): void {
     event.transaction.hash
   )
 
-  let retire = loadRetire(sender.id.concatI32(sender.totalRetirements))
-  let offSetRequest = retire.c3OffsetRequest
-
-  // for JCS tokens, fetch the tokenUri from the contract and save the ipfs hash
-  if (offSetRequest == null) {
-    log.info('No C3OffsetRequest found for retireId: {} hash: {}', [
-      retire.id.toHexString(),
-      event.transaction.hash.toHexString(),
-    ])
-  }
-  if (offSetRequest != null) {
-    let request = C3OffsetRequest.load(offSetRequest as string)
-
-    if (request != null) {
-      let tokenUri = retireContract.tokenURI(event.params.tokenId)
-      request.tokenUri = tokenUri
-      request.save()
-    }
-  }
-
-  retire.save()
-
   // Do not increment retirements for C3T-JCS tokens as the retirement has already been counted in StartAsyncToken
   let token = Token.load(projectAddress)
 
-  if (token != null && !token.symbol.startsWith('C3T-JCS')) {
+  if (token != null && (!token.symbol.startsWith('C3T-JCS') || !token.symbol.startsWith('C3T-ECO'))) {
     incrementAccountRetirements(senderAddress)
   }
   if (token != null) {
@@ -252,9 +235,10 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
     'C3'
   )
 
-  let eventAddress = event.params.fromToken.toHexString()
+  let fromToken = event.params.fromToken.toHexString()
   let beneficiaryAddress = event.params.beneficiary.toHexString()
-  let requestId = `${eventAddress}-${beneficiaryAddress}-${event.params.index}`
+
+  let requestId = `${fromToken}-${beneficiaryAddress}-${event.params.index}`
   let request = loadOrCreateC3OffsetBridgeRequest(requestId)
 
   request.status = 'PENDING'
@@ -279,10 +263,10 @@ export function completeC3OffsetRequest(event: EndAsyncToken): void {
 
   let retireId = sender.id.concatI32(sender.totalRetirements)
 
-  let eventAddress = event.params.fromToken.toHexString()
+  let fromToken = event.params.fromToken.toHexString()
   let beneficiaryAddress = event.params.beneficiary.toHexString()
 
-  let requestId = `${eventAddress}-${beneficiaryAddress}-${event.params.index}`
+  let requestId = `${fromToken}-${beneficiaryAddress}-${event.params.index}`
   let request = loadOrCreateC3OffsetBridgeRequest(requestId)
 
   if (request == null) {
@@ -293,6 +277,31 @@ export function completeC3OffsetRequest(event: EndAsyncToken): void {
     return
   } else {
     if (request.status == 'PENDING') {
+      let c3OffsetNftContract = C3OffsetNFT.bind(C3_VERIFIED_CARBON_UNITS_OFFSET)
+
+      let tokenURICall = c3OffsetNftContract.try_tokenURI(event.params.nftIndex)
+
+      request.c3OffsetNftIndex = event.params.nftIndex
+      if (tokenURICall.reverted) {
+        log.error('tokenURI call reverted for NFT index {}', [event.params.nftIndex.toString()])
+      } else {
+        let tokenURI = tokenURICall.value
+        if (tokenURI == null || tokenURI == '') {
+          let safeguard = TokenURISafeguard.load('safeguard')
+          if (safeguard == null) {
+            safeguard = new TokenURISafeguard('safeguard')
+            safeguard.requestsWithoutURI = []
+            safeguard.save()
+          }
+          let requestsArray = safeguard.requestsWithoutURI
+          requestsArray.push(requestId)
+          safeguard.requestsWithoutURI = requestsArray
+          safeguard.save()
+          log.error('Retrieved tokenURI is null or empty for nft index {}', [event.params.nftIndex.toString()])
+        }
+        request.tokenURI = tokenURI
+      }
+
       request.status = 'COMPLETED'
       request.save()
       /** decrement account retirements because the retire is double counted in VCUOMinted */

@@ -1,14 +1,19 @@
 import { C3ProjectToken } from '../../generated/templates'
-import { NewTokenProject } from '../../generated/C3ProjectTokenFactory/C3ProjectTokenFactory'
+import {
+  NewTokenProject,
+  StartAsyncToken,
+  EndAsyncToken,
+} from '../../generated/C3ProjectTokenFactory/C3ProjectTokenFactory'
 import { loadOrCreateCarbonCredit, updateCarbonCreditWithCall } from '../utils/CarbonCredit'
 import { createTokenWithCall } from '../utils/Token'
-import { log } from '@graphprotocol/graph-ts'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
-import { saveStartAsyncToken } from '../RetirementHandler'
+import { saveStartAsyncToken, completeC3OffsetRequest } from '../RetirementHandler'
 import { recordProvenance } from '../utils/Provenance'
-import { ZERO_ADDRESS } from '../../../lib/utils/Constants'
-import { completeC3OffsetRequest } from '../RetirementHandler'
-import { StartAsyncToken, EndAsyncToken } from '../../generated/C3ProjectTokenFactory/C3ProjectTokenFactory'
+import { ZERO_ADDRESS, C3_VERIFIED_CARBON_UNITS_OFFSET } from '../../../lib/utils/Constants'
+import { BigInt, ethereum, log } from '@graphprotocol/graph-ts'
+import { TokenURISafeguard } from '../../generated/schema'
+import { C3OffsetNFT } from '../../generated/C3-Offset/C3OffsetNFT'
+import { loadOrCreateC3OffsetBridgeRequest } from '../utils/C3'
 
 export function handleNewC3T(event: NewTokenProject): void {
   // Start indexing the C3T tokens; `event.params.tokenAddress` is the
@@ -42,4 +47,49 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
 export function handleEndAsyncToken(event: EndAsyncToken): void {
   // load request and set status to completed
   completeC3OffsetRequest(event)
+}
+
+export function handleTokenURISafeguard(block: ethereum.Block): void {
+  log.info('handleTokenURISafeguard block number {}', [block.number.toString()])
+  let safeguard = TokenURISafeguard.load('safeguard')
+  if (safeguard == null) {
+    safeguard = new TokenURISafeguard('safeguard')
+    safeguard.requestsWithoutURI = []
+    safeguard.save()
+  }
+  let requestsArray = safeguard.requestsWithoutURI
+  if (requestsArray.length == 0) return
+
+  let c3OffsetNftContract = C3OffsetNFT.bind(C3_VERIFIED_CARBON_UNITS_OFFSET)
+
+  let updatedRequestArray: string[] = []
+
+  for (let i = 0; i < requestsArray.length; i++) {
+    let requestId = requestsArray[i]
+    let request = loadOrCreateC3OffsetBridgeRequest(requestId)
+
+    let tokenURICall = c3OffsetNftContract.try_tokenURI(request.c3OffsetNftIndex)
+
+    if (tokenURICall.reverted) {
+      log.error('handleURIBlockSafeguard reverted for request id {}', [request.id.toString()])
+      return
+    } else {
+      let tokenURI = tokenURICall.value
+      log.info('handleURIBlockSafeguard tokenURI {}', [tokenURI])
+      if (tokenURI == null || tokenURI == '') {
+        log.error('handleURIBlockSafeguard tokenURI still null or undefined {}', [request.id.toString()])
+        return
+      } else {
+        request.tokenURI = tokenURI
+        request.save()
+      }
+    }
+    // remove request from safeguard if tokenURI is found
+    if (request.tokenURI != null && request.tokenURI != '') {
+      updatedRequestArray.push(requestId)
+    }
+  }
+
+  safeguard.requestsWithoutURI = updatedRequestArray
+  safeguard.save()
 }

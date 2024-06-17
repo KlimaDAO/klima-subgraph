@@ -114,9 +114,10 @@ export const ZERO_ADDRESS = Address.fromString('0x000000000000000000000000000000
 // Klima Infinity Addresses
 export const KLIMA_CARBON_RETIREMENTS_CONTRACT = Address.fromString('0xac298CD34559B9AcfaedeA8344a977eceff1C0Fd') // polygon
 export const AMOY_KLIMA_CARBON_RETIREMENTS_CONTRACT = Address.fromString('0x5505a7b6ced40a41882a38fc11e2f8bcab2b46f7') //amoy
-export const KLIMA_INFINITY_DIAMOND = Address.fromString('0x62d3897089C93A0fa2B0746A6975Ec4693c13cb8') //mumbai
+export const KLIMA_INFINITY_DIAMOND = Address.fromString('0x8cE54d9625371fb2a068986d32C85De8E6e995f8') //mumbai
 
 // Other ecosystem addresses
+export const C3_VERIFIED_CARBON_UNITS_OFFSET = Address.fromString('0x7b364DFc0e085468aFDe869DF20036D80b8868e7') 
 export const TOUCAN_REGEN_BRIDGE = Address.fromString('0xdC1Dfa22824Af4e423a558bbb6C53a31c3c11DCC')
 export const TOUCAN_CROSS_CHAIN_MESSENGER = Address.fromString('0xABaC3D6b281Bbe0Fc0F67b26247cB27994eaAcaf')
 export const ICR_MIGRATION_BLOCK = BigInt.fromI32(55149940)

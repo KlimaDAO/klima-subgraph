@@ -14,9 +14,7 @@ import { loadOrCreateHolding } from './utils/Holding'
 import { ZERO_BI, BIG_INT_1E18 } from '../../lib/utils/Decimals'
 import { loadOrCreateAccount } from './utils/Account'
 import {
-  completeC3OffsetRequest,
   saveICRRetirement,
-  saveStartAsyncToken,
   saveToucanRetirement,
   saveToucanRetirement_1_4_0,
 } from './RetirementHandler'

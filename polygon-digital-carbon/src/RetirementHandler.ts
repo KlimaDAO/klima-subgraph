@@ -109,7 +109,6 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   let token = Token.load(projectAddress)
   if (token !== null && !token.symbol.startsWith('C3T-JCS') && !token.symbol.startsWith('C3T-ECO')) {
     log.info('token: {} request: {}', [token.symbol, event.params.tokenId.toString()])
-    log.info('fuckin hell {}', [event.params.tokenId.toString()])
 
     saveRetire(
       sender.id.concatI32(sender.totalRetirements),

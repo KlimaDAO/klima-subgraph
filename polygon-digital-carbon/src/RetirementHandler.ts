@@ -14,9 +14,11 @@ import { incrementAccountRetirements, loadOrCreateAccount, decrementAccountRetir
 import { loadCarbonCredit, loadOrCreateCarbonCredit } from './utils/CarbonCredit'
 import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 import { loadRetire, saveRetire } from './utils/Retire'
-import { log } from '@graphprotocol/graph-ts'
+import { log, Address } from '@graphprotocol/graph-ts'
 import { loadOrCreateC3OffsetBridgeRequest } from './utils/C3'
 import { Token, TokenURISafeguard } from '../generated/schema'
+import { getC3OffsetRequestId } from '../utils/getRetirementsContractAddress'
+import { updateProvenanceForRetirement } from './utils/Provenance'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -90,7 +92,6 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   // This event only emits who receives the NFT and the token ID, although the data is stored.
   // Update associated entities using a call to retrieve the retirement details.
   let c3OffsetNftContract = C3OffsetNFT.bind(event.address)
-
   let projectAddress = c3OffsetNftContract.list(event.params.tokenId).getProjectAddress()
   let retireAmount = c3OffsetNftContract.list(event.params.tokenId).getAmount()
 
@@ -104,29 +105,27 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   let sender = loadOrCreateAccount(event.transaction.from)
   let senderAddress = event.transaction.from
 
-  // this should probably also be under the conditoinal below
-  saveRetire(
-    sender.id.concatI32(sender.totalRetirements),
-    projectAddress,
-    ZERO_ADDRESS,
-    'OTHER',
-    retireAmount,
-    event.params.sender,
-    '',
-    senderAddress,
-    '',
-    event.block.timestamp,
-    event.transaction.hash
-  )
-
   // Do not increment retirements for C3T-JCS tokens as the retirement has already been counted in StartAsyncToken
   let token = Token.load(projectAddress)
+  if (token !== null && !token.symbol.startsWith('C3T-JCS') && !token.symbol.startsWith('C3T-ECO')) {
+    log.info('token: {} request: {}', [token.symbol, event.params.tokenId.toString()])
+    log.info('fuckin hell {}', [event.params.tokenId.toString()])
 
-  if (token != null && (!token.symbol.startsWith('C3T-JCS') || !token.symbol.startsWith('C3T-ECO'))) {
+    saveRetire(
+      sender.id.concatI32(sender.totalRetirements),
+      projectAddress,
+      ZERO_ADDRESS,
+      'OTHER',
+      retireAmount,
+      event.params.sender,
+      '',
+      senderAddress,
+      '',
+      event.block.timestamp,
+      event.transaction.hash
+    )
+
     incrementAccountRetirements(senderAddress)
-  }
-  if (token != null) {
-    log.info('token: {}', [token.symbol])
   }
 }
 
@@ -235,38 +234,37 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
     'C3'
   )
 
-  let fromToken = event.params.fromToken.toHexString()
-  let beneficiaryAddress = event.params.beneficiary.toHexString()
+  let retire = loadRetire(retireId)
 
-  let requestId = `${fromToken}-${beneficiaryAddress}-${event.params.index}`
+  let requestId = getC3OffsetRequestId(event.params.fromToken, event.transaction.from, event.params.index)
   let request = loadOrCreateC3OffsetBridgeRequest(requestId)
 
   request.status = 'PENDING'
   request.index = event.params.index
   request.retire = retireId
+  request.provenance = retire.provenance
+  request.save()
 
-  let retire = loadRetire(retireId)
   retire.c3OffsetRequest = requestId
   retire.save()
-
-  if (retire != null) {
-    request.provenance = retire.provenance
-  }
-
-  request.save()
 
   incrementAccountRetirements(senderAddress)
 }
 
 export function completeC3OffsetRequest(event: EndAsyncToken): void {
-  let sender = loadOrCreateAccount(event.transaction.from)
+  log.info('completeC3OffsetRequest event fired {}', [event.transaction.hash.toHexString()])
 
-  let retireId = sender.id.concatI32(sender.totalRetirements)
+  loadOrCreateAccount(event.transaction.from)
+  let originalSender = loadOrCreateAccount(event.params.account)
+  log.info('originalSender: {}', [originalSender.id.toHexString()])
 
-  let fromToken = event.params.fromToken.toHexString()
-  let beneficiaryAddress = event.params.beneficiary.toHexString()
+  let retireId = originalSender.id.concatI32(originalSender.totalRetirements)
+  let retire = loadRetire(retireId)
+  // store finalizeAsync hash, replacing the transaction hash which initiated the retirement
+  retire.hash = event.transaction.hash
+  retire.save()
 
-  let requestId = `${fromToken}-${beneficiaryAddress}-${event.params.index}`
+  let requestId = getC3OffsetRequestId(event.params.fromToken, Address.fromBytes(originalSender.id), event.params.index)
   let request = loadOrCreateC3OffsetBridgeRequest(requestId)
 
   if (request == null) {

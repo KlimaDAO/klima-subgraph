@@ -388,7 +388,7 @@ type C3OffsetRequest @entity {
   "Request ID"
   id: ID!
   index: BigInt!
-  c3OffsetNftIndex: BigInt!
+  c3OffsetNftIndex: BigInt
   status: BridgeStatus!
   retire: Retire
   provenance: ProvenanceRecord
@@ -667,5 +667,3 @@ type HoldingDailySnapshot @entity {
   "Amount currently held in native units"
   amount: BigInt!
 }
-
-

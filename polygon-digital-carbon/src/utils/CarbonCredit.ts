@@ -85,7 +85,7 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
 
   /** the last two charactes of a JCS or JPN project ID are a suffix id of
    * the vintage and do not relate to the project itself */
-  if (attributes.registry == 'JCS' || attributes.registry == 'JPN') {
+  if (attributes.registry === 'JCS' || attributes.registry === 'JPN') {
     projectID = attributes.project_id.slice(0, attributes.project_id.length - 2)
   } else {
     projectID = attributes.project_id
@@ -101,12 +101,10 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
 
   project.methodologies = attributes.methodology
   project.category = MethodologyCategories.getMethodologyCategory(project.methodologies)
-  project.country = attributes.country
-  project.category = attributes.project_type
   project.region = attributes.region
   project.methodologies = attributes.methodology
-  project.name = attributes.name
   project.save()
+  
   return carbonCredit
 }
 

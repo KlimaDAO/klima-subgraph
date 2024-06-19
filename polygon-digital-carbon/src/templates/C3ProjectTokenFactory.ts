@@ -30,18 +30,18 @@ export function handleStartAsyncToken(event: StartAsyncToken): void {
   // Ignore retirements of zero value
   if (event.params.amount == ZERO_BI) return
 
+  // recordProvenance(
+  //   event.transaction.hash,
+  //   event.params.fromToken,
+  //   null,
+  //   event.transaction.from,
+  //   ZERO_ADDRESS,
+  //   'RETIREMENT',
+  //   event.params.amount,
+  //   event.block.timestamp
+  // )
+  log.info('handleStartAsyncToken event fired {}', [event.transaction.hash.toHexString()])
   saveStartAsyncToken(event)
-
-  recordProvenance(
-    event.transaction.hash,
-    event.params.fromToken,
-    null,
-    event.transaction.from,
-    ZERO_ADDRESS,
-    'RETIREMENT',
-    event.params.amount,
-    event.block.timestamp
-  )
 }
 
 export function handleEndAsyncToken(event: EndAsyncToken): void {
@@ -67,25 +67,30 @@ export function handleTokenURISafeguard(block: ethereum.Block): void {
   for (let i = 0; i < requestsArray.length; i++) {
     let requestId = requestsArray[i]
     let request = loadOrCreateC3OffsetBridgeRequest(requestId)
+    let c3OffsetNftIndex = request.c3OffsetNftIndex
 
-    let tokenURICall = c3OffsetNftContract.try_tokenURI(request.c3OffsetNftIndex)
+    if (c3OffsetNftIndex === null) {
+      log.info('handleURIBlockSafeguard c3OffsetNftIndex is null {}', [request.id.toString()])
+      continue
+    }
+    let tokenURICall = c3OffsetNftContract.try_tokenURI(c3OffsetNftIndex as BigInt)
 
     if (tokenURICall.reverted) {
       log.error('handleURIBlockSafeguard reverted for request id {}', [request.id.toString()])
-      return
+      continue
     } else {
       let tokenURI = tokenURICall.value
       log.info('handleURIBlockSafeguard tokenURI {}', [tokenURI])
       if (tokenURI == null || tokenURI == '') {
         log.error('handleURIBlockSafeguard tokenURI still null or undefined {}', [request.id.toString()])
-        return
+        continue
       } else {
         request.tokenURI = tokenURI
         request.save()
       }
     }
     // remove request from safeguard if tokenURI is found
-    if (request.tokenURI != null && request.tokenURI != '') {
+    if (request.tokenURI == null || request.tokenURI == '') {
       updatedRequestArray.push(requestId)
     }
   }

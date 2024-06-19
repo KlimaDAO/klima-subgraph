@@ -7,6 +7,8 @@
     "codegen": "rm -rf ./generated && graph codegen",
     "test": "graph test",
     "build": "graph build",
+    "prepare-polygon-amoy": "npx mustache networkConfig/polygon-amoy.json subgraph.template.yaml > subgraph.yaml",
+    "prepare-debug": "npx mustache networkConfig/debug.json subgraph.template.yaml > subgraph.yaml",
     "prepare-matic": "npx mustache networkConfig/matic.json subgraph.template.yaml > subgraph.yaml",
     "prepare-mumbai": "npx mustache networkConfig/mumbai.json subgraph.template.yaml > subgraph.yaml",
     "create-local": "graph create --node http://127.0.0.1:8020 polygon-carbon",
@@ -18,7 +20,8 @@
     "deploy-version": "graph deploy --ipfs $npm_config_ipfs --node $npm_config_node --version-label $npm_config_label polygon-carbon",
     "deploy-staging": "graph deploy --ipfs https://api.staging.thegraph.com/ipfs/ --node https://api.staging.thegraph.com/deploy/ polygon-carbon",
     "deploy-hosted": "graph deploy --product hosted-service $npm_config_path",
-    "deploy-tufnel": "yarn codegen && yarn build && graph deploy --product hosted-service psparacino/split-protocol"
+    "deploy-tufnel": "yarn prepare-matic && yarn codegen && yarn build && graph deploy --studio jcredit-testing-mainnet-grafts",
+    "deploy-tufnel-amoy": "yarn prepare-polygon-amoy && yarn codegen && yarn build && graph deploy --studio async-retires-amoy"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.69.1",

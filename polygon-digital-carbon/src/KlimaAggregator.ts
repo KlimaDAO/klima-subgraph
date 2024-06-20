@@ -116,13 +116,6 @@ export function handleC3Retired(event: C3Retired): void {
 }
 
 export function handleCarbonRetired(event: CarbonRetired): void {
-  log.info('asdf: {} beneficary: {} retiring: {}', [
-    event.transaction.from.toHexString(),
-
-    event.params.beneficiaryAddress.toHexString(),
-    event.params.retiringAddress.toHexString(),
-  ])
-
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
   let network = dataSource.network()

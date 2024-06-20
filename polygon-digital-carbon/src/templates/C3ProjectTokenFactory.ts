@@ -13,7 +13,7 @@ import { ZERO_ADDRESS, C3_VERIFIED_CARBON_UNITS_OFFSET } from '../../../lib/util
 import { BigInt, ethereum, log } from '@graphprotocol/graph-ts'
 import { TokenURISafeguard } from '../../generated/schema'
 import { C3OffsetNFT } from '../../generated/C3-Offset/C3OffsetNFT'
-import { loadOrCreateC3OffsetBridgeRequest } from '../utils/C3'
+import { loadC3OffsetBridgeRequest} from '../utils/C3'
 
 export function handleNewC3T(event: NewTokenProject): void {
   // Start indexing the C3T tokens; `event.params.tokenAddress` is the
@@ -29,19 +29,9 @@ export function handleNewC3T(event: NewTokenProject): void {
 export function handleStartAsyncToken(event: StartAsyncToken): void {
   // Ignore retirements of zero value
   if (event.params.amount == ZERO_BI) return
-
+  
+  log.info('handleStartAsyncToken event fired {}', [event.transaction.hash.toHexString()])
   saveStartAsyncToken(event)
-
-  recordProvenance(
-    event.transaction.hash,
-    event.params.fromToken,
-    null,
-    event.transaction.from,
-    ZERO_ADDRESS,
-    'RETIREMENT',
-    event.params.amount,
-    event.block.timestamp
-  )
 }
 
 export function handleEndAsyncToken(event: EndAsyncToken): void {
@@ -66,26 +56,35 @@ export function handleTokenURISafeguard(block: ethereum.Block): void {
 
   for (let i = 0; i < requestsArray.length; i++) {
     let requestId = requestsArray[i]
-    let request = loadOrCreateC3OffsetBridgeRequest(requestId)
+    let request = loadC3OffsetBridgeRequest(requestId)
+    if (request == null) {
+      log.error('handleURIBlockSafeguard request is null {}', [requestId])
+      continue
+    }
+    let c3OffsetNftIndex = request.c3OffsetNftIndex
 
-    let tokenURICall = c3OffsetNftContract.try_tokenURI(request.c3OffsetNftIndex)
+    if (c3OffsetNftIndex === null) {
+      log.info('handleURIBlockSafeguard c3OffsetNftIndex is null {}', [request.id.toString()])
+      continue
+    }
+    let tokenURICall = c3OffsetNftContract.try_tokenURI(c3OffsetNftIndex as BigInt)
 
     if (tokenURICall.reverted) {
       log.error('handleURIBlockSafeguard reverted for request id {}', [request.id.toString()])
-      return
+      continue
     } else {
       let tokenURI = tokenURICall.value
       log.info('handleURIBlockSafeguard tokenURI {}', [tokenURI])
       if (tokenURI == null || tokenURI == '') {
         log.error('handleURIBlockSafeguard tokenURI still null or undefined {}', [request.id.toString()])
-        return
+        continue
       } else {
         request.tokenURI = tokenURI
         request.save()
       }
     }
     // remove request from safeguard if tokenURI is found
-    if (request.tokenURI != null && request.tokenURI != '') {
+    if (request.tokenURI == null || request.tokenURI == '') {
       updatedRequestArray.push(requestId)
     }
   }

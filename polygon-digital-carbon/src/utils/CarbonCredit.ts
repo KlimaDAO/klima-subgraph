@@ -101,12 +101,10 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
 
   project.methodologies = attributes.methodology
   project.category = MethodologyCategories.getMethodologyCategory(project.methodologies)
-  project.country = attributes.country
-  project.category = attributes.project_type
   project.region = attributes.region
   project.methodologies = attributes.methodology
-  project.name = attributes.name
   project.save()
+  
   return carbonCredit
 }
 

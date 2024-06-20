@@ -121,7 +121,7 @@ export function updateProvenanceForRetirement(creditId: Bytes): Bytes | null {
   /** these J_CREDIT and ECO credits C3 tokens that have async retires.
    * The tokens are transferred back to the contract and then retired from there */
   let id =
-    project.registry == 'J_CREDIT' || project.registry == 'ECO'
+    project.registry == 'J_CREDIT' || project.registry == 'ECO_REGISTRY'
       ? creditId.concat(Address.fromHexString(credit.tokenAddress.toHexString())).concatI32(credit.provenanceCount - 1)
       : creditId.concat(ZERO_ADDRESS).concatI32(credit.provenanceCount - 1)
   let record = ProvenanceRecord.load(id)

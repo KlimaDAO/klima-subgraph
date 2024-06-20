@@ -13,5 +13,10 @@ export function loadOrCreateC3OffsetBridgeRequest(requestId: string): C3OffsetRe
     request.save()
   }
 
-  return request;
+  return request
+}
+
+export function loadC3OffsetBridgeRequest(requestId: string): C3OffsetRequest | null {
+  let request = C3OffsetRequest.load(requestId)
+  return request
 }

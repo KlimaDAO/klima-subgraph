@@ -71,8 +71,6 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
 
   let attributes = carbonCreditERC20.getProjectInfo()
 
-  log.info('C3 Project Info: {}', [attributes.registry.toString()])
-
   // Map to enum values
   let registry = ''
   if (attributes.registry == 'VCS') registry = 'VERRA'
@@ -104,7 +102,7 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
   project.region = attributes.region
   project.methodologies = attributes.methodology
   project.save()
-  
+
   return carbonCredit
 }
 

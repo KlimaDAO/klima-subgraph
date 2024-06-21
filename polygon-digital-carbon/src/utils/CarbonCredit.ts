@@ -83,8 +83,8 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
 
   let projectID: string
 
-  /** the last two charactes of a JCS or JPN project ID are a suffix id of
-   * the vintage and do not relate to the project itself */
+  /** the last two characters of a JCS/JPN project ID are a  batch suffix id of
+   * the vintage and do not relate to the projectId itself */
   if (attributes.registry == 'JCS' || attributes.registry == 'JPN') {
     projectID = attributes.project_id.slice(0, attributes.project_id.length - 2)
   } else {

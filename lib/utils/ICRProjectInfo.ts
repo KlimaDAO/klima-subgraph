@@ -99,7 +99,7 @@ export const ICR_PROJECT_INFO = [
     'ICR-137',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
   ],
 ]

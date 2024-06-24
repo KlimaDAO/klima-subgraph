@@ -10303,7 +10303,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '1970',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '0',
     false
@@ -10314,7 +10314,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2028',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '1',
     false
@@ -10325,7 +10325,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2029',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '2',
     false
@@ -10336,7 +10336,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2030',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '3',
     false
@@ -10347,7 +10347,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2031',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '4',
     false
@@ -10358,7 +10358,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2032',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '5',
     false
@@ -10369,7 +10369,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2033',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '6',
     false
@@ -10380,7 +10380,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2034',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '7',
     false
@@ -10391,7 +10391,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2035',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '8',
     false
@@ -10402,7 +10402,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2036',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '9',
     false
@@ -10413,7 +10413,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2037',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '10',
     false
@@ -10424,7 +10424,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2038',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '11',
     false
@@ -10435,7 +10435,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2039',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '12',
     false
@@ -10446,7 +10446,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2040',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '13',
     false
@@ -10457,7 +10457,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2041',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '14',
     false
@@ -10468,7 +10468,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2042',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '15',
     false
@@ -10479,7 +10479,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2043',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '16',
     false
@@ -10490,7 +10490,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2044',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '17',
     false
@@ -10501,7 +10501,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2045',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '18',
     false
@@ -10512,7 +10512,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2046',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '19',
     false
@@ -10523,7 +10523,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2047',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '20',
     false
@@ -10534,7 +10534,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2048',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '21',
     false
@@ -10545,7 +10545,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2049',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '22',
     false
@@ -10556,7 +10556,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2050',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '23',
     false
@@ -10567,7 +10567,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2051',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '24',
     false
@@ -10578,7 +10578,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2052',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '25',
     false
@@ -10589,7 +10589,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2053',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '26',
     false
@@ -10600,7 +10600,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2054',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '27',
     false
@@ -10611,7 +10611,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2055',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '28',
     false
@@ -10622,7 +10622,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2056',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '29',
     false
@@ -10633,9 +10633,10 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '2057',
     'Dammam DR Sustainable Wetlands and Mangrove Conservation (DD-SWAM)',
     'AR-AM0014',
-    'Forestry',
+    'Blue Carbon',
     'Saudi Arabia',
     '30',
     false
-  ),
+  )
+  
 ]

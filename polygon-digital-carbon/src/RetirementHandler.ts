@@ -18,6 +18,7 @@ import { log } from '@graphprotocol/graph-ts'
 import { loadOrCreateC3RetireRequest, loadC3RetireRequest } from './utils/C3'
 import { Token, TokenURISafeguard } from '../generated/schema'
 import { getC3RetireRequestId } from '../utils/getRetirementsContractAddress'
+import { BridgeStatus } from '../utils/enums'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -104,7 +105,7 @@ export function handleVCUOMinted(event: VCUOMinted): void {
   let sender = loadOrCreateAccount(event.transaction.from)
   let senderAddress = event.transaction.from
 
-  // Do not increment retirements for C3T-JCS tokens as the retirement has already been counted in StartAsyncToken
+  // Do not increment retirements for JCS or ECO tokens as the retirement has already been counted in StartAsyncToken
   let token = Token.load(projectAddress)
   if (token !== null && !token.symbol.startsWith('C3T-JCS') && !token.symbol.startsWith('C3T-ECO')) {
     saveRetire(
@@ -235,7 +236,7 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
   let requestId = getC3RetireRequestId(event.params.fromToken, event.params.index)
   let request = loadOrCreateC3RetireRequest(requestId)
 
-  request.status = 'REQUESTED'
+  request.status = BridgeStatus.REQUESTED
   request.index = event.params.index
   request.retire = retireId
   request.provenance = retire.provenance
@@ -262,7 +263,7 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
     ])
     return
   } else {
-    if (request.status == 'REQUESTED') {
+    if (request.status == BridgeStatus.REQUESTED) {
       let c3OffsetNftContract = C3OffsetNFT.bind(C3_VERIFIED_CARBON_UNITS_OFFSET)
 
       let tokenURICall = c3OffsetNftContract.try_tokenURI(event.params.nftIndex)
@@ -288,7 +289,7 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
         request.tokenURI = tokenURI
       }
 
-      request.status = 'FINALIZED'
+      request.status = BridgeStatus.FINALIZED
       request.save()
     }
   }

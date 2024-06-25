@@ -10,15 +10,14 @@ import { CarbonOffset } from '../generated/MossCarbonOffset/CarbonChain'
 import { StartAsyncToken, EndAsyncToken } from '../generated/C3ProjectTokenFactory/C3ProjectTokenFactory'
 import { RetiredVintage } from '../generated/templates/ICRProjectToken/ICRProjectToken'
 import { Retired, Retired1 as Retired_1_4_0 } from '../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
-import { incrementAccountRetirements, loadOrCreateAccount, decrementAccountRetirements } from './utils/Account'
+import { incrementAccountRetirements, loadOrCreateAccount } from './utils/Account'
 import { loadCarbonCredit, loadOrCreateCarbonCredit } from './utils/CarbonCredit'
 import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 import { loadRetire, saveRetire } from './utils/Retire'
 import { log } from '@graphprotocol/graph-ts'
-import { loadOrCreateC3OffsetBridgeRequest, loadC3OffsetBridgeRequest } from './utils/C3'
+import { loadOrCreateC3RetireRequest, loadC3RetireRequest } from './utils/C3'
 import { Token, TokenURISafeguard } from '../generated/schema'
-import { getC3OffsetRequestId } from '../utils/getRetirementsContractAddress'
-import { updateProvenanceForRetirement } from './utils/Provenance'
+import { getC3RetireRequestId } from '../utils/getRetirementsContractAddress'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -233,8 +232,8 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
 
   let retire = loadRetire(retireId)
 
-  let requestId = getC3OffsetRequestId(event.params.fromToken, event.params.index)
-  let request = loadOrCreateC3OffsetBridgeRequest(requestId)
+  let requestId = getC3RetireRequestId(event.params.fromToken, event.params.index)
+  let request = loadOrCreateC3RetireRequest(requestId)
 
   request.status = 'REQUESTED'
   request.index = event.params.index
@@ -242,22 +241,22 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
   request.provenance = retire.provenance
   request.save()
 
-  retire.c3OffsetRequest = requestId
+  retire.c3RetireRequest = requestId
   retire.save()
 
   incrementAccountRetirements(senderAddress)
 }
 
-export function completeC3OffsetRequest(event: EndAsyncToken): void {
-  log.info('completeC3OffsetRequest event fired {}', [event.transaction.hash.toHexString()])
+export function completeC3RetireRequest(event: EndAsyncToken): void {
+  log.info('completeC3RetireRequest event fired {}', [event.transaction.hash.toHexString()])
 
   loadOrCreateAccount(event.transaction.from)
 
-  let requestId = getC3OffsetRequestId(event.params.fromToken, event.params.index)
-  let request = loadC3OffsetBridgeRequest(requestId)
+  let requestId = getC3RetireRequestId(event.params.fromToken, event.params.index)
+  let request = loadC3RetireRequest(requestId)
 
   if (request == null) {
-    log.error('No C3OffsetRequest found for retireId: {} hash: {}', [
+    log.error('No C3RetireRequest found for retireId: {} hash: {}', [
       // retireId.toHexString(),
       event.transaction.hash.toHexString(),
     ])
@@ -291,8 +290,6 @@ export function completeC3OffsetRequest(event: EndAsyncToken): void {
 
       request.status = 'FINALIZED'
       request.save()
-      /** decrement account retirements because the retire is double counted in VCUOMinted */
-      // decrementAccountRetirements(Address.fromBytes(sender.id))
     }
   }
 }

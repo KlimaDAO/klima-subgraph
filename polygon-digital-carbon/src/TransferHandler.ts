@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, log, store } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, store } from '@graphprotocol/graph-ts'
 import { ICR_MIGRATION_BLOCK, ICR_MIGRATION_HASHES, MCO2_ERC20_CONTRACT, ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Transfer } from '../generated/BCT/ERC20'
 import { loadOrCreateCarbonCredit, updateICRCredit } from './utils/CarbonCredit'

@@ -350,7 +350,7 @@ type Retire @entity {
 
   klimaRetire: KlimaRetire @derivedFrom(field: "retire")
 
-  c3OffsetRequest: C3OffsetRequest
+  c3RetireRequest: C3RetireRequest
 }
 
 type KlimaRetire @entity {
@@ -385,7 +385,7 @@ type ToucanBatch @entity {
   creationTransactionHash: Bytes!
 }
 
-type C3OffsetRequest @entity {
+type C3RetireRequest @entity {
   "Request ID"
   id: ID!
   index: BigInt!
@@ -400,7 +400,7 @@ type C3OffsetRequest @entity {
 type TokenURISafeguard @entity {
   "Token URI"
   id: ID!
-  requestsWithoutURI: [C3OffsetRequest!]!
+  requestsWithoutURI: [C3RetireRequest!]!
 }
 
 ##############################

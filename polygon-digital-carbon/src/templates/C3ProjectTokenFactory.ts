@@ -7,13 +7,12 @@ import {
 import { loadOrCreateCarbonCredit, updateCarbonCreditWithCall } from '../utils/CarbonCredit'
 import { createTokenWithCall } from '../utils/Token'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
-import { saveStartAsyncToken, completeC3OffsetRequest } from '../RetirementHandler'
-import { recordProvenance } from '../utils/Provenance'
-import { ZERO_ADDRESS, C3_VERIFIED_CARBON_UNITS_OFFSET } from '../../../lib/utils/Constants'
+import { saveStartAsyncToken, completeC3RetireRequest } from '../RetirementHandler'
+import { C3_VERIFIED_CARBON_UNITS_OFFSET } from '../../../lib/utils/Constants'
 import { BigInt, ethereum, log } from '@graphprotocol/graph-ts'
 import { TokenURISafeguard } from '../../generated/schema'
 import { C3OffsetNFT } from '../../generated/C3-Offset/C3OffsetNFT'
-import { loadC3OffsetBridgeRequest} from '../utils/C3'
+import { loadC3RetireRequest } from '../utils/C3'
 
 export function handleNewC3T(event: NewTokenProject): void {
   // Start indexing the C3T tokens; `event.params.tokenAddress` is the
@@ -29,14 +28,14 @@ export function handleNewC3T(event: NewTokenProject): void {
 export function handleStartAsyncToken(event: StartAsyncToken): void {
   // Ignore retirements of zero value
   if (event.params.amount == ZERO_BI) return
-  
+
   log.info('handleStartAsyncToken event fired {}', [event.transaction.hash.toHexString()])
   saveStartAsyncToken(event)
 }
 
 export function handleEndAsyncToken(event: EndAsyncToken): void {
   // load request and set status to completed
-  completeC3OffsetRequest(event)
+  completeC3RetireRequest(event)
 }
 
 export function handleTokenURISafeguard(block: ethereum.Block): void {
@@ -56,7 +55,7 @@ export function handleTokenURISafeguard(block: ethereum.Block): void {
 
   for (let i = 0; i < requestsArray.length; i++) {
     let requestId = requestsArray[i]
-    let request = loadC3OffsetBridgeRequest(requestId)
+    let request = loadC3RetireRequest(requestId)
     if (request == null) {
       log.error('handleURIBlockSafeguard request is null {}', [requestId])
       continue

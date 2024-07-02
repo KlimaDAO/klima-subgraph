@@ -263,7 +263,7 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
     ])
     return
   } else {
-    if (request.status == BridgeStatus.REQUESTED) {
+    if (request.status == BridgeStatus.REQUESTED && event.params.success == true) {
       let c3OffsetNftContract = C3OffsetNFT.bind(C3_VERIFIED_CARBON_UNITS_OFFSET)
 
       let tokenURICall = c3OffsetNftContract.try_tokenURI(event.params.nftIndex)
@@ -290,6 +290,9 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
       }
 
       request.status = BridgeStatus.FINALIZED
+      request.save()
+    } else if (request.status == BridgeStatus.REQUESTED && event.params.success == false) {
+      request.status = BridgeStatus.REVERTED
       request.save()
     }
   }

@@ -23,7 +23,7 @@
     "deploy": "yarn prepare-local && yarn codegen && yarn build && yarn graph:remove && yarn graph:create && yarn graph:deploy"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "0.69.1",
+    "@graphprotocol/graph-cli": "0.78.0",
     "@graphprotocol/graph-ts": "0.34.0",
     "prettier": "2.7.1"
   },

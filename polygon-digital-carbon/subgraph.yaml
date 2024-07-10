@@ -1,11 +1,11 @@
-specVersion: 1.2.0
+specVersion: 0.0.8
 description: Polygon Carbon
 repository: https://github.com/KlimaDAO/klima-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: CarbonProjectsAddress
+    name: CarbonProjectsAddress  
     network: matic
     source:
       address: '0x599a978c43F5cEa1B26a399D28869Ad4690DC07d'
@@ -81,9 +81,9 @@ dataSources:
         - name: ERC20
           file: ../lib/abis/ERC20.json
         - name: ToucanContractRegistry
-          file: ../lib/abis/ToucanContractRegistry.json
+          file: ../lib/abis/ToucanContractRegistry.json      
         - name: ToucanCarbonOffsetBatches
-          file: ../lib/abis/ToucanCarbonOffsetBatches.json
+          file: ../lib/abis/ToucanCarbonOffsetBatches.json    
       eventHandlers:
         - event: TokenCreated(uint256,address)
           handler: handleNewPuroTCO2
@@ -121,7 +121,7 @@ dataSources:
         - event: BatchUpdated(uint256,string,uint256)
           handler: handleBatchUpdated
         - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleBatchTransfer
+          handler: handleBatchTransfer   
   - kind: ethereum/contract
     name: BCT
     network: matic
@@ -363,21 +363,21 @@ dataSources:
         - event: Deposited(address,uint256)
           handler: handleDeposited
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()          
+            ERC20.name: ERC20[event.params.tokenERC2OAddress].name()
+            ERC20.symbol: ERC20[event.params.tokenERC2OAddress].symbol()
+            ERC20.decimals: ERC20[event.params.tokenERC2OAddress].decimals()          
         - event: Redeemed(address,address,uint256)
           handler: handleRedeemed
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()          
+            ERC20.name: ERC20[event.params.tokenERC2OAddress].name()
+            ERC20.symbol: ERC20[event.params.tokenERC2OAddress].symbol()
+            ERC20.decimals: ERC20[event.params.tokenERC2OAddress].decimals()          
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()
+            ERC20.name: ERC20[event.address].name()
+            ERC20.symbol: ERC20[event.address].symbol()
+            ERC20.decimals: ERC20[event.address].decimals()
   - kind: ethereum/contract
     name: NBO
     network: matic
@@ -401,21 +401,21 @@ dataSources:
         - event: Deposited(address,uint256)
           handler: handleDeposited
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()          
+            ERC20.name: ERC20[event.params.tokenERC2OAddress].name()
+            ERC20.symbol: ERC20[event.params.tokenERC2OAddress].symbol()
+            ERC20.decimals: ERC20[event.params.tokenERC2OAddress].decimals()          
         - event: Redeemed(address,address,uint256)
           handler: handleRedeemed
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()             
+            ERC20.name: ERC20[event.params.tokenERC2OAddress].name()
+            ERC20.symbol: ERC20[event.params.tokenERC2OAddress].symbol()
+            ERC20.decimals: ERC20[event.params.tokenERC2OAddress].decimals()             
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()
+            ERC20.name: ERC20[event.address].name()
+            ERC20.symbol: ERC20[event.address].symbol()
+            ERC20.decimals: ERC20[event.address].decimals()
   - kind: ethereum/contract
     name: C3-Offset
     network: matic
@@ -699,9 +699,9 @@ templates:
           file: ../lib/abis/ERC1155.json
       eventHandlers:
         - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
-          handler: handle1155CreditTransfer          
+          handler: handle1155CreditTransfer
         - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
-          handler: handle1155CreditTransferBatch           
+          handler: handle1155CreditTransferBatch
         - event: RetiredVintage(indexed address,indexed uint256,uint256,uint256,bytes)
           handler: handleICRRetired
         - event: ExPostCreated(indexed uint256,uint256,uint256,uint256,string)

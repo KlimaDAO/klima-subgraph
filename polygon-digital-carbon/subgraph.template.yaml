@@ -363,21 +363,21 @@ dataSources:
         - event: Deposited(address,uint256)
           handler: handleDeposited
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()          
+            ERC20.name: ERC20[event.params.tokenERC2OAddress].name()
+            ERC20.symbol: ERC20[event.params.tokenERC2OAddress].symbol()
+            ERC20.decimals: ERC20[event.params.tokenERC2OAddress].decimals()          
         - event: Redeemed(address,address,uint256)
           handler: handleRedeemed
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()          
+            ERC20.name: ERC20[event.params.tokenERC2OAddress].name()
+            ERC20.symbol: ERC20[event.params.tokenERC2OAddress].symbol()
+            ERC20.decimals: ERC20[event.params.tokenERC2OAddress].decimals()          
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()
+            ERC20.name: ERC20[event.address].name()
+            ERC20.symbol: ERC20[event.address].symbol()
+            ERC20.decimals: ERC20[event.address].decimals()
   - kind: ethereum/contract
     name: NBO
     network: {{network}}
@@ -401,21 +401,21 @@ dataSources:
         - event: Deposited(address,uint256)
           handler: handleDeposited
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()          
+            ERC20.name: ERC20[event.params.tokenERC2OAddress].name()
+            ERC20.symbol: ERC20[event.params.tokenERC2OAddress].symbol()
+            ERC20.decimals: ERC20[event.params.tokenERC2OAddress].decimals()          
         - event: Redeemed(address,address,uint256)
           handler: handleRedeemed
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()             
+            ERC20.name: ERC20[event.params.tokenERC2OAddress].name()
+            ERC20.symbol: ERC20[event.params.tokenERC2OAddress].symbol()
+            ERC20.decimals: ERC20[event.params.tokenERC2OAddress].decimals()             
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
           calls:
-            ERC20.name: ERC20[event.params.tokenAddress].name()
-            ERC20.symbol: ERC20[event.params.tokenAddress].symbol()
-            ERC20.decimals: ERC20[event.params.tokenAddress].decimals()
+            ERC20.name: ERC20[event.address].name()
+            ERC20.symbol: ERC20[event.address].symbol()
+            ERC20.decimals: ERC20[event.address].decimals()
   - kind: ethereum/contract
     name: C3-Offset
     network: {{network}}

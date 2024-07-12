@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
 import { stdYearFromTimestampNew as stdYearFromTimestamp } from '../../../lib/utils/Dates'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 import { C3ProjectToken } from '../../generated/templates/C3ProjectToken/C3ProjectToken'
@@ -64,7 +64,7 @@ function updateToucanCall(tokenAddress: Address, carbonCredit: CarbonCredit, reg
   let standard = attributes.value0.standard
 
   if (standard.toLowerCase() == 'puro') {
-    // retrieve nft batch token id linked to batch to enable retirement
+    // retrieve largest batch tokenId with largest quantity to enable retirement
     let projectVintageTokenId = carbonCreditERC20.projectVintageTokenId()
     let contractRegistryAddress = carbonCreditERC20.contractRegistry()
 
@@ -72,11 +72,12 @@ function updateToucanCall(tokenAddress: Address, carbonCredit: CarbonCredit, reg
     let toucanCarbonOffsetsBatchesAddress = contractRegistry.carbonOffsetBatchesAddress()
 
     let toucanCarbonOffsetsBatches = ToucanCarbonOffsetBatches.bind(toucanCarbonOffsetsBatchesAddress)
-    let totalSupply = toucanCarbonOffsetsBatches.totalSupply()
+    // let totalSupply = toucanCarbonOffsetsBatches.totalSupply()
+    let batchTokenCounter = toucanCarbonOffsetsBatches.batchTokenCounter()
 
     let tokenIds: Array<BigInt> = []
 
-    for (let i = 0; i < totalSupply.toI32(); i++) {
+    for (let i = 0; i < batchTokenCounter.toI32(); i++) {
       let tokenId = toucanCarbonOffsetsBatches.try_tokenOfOwnerByIndex(tokenAddress, BigInt.fromI32(i))
       if (tokenId.reverted) {
         break
@@ -84,14 +85,43 @@ function updateToucanCall(tokenAddress: Address, carbonCredit: CarbonCredit, reg
       tokenIds.push(tokenId.value)
     }
 
+    // retrieve all batches & quantities linked to projectVintageTokenId
+    let batchesAndQuantities: Array<Array<BigInt>> = new Array<Array<BigInt>>()
     for (let i = 0; i < tokenIds.length; i++) {
-      let nftData = toucanCarbonOffsetsBatches.nftList(tokenIds[i])
+      let nftData = toucanCarbonOffsetsBatches.getBatchNFTData(tokenIds[i])
       let projectVintageTokenIdFromNftList = nftData.value0
+      let quantity = nftData.value1
+      let batchStatus = nftData.value2
+      
 
       if (projectVintageTokenIdFromNftList == projectVintageTokenId) {
         carbonCredit.puroBatchTokenId = tokenIds[i]
-        break
+        // break
+        let batchAndQuantity: Array<BigInt> = new Array<BigInt>(2)
+        batchAndQuantity[0] = tokenIds[i]
+        // if the batch status is 5 then the whole batch is being requested for retirement
+        // If a retirement is requested for less than a whole batch a new batch will be created with the requested amount
+        // and the original batch is be updated with the remaining amount that has not been requested
+        batchAndQuantity[1] = (batchStatus == 5) ? BigInt.fromI32(0) : quantity
+
+        batchesAndQuantities.push(batchAndQuantity)
       }
+
+      let maxQuantity: BigInt = BigInt.fromI32(0)
+      let maxBatchTokenId: BigInt = BigInt.fromI32(0)
+  
+      for (let i = 0; i < batchesAndQuantities.length; i++) {
+        let currentBatchTokenId: BigInt = batchesAndQuantities[i][0]
+        let currentQuantity: BigInt = batchesAndQuantities[i][1]
+  
+        if (currentQuantity > maxQuantity) {
+          maxQuantity = currentQuantity
+          maxBatchTokenId = currentBatchTokenId
+        }
+      }
+  
+      carbonCredit.puroBatchTokenId = maxBatchTokenId
+      carbonCredit.maxRetireAmount = maxQuantity
     }
   }
 

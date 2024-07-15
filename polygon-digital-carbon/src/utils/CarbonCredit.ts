@@ -97,11 +97,25 @@ function updateToucanCall(tokenAddress: Address, carbonCredit: CarbonCredit, reg
         // break
         let batchAndQuantity: Array<BigInt> = new Array<BigInt>(2)
         batchAndQuantity[0] = tokenIds[i]
+
+        // Toucan BatchStatus enum
+        //   enum BatchStatus {
+        //     Pending, // 0
+        //     Rejected, // 1
+        //     Confirmed, // 2
+        //     DetokenizationRequested, // 3
+        //     DetokenizationFinalized, // 4
+        //     RetirementRequested, // 5
+        //     RetirementFinalized // 6
+        // }
+
+        // If the batch status is 2 then those credits are confirmed and avaiable for retirement
         // if the batch status is 5 then the whole batch is being requested for retirement
-        // If a retirement is requested for less than a whole batch a new batch will be created with the requested amount
+        // If a retirement is requested for less than a whole batch a new batch with a new batch token id will be created with the requested amount
         // and the original batch is be updated with the remaining amount that has not been requested
         // if the batch status is 6 then the whole batch has been retired and is no longer available for retirement
-        batchAndQuantity[1] =( batchStatus == 5 || batchStatus == 6) ? BigInt.fromI32(0) : quantity
+
+        batchAndQuantity[1] = batchStatus == 2 ? quantity : BigInt.fromI32(0)
 
         batchesAndQuantities.push(batchAndQuantity)
       }

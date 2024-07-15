@@ -92,8 +92,6 @@ function updateToucanCall(tokenAddress: Address, carbonCredit: CarbonCredit, reg
       let projectVintageTokenIdFromNftList = nftData.value0
       let quantity = nftData.value1
       let batchStatus = nftData.value2
-      
-
       if (projectVintageTokenIdFromNftList == projectVintageTokenId) {
         carbonCredit.puroBatchTokenId = tokenIds[i]
         // break
@@ -102,24 +100,27 @@ function updateToucanCall(tokenAddress: Address, carbonCredit: CarbonCredit, reg
         // if the batch status is 5 then the whole batch is being requested for retirement
         // If a retirement is requested for less than a whole batch a new batch will be created with the requested amount
         // and the original batch is be updated with the remaining amount that has not been requested
-        batchAndQuantity[1] = (batchStatus == 5) ? BigInt.fromI32(0) : quantity
+        // if the batch status is 6 then the whole batch has been retired and is no longer available for retirement
+        batchAndQuantity[1] =( batchStatus == 5 || batchStatus == 6) ? BigInt.fromI32(0) : quantity
 
         batchesAndQuantities.push(batchAndQuantity)
       }
 
       let maxQuantity: BigInt = BigInt.fromI32(0)
       let maxBatchTokenId: BigInt = BigInt.fromI32(0)
-  
+
       for (let i = 0; i < batchesAndQuantities.length; i++) {
         let currentBatchTokenId: BigInt = batchesAndQuantities[i][0]
         let currentQuantity: BigInt = batchesAndQuantities[i][1]
-  
+        // issue here if quantity is 0 then batch token id won't be set
         if (currentQuantity > maxQuantity) {
           maxQuantity = currentQuantity
           maxBatchTokenId = currentBatchTokenId
+        } else if (currentQuantity == BigInt.fromI32(0) && maxQuantity == BigInt.fromI32(0)) {
+          maxBatchTokenId = currentBatchTokenId
         }
       }
-  
+
       carbonCredit.puroBatchTokenId = maxBatchTokenId
       carbonCredit.maxRetireAmount = maxQuantity
     }

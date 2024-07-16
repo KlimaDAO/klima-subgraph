@@ -41,15 +41,14 @@ enum BridgeStatus {
 }
 
 enum ToucanBatchStatus {
-    Pending, 
-    Rejected, 
-    Confirmed, 
-    DetokenizationRequested, 
-    DetokenizationFinalized, 
-    RetirementRequested, 
-    RetirementFinalized
+  Pending
+  Rejected
+  Confirmed
+  DetokenizationRequested
+  DetokenizationFinalized
+  RetirementRequested
+  RetirementFinalized
 }
-
 
 type ProvenanceRecord @entity {
   "Token address - Holding address - increment"
@@ -248,9 +247,6 @@ type CarbonCredit @entity {
   # Puro specific fields
   "Puro NFT token ID linked to Puro batch"
   puroBatchTokenId: BigInt
-  
-  "Remaining batch size linked to batch token ID"
-  maxRetireAmount: BigInt
 }
 
 type CarbonCreditSnapshot @entity {

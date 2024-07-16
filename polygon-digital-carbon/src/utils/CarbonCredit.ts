@@ -136,7 +136,6 @@ function updateToucanCall(tokenAddress: Address, carbonCredit: CarbonCredit, reg
       }
 
       carbonCredit.puroBatchTokenId = maxBatchTokenId
-      carbonCredit.maxRetireAmount = maxQuantity
     }
   }
 

@@ -106,8 +106,14 @@ yarn fund
 ```
 USE_LOCAL_ENVIRONMENT=true
 ```
+and 
 
-to `.env.local` in the root
+```
+GRAPH_POLYGON_DIGITALCARBON_URL=http://127.0.0.1:8000/subgraphs/name/polygon-digital-carbon
+GRAPH_POLYGON_MARKETPLACE_URL=http://127.0.0.1:8000/subgraphs/name/carbonmark
+```
+
+to .env.local in `carbonmark-api/`
 
 2. run local api and local checkout
 

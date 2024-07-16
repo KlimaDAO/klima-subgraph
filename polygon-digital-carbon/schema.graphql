@@ -40,16 +40,6 @@ enum BridgeStatus {
   AWAITING
 }
 
-enum ToucanBatchStatus {
-  Pending
-  Rejected
-  Confirmed
-  DetokenizationRequested
-  DetokenizationFinalized
-  RetirementRequested
-  RetirementFinalized
-}
-
 type ProvenanceRecord @entity {
   "Token address - Holding address - increment"
   id: Bytes!

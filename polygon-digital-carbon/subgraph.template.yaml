@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 0.0.8
 description: Polygon Carbon
 repository: https://github.com/KlimaDAO/klima-subgraph
 schema:
@@ -79,7 +79,11 @@ dataSources:
           file: ../lib/abis/ToucanCarbonOffsetBatches.json       
       eventHandlers:
         - event: TokenCreated(uint256,address)
-          handler: handleNewPuroTCO2 
+          handler: handleNewPuroTCO2  
+      blockHandlers:
+        - handler: initializeToucanCredits
+          filter:
+            kind: once
   - kind: ethereum/contract
     name: ToucanCarbonOffsetBatch
     network: {{network}}

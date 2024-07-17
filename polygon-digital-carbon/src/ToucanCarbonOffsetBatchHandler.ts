@@ -1,3 +1,4 @@
+import { log } from '@graphprotocol/graph-ts'
 import {
   BatchMinted,
   BatchUpdated,
@@ -9,6 +10,7 @@ import { updateCarbonCreditWithCall } from './utils/CarbonCredit'
 import { loadOrCreateToucanBatch } from './utils/Toucan'
 
 export function handleTokenized(event: Tokenized): void {
+  log.info("tokenized {} {}", [event.params.tco2.toHexString(), event.params.tokenId.toI32().toString()])
   let credit = updateCarbonCreditWithCall(event.params.tco2, 'PURO_EARTH')
 
   credit.puroBatchTokenId = event.params.tokenId

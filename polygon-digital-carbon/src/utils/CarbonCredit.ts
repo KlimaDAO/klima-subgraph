@@ -2,12 +2,10 @@ import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
 import { stdYearFromTimestampNew as stdYearFromTimestamp } from '../../../lib/utils/Dates'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 import { C3ProjectToken } from '../../generated/templates/C3ProjectToken/C3ProjectToken'
-import { CarbonCredit } from '../../generated/schema'
+import { CarbonCredit, CarbonProject } from '../../generated/schema'
 import { ToucanCarbonOffsets } from '../../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
 import { loadOrCreateCarbonProject } from './CarbonProject'
 import { MethodologyCategories } from './MethodologyCategories'
-import { ToucanContractRegistry } from '../../generated/ToucanPuroFactory/ToucanContractRegistry'
-import { ToucanCarbonOffsetBatches } from '../../generated/ToucanCarbonOffsetBatch/ToucanCarbonOffsetBatches'
 
 export function loadOrCreateCarbonCredit(tokenAddress: Address, bridge: string, tokenId: BigInt | null): CarbonCredit {
   let id = Bytes.fromHexString(tokenAddress.toHexString())
@@ -56,7 +54,15 @@ function updateToucanCall(tokenAddress: Address, carbonCredit: CarbonCredit, reg
   let carbonCreditERC20 = ToucanCarbonOffsets.bind(tokenAddress)
 
   let attributes = carbonCreditERC20.getAttributes()
-  let project = loadOrCreateCarbonProject(registry, attributes.value0.projectId)
+  log.info('shit: {} tokenAddress {}', [attributes.value0.projectId.toString(), tokenAddress.toHexString()])
+
+  let project: CarbonProject
+
+  if (attributes.value0.projectId == '') {
+    project = loadOrCreateCarbonProject(registry, 'PURO-NO_PROJECT_DATA_NOT_AVAILABLE')
+  } else {
+    project = loadOrCreateCarbonProject(registry, attributes.value0.projectId)
+  }
 
   project.methodologies = attributes.value0.methodology
   project.category = MethodologyCategories.getMethodologyCategory(project.methodologies)

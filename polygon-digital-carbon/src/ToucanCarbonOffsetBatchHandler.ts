@@ -1,6 +1,20 @@
-import { BatchMinted, BatchUpdated, Transfer } from '../generated/ToucanCarbonOffsetBatch/ToucanCarbonOffsetBatches'
+import {
+  BatchMinted,
+  BatchUpdated,
+  Transfer,
+  Tokenized,
+} from '../generated/ToucanCarbonOffsetBatch/ToucanCarbonOffsetBatches'
 import { CarbonCredit } from '../generated/schema'
+import { updateCarbonCreditWithCall } from './utils/CarbonCredit'
 import { loadOrCreateToucanBatch } from './utils/Toucan'
+
+export function handleTokenized(event: Tokenized): void {
+  let credit = updateCarbonCreditWithCall(event.params.tco2, 'PURO_EARTH')
+
+  credit.puroBatchTokenId = event.params.tokenId
+
+  credit.save()
+}
 
 export function handleBatchMinted(event: BatchMinted): void {
   let batch = loadOrCreateToucanBatch(event.params.tokenId)

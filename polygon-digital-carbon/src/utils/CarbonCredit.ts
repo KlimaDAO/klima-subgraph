@@ -58,92 +58,93 @@ function updateToucanCall(tokenAddress: Address, carbonCredit: CarbonCredit, reg
   let attributes = carbonCreditERC20.getAttributes()
   let project = loadOrCreateCarbonProject(registry, attributes.value0.projectId)
 
-  carbonCredit.project = project.id
-  carbonCredit.vintage = stdYearFromTimestamp(attributes.value1.endTime)
-
-  let standard = attributes.value0.standard
-
-  if (standard.toLowerCase() == 'puro') {
-    // retrieve largest batch tokenId with largest quantity to enable retirement
-    let projectVintageTokenId = carbonCreditERC20.projectVintageTokenId()
-    let contractRegistryAddress = carbonCreditERC20.contractRegistry()
-
-    let contractRegistry = ToucanContractRegistry.bind(contractRegistryAddress)
-    let toucanCarbonOffsetsBatchesAddress = contractRegistry.carbonOffsetBatchesAddress()
-
-    let toucanCarbonOffsetsBatches = ToucanCarbonOffsetBatches.bind(toucanCarbonOffsetsBatchesAddress)
-    // let totalSupply = toucanCarbonOffsetsBatches.totalSupply()
-    let batchTokenCounter = toucanCarbonOffsetsBatches.batchTokenCounter()
-
-    let tokenIds: Array<BigInt> = []
-
-    for (let i = 0; i < batchTokenCounter.toI32(); i++) {
-      let tokenId = toucanCarbonOffsetsBatches.try_tokenOfOwnerByIndex(tokenAddress, BigInt.fromI32(i))
-      if (tokenId.reverted) {
-        break
-      }
-      tokenIds.push(tokenId.value)
-    }
-
-    // retrieve all batches & quantities linked to projectVintageTokenId
-    let batchesAndQuantities: Array<Array<BigInt>> = new Array<Array<BigInt>>()
-    for (let i = 0; i < tokenIds.length; i++) {
-      let nftData = toucanCarbonOffsetsBatches.getBatchNFTData(tokenIds[i])
-      let projectVintageTokenIdFromNftList = nftData.value0
-      let quantity = nftData.value1
-      let batchStatus = nftData.value2
-      if (projectVintageTokenIdFromNftList == projectVintageTokenId) {
-        carbonCredit.puroBatchTokenId = tokenIds[i]
-        // break
-        let batchAndQuantity: Array<BigInt> = new Array<BigInt>(2)
-        batchAndQuantity[0] = tokenIds[i]
-
-        // Toucan BatchStatus enum
-        //   enum BatchStatus {
-        //     Pending, // 0
-        //     Rejected, // 1
-        //     Confirmed, // 2
-        //     DetokenizationRequested, // 3
-        //     DetokenizationFinalized, // 4
-        //     RetirementRequested, // 5
-        //     RetirementFinalized // 6
-        // }
-
-        // If the batch status is 2 then those credits are confirmed and avaiable for retirement
-        // if the batch status is 5 then the whole batch is being requested for retirement
-        // If a retirement is requested for less than a whole batch a new batch with a new batch token id will be created with the requested amount
-        // and the original batch is be updated with the remaining amount that has not been requested
-        // if the batch status is 6 then the whole batch has been retired and is no longer available for retirement
-
-        batchAndQuantity[1] = batchStatus == 2 ? quantity : BigInt.fromI32(0)
-
-        batchesAndQuantities.push(batchAndQuantity)
-      }
-
-      let maxQuantity: BigInt = BigInt.fromI32(0)
-      let maxBatchTokenId: BigInt = BigInt.fromI32(0)
-
-      for (let i = 0; i < batchesAndQuantities.length; i++) {
-        let currentBatchTokenId: BigInt = batchesAndQuantities[i][0]
-        let currentQuantity: BigInt = batchesAndQuantities[i][1]
-        // issue here if quantity is 0 then batch token id won't be set
-        if (currentQuantity > maxQuantity) {
-          maxQuantity = currentQuantity
-          maxBatchTokenId = currentBatchTokenId
-        } else if (currentQuantity == BigInt.fromI32(0) && maxQuantity == BigInt.fromI32(0)) {
-          maxBatchTokenId = currentBatchTokenId
-        }
-      }
-
-      carbonCredit.puroBatchTokenId = maxBatchTokenId
-    }
-  }
-
-  carbonCredit.save()
-
   project.methodologies = attributes.value0.methodology
   project.category = MethodologyCategories.getMethodologyCategory(project.methodologies)
   project.save()
+
+  carbonCredit.project = project.id
+  carbonCredit.vintage = stdYearFromTimestamp(attributes.value1.endTime)
+
+  // let standard = attributes.value0.standard
+
+  // if (standard.toLowerCase() == 'puro') {
+  //   // retrieve largest batch tokenId with largest quantity to enable retirement
+  //   let projectVintageTokenId = carbonCreditERC20.projectVintageTokenId()
+  //   let contractRegistryAddress = carbonCreditERC20.contractRegistry()
+
+  //   let contractRegistry = ToucanContractRegistry.bind(contractRegistryAddress)
+  //   let toucanCarbonOffsetsBatchesAddress = contractRegistry.carbonOffsetBatchesAddress()
+
+  //   let toucanCarbonOffsetsBatches = ToucanCarbonOffsetBatches.bind(toucanCarbonOffsetsBatchesAddress)
+  //   // let totalSupply = toucanCarbonOffsetsBatches.totalSupply()
+  //   let batchTokenCounter = toucanCarbonOffsetsBatches.batchTokenCounter()
+
+  //   let tokenIds: Array<BigInt> = []
+
+  //   for (let i = 0; i < batchTokenCounter.toI32(); i++) {
+  //     let tokenId = toucanCarbonOffsetsBatches.try_tokenOfOwnerByIndex(tokenAddress, BigInt.fromI32(i))
+  //     if (tokenId.reverted) {
+  //       break
+  //     }
+  //     tokenIds.push(tokenId.value)
+  //   }
+
+  //   // retrieve all batches & quantities linked to projectVintageTokenId
+  //   let batchesAndQuantities: Array<Array<BigInt>> = new Array<Array<BigInt>>()
+  //   for (let i = 0; i < tokenIds.length; i++) {
+  //     let nftData = toucanCarbonOffsetsBatches.getBatchNFTData(tokenIds[i])
+  //     let projectVintageTokenIdFromNftList = nftData.value0
+  //     let quantity = nftData.value1
+  //     let batchStatus = nftData.value2
+  //     if (projectVintageTokenIdFromNftList == projectVintageTokenId) {
+  //       carbonCredit.puroBatchTokenId = tokenIds[i]
+  //       // break
+  //       let batchAndQuantity: Array<BigInt> = new Array<BigInt>(2)
+  //       batchAndQuantity[0] = tokenIds[i]
+
+  //       // Toucan BatchStatus enum
+  //       //   enum BatchStatus {
+  //       //     Pending, // 0
+  //       //     Rejected, // 1
+  //       //     Confirmed, // 2
+  //       //     DetokenizationRequested, // 3
+  //       //     DetokenizationFinalized, // 4
+  //       //     RetirementRequested, // 5
+  //       //     RetirementFinalized // 6
+  //       // }
+
+  //       // If the batch status is 2 then those credits are confirmed and avaiable for retirement
+  //       // if the batch status is 5 then the whole batch is being requested for retirement
+  //       // If a retirement is requested for less than a whole batch a new batch with a new batch token id will be created with the requested amount
+  //       // and the original batch is be updated with the remaining amount that has not been requested
+  //       // if the batch status is 6 then the whole batch has been retired and is no longer available for retirement
+
+  //       batchAndQuantity[1] = batchStatus == 2 ? quantity : BigInt.fromI32(0)
+
+  //       batchesAndQuantities.push(batchAndQuantity)
+  //     }
+
+  //     let maxQuantity: BigInt = BigInt.fromI32(0)
+  //     let maxBatchTokenId: BigInt = BigInt.fromI32(0)
+
+  //     for (let i = 0; i < batchesAndQuantities.length; i++) {
+  //       let currentBatchTokenId: BigInt = batchesAndQuantities[i][0]
+  //       let currentQuantity: BigInt = batchesAndQuantities[i][1]
+  //       // issue here if quantity is 0 then batch token id won't be set
+  //       if (currentQuantity > maxQuantity) {
+  //         maxQuantity = currentQuantity
+  //         maxBatchTokenId = currentBatchTokenId
+  //       } else if (currentQuantity == BigInt.fromI32(0) && maxQuantity == BigInt.fromI32(0)) {
+  //         maxBatchTokenId = currentBatchTokenId
+  //       }
+  //     }
+
+  //     carbonCredit.puroBatchTokenId = maxBatchTokenId
+  //   }
+  // }
+
+  carbonCredit.save()
+
   return carbonCredit
 }
 

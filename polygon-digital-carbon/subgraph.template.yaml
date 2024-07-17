@@ -3,6 +3,11 @@ description: Polygon Carbon
 repository: https://github.com/KlimaDAO/klima-subgraph
 schema:
   file: ./schema.graphql
+features: 
+  - grafting
+graft:
+    base: QmbDuDTk61QH4ANxB8SusZaNEiG3TRR64LQgmsmzGF38XA
+    block: 55637898
 dataSources:
   - kind: ethereum/contract
     name: CarbonProjectsAddress  
@@ -98,6 +103,8 @@ dataSources:
         - name: ToucanCarbonOffsetBatches
           file: ../lib/abis/ToucanCarbonOffsetBatches.json
       eventHandlers:
+        - event: Tokenized(uint256,address,indexed address,uint256)
+          handler: handleTokenized
         - event: BatchMinted(address,uint256)
           handler: handleBatchMinted
         - event: BatchUpdated(uint256,string,uint256)

@@ -3,15 +3,13 @@ import { ToucanRetired } from '../generated/RetireToucanCarbon/RetireToucanCarbo
 import { C3Retired } from '../generated/RetireC3Carbon/RetireC3Carbon'
 import { CarbonRetired, CarbonRetired1 as CarbonRetiredTokenId } from '../generated/KlimaInfinity/KlimaInfinity'
 import { KlimaCarbonRetirements } from '../generated/RetireC3Carbon/KlimaCarbonRetirements'
-import { Address, BigInt, dataSource } from '@graphprotocol/graph-ts'
+import { BigInt, dataSource } from '@graphprotocol/graph-ts'
 import { loadOrCreateAccount } from './utils/Account'
 import { loadRetire } from './utils/Retire'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { saveKlimaRetire } from './utils/KlimaRetire'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { getRetirementsContractAddress } from '../utils/getRetirementsContractAddress'
-import { loadCarbonCredit, updateCarbonCreditWithCall } from './utils/CarbonCredit'
-import { CarbonProject } from '../generated/schema'
 
 export function handleMossRetired(event: MossRetired): void {
   // Ignore zero value retirements
@@ -172,17 +170,6 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
   retire.retiringAddress = event.params.retiringAddress
   retire.retirementMessage = event.params.retirementMessage
   retire.save()
-
-  let credit = loadCarbonCredit(retire.credit)
-  let project = CarbonProject.load(credit.project) as CarbonProject
-
-  // update the credit with the largest batch and remaining quantity
-  if (project != null) {
-    if (project.registry == 'PURO_EARTH') {
-      updateCarbonCreditWithCall(Address.fromBytes(credit.id), project.registry)
-    }
-  }
-
 
   saveKlimaRetire(
     event.params.beneficiaryAddress,

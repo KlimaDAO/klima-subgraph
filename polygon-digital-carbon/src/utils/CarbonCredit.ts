@@ -7,7 +7,7 @@ import { ToucanCarbonOffsets } from '../../generated/templates/ToucanCarbonOffse
 import { loadOrCreateCarbonProject } from './CarbonProject'
 import { MethodologyCategories } from './MethodologyCategories'
 import { ToucanCarbonOffsetBatches } from '../../generated/ToucanCarbonOffsetBatch/ToucanCarbonOffsetBatches'
-import { TOUCAN_CONTRACT_REGISTRY_ADDRESS } from '../../../lib/utils/Constants'
+import { ToucanContractRegistry } from '../../generated/ToucanPuroFactory/ToucanContractRegistry'
 
 export function loadOrCreateCarbonCredit(tokenAddress: Address, bridge: string, tokenId: BigInt | null): CarbonCredit {
   let id = Bytes.fromHexString(tokenAddress.toHexString())
@@ -74,14 +74,18 @@ function updateToucanCall(tokenAddress: Address, carbonCredit: CarbonCredit, reg
   carbonCredit.vintage = stdYearFromTimestamp(attributes.value1.endTime)
 
   // still necessary for a local environment
-  // ideally replaced with event emission script in the future 
+  // ideally replaced with event emission script in the future
   let standard = attributes.value0.standard
 
   if (standard.toLowerCase() == 'puro' && network == 'mainnet') {
     // retrieve largest batch tokenId with largest quantity to enable retirement
     let projectVintageTokenId = carbonCreditERC20.projectVintageTokenId()
+    let contractRegistryAddress = carbonCreditERC20.contractRegistry()
 
-    let toucanCarbonOffsetsBatches = ToucanCarbonOffsetBatches.bind(TOUCAN_CONTRACT_REGISTRY_ADDRESS)
+    let contractRegistry = ToucanContractRegistry.bind(contractRegistryAddress)
+    let toucanCarbonOffsetsBatchesAddress = contractRegistry.carbonOffsetBatchesAddress()
+
+    let toucanCarbonOffsetsBatches = ToucanCarbonOffsetBatches.bind(toucanCarbonOffsetsBatchesAddress)
     // let totalSupply = toucanCarbonOffsetsBatches.totalSupply()
     let batchTokenCounter = toucanCarbonOffsetsBatches.batchTokenCounter()
 

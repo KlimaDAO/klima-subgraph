@@ -15,7 +15,7 @@ import { incrementAccountRetirements, loadOrCreateAccount } from './utils/Accoun
 import { loadCarbonCredit, loadOrCreateCarbonCredit } from './utils/CarbonCredit'
 import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 import { loadRetire, saveRetire } from './utils/Retire'
-import { log } from '@graphprotocol/graph-ts'
+import { log, Bytes } from '@graphprotocol/graph-ts'
 import { loadOrCreateC3RetireRequest, loadC3RetireRequest } from './utils/C3'
 import { Token, TokenURISafeguard } from '../generated/schema'
 import { getC3RetireRequestId } from '../utils/getRetirementsContractAddress'
@@ -348,9 +348,11 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
       }
 
       // set status on retire as well
-      let retireId = request.retire
+      let retireId: Bytes | null = request.retire
 
-      if (retireId != null) {
+      if (retireId === null) {
+        log.info('RetireId is null for requestId: {}', [requestId.toHexString()])
+      } else {
         let retire = loadRetire(retireId)
         retire.bridgeStatus = BridgeStatus.FINALIZED
       }

@@ -347,6 +347,14 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
         }
       }
 
+      // set status on retire as well
+      let retireId = request.retire
+
+      if (retireId != null) {
+        let retire = loadRetire(retireId)
+        retire.bridgeStatus = BridgeStatus.FINALIZED
+      }
+
       request.status = BridgeStatus.FINALIZED
     } else if (request.status == BridgeStatus.REQUESTED && event.params.success == false) {
       request.status = BridgeStatus.REVERTED

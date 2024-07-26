@@ -141,7 +141,6 @@ export function handlePuroIdMigration(event: ProjectIdUpdated): void {
     }
 
     let projectAddress = Address.fromBytes(tokenIds[i])
-    // let carbonCreditContract = ERC20.bind(projectAddress)
     let carbonCreditContract = ToucanPuroCarbonOffsets.bind(projectAddress)
 
     let newSymbol = carbonCreditContract.try_symbol()

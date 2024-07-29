@@ -111,7 +111,7 @@ export function loadProject(projectId: string): Project {
   return project
 }
 
-function createCountry(id: string): void {
+export function createCountry(id: string): void {
   let country = Country.load(id)
   if (country == null) {
     country = new Country(id)

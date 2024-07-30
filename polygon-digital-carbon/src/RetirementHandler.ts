@@ -310,9 +310,7 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
   let request = loadC3RetireRequest(requestId)
 
   if (request == null) {
-    log.error('No C3RetireRequest found for retireId: {} hash: {}', [
-      event.transaction.hash.toHexString(),
-    ])
+    log.error('No C3RetireRequest found for retireId: {} hash: {}', [event.transaction.hash.toHexString()])
     return
   } else {
     if (request.status == BridgeStatus.REQUESTED && event.params.success == true) {
@@ -337,7 +335,9 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
           requestsArray.push(requestId)
           safeguard.requestsWithoutURI = requestsArray
           safeguard.save()
-          log.error('Initial attempt to retrieve tokenURI is null or empty for nft index {}', [event.params.nftIndex.toString()])
+          log.error('Initial attempt to retrieve tokenURI is null or empty for nft index {}', [
+            event.params.nftIndex.toString(),
+          ])
         } else {
           request.tokenURI = tokenURI
           const hash = extractIpfsHash(tokenURI)
@@ -348,14 +348,10 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
       }
 
       // set status on retire as well
-      let retireId: Bytes | null = request.retire
+      let retireId: Bytes = request.retire
 
-      if (retireId === null) {
-        log.info('RetireId is null for requestId: {}', [requestId.toHexString()])
-      } else {
-        let retire = loadRetire(retireId)
-        retire.bridgeStatus = BridgeStatus.FINALIZED
-      }
+      let retire = loadRetire(retireId)
+      retire.bridgeStatus = BridgeStatus.FINALIZED
 
       request.status = BridgeStatus.FINALIZED
     } else if (request.status == BridgeStatus.REQUESTED && event.params.success == false) {
@@ -378,9 +374,8 @@ export function handleVCUOMetaDataUpdated(event: VCUOMetaDataUpdated): void {
   /** Target the request with the index that matches the event.params.tokenId
    * With event.params.tokenId, it's theoretically possible to call .list() on the C3OffsetNFT contract to get the project address
    * However the issue is the request cannot be loaded as the request id is project address.concat(with retirement index)
-   * The retirement index is not available in this event. There is currently no way to call the C3OffsetNFT or 
-   * credit contract with any of the event params to retrieve the retirement index  */ 
-
+   * The retirement index is not available in this event. There is currently no way to call the C3OffsetNFT or
+   * credit contract with any of the event params to retrieve the retirement index  */
 
   for (let i = 0; i < requestsArray.length; i++) {
     let requestId = requestsArray[i]

@@ -8,6 +8,7 @@ enum Registry {
   J_CREDIT
   ECO_REGISTRY
   CCS
+  UNSUPPORTED_REGISTRY
 }
 
 enum RetireSource {

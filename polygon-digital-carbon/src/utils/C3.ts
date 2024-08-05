@@ -9,6 +9,7 @@ export function loadOrCreateC3RetireRequest(requestId: Bytes): C3RetireRequest {
     request = new C3RetireRequest(requestId)
     request.status = BridgeStatus.AWAITING
     request.index = BigInt.fromI32(0)
+    request.retire = new Bytes(0)
     request.c3OffsetNftIndex = BigInt.fromI32(0)
     request.tokenURI = ''
     request.save()

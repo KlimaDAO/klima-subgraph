@@ -413,7 +413,7 @@ type C3RetireRequest @entity {
   index: BigInt!
   c3OffsetNftIndex: BigInt!
   status: BridgeStatus!
-  retire: Retire
+  retire: Retire!
   provenance: ProvenanceRecord
   tokenURI: String!
   retirementMetadata: C3RetirementMetadata

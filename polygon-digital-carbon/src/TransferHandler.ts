@@ -20,6 +20,7 @@ import { loadOrCreateHolding } from './utils/Holding'
 import { ZERO_BI, BIG_INT_1E18 } from '../../lib/utils/Decimals'
 import { loadOrCreateAccount } from './utils/Account'
 import {
+  saveCCO2Retirement,
   saveICRRetirement,
   saveToucanPuroRetirementRequest,
   saveToucanRetirement,
@@ -38,6 +39,7 @@ import {
   RetirementFinalized,
 } from '../generated/templates/ToucanPuroCarbonOffsets/ToucanPuroCarbonOffsets'
 import { loadOrCreateToucanBridgeRequest } from './utils/Toucan'
+import { burnedCO2Token } from '../generated/CCO2/CCO2'
 
 export function handleCreditTransfer(event: Transfer): void {
   recordTransfer(
@@ -121,6 +123,11 @@ export function handleToucanPuroDetokenizationRequested(): void {}
 export function handleToucanPuroDetokenizationFinalized(): void {}
 
 export function handleToucanPuroDetokenizationReverted(): void {}
+
+export function handleCCO2Retired(event: burnedCO2Token): void {
+  if (event.params.amount == ZERO_BI) return
+  saveCCO2Retirement(event)
+}
 
 export function handle1155CreditTransfer(event: TransferSingle): void {
   if (ICR_MIGRATION_HASHES.indexOf(event.transaction.hash.toHexString()) > 0) return

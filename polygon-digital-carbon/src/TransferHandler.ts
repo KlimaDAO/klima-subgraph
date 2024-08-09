@@ -1,9 +1,9 @@
-import { Address, BigInt, Bytes, ethereum, log, store } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt, Bytes, ethereum, log, store } from '@graphprotocol/graph-ts'
 import {
+  CCO2_ERC20_CONTRACT,
   ICR_MIGRATION_BLOCK,
   ICR_MIGRATION_HASHES,
   MCO2_ERC20_CONTRACT,
-  TOUCAN_CROSS_CHAIN_MESSENGER,
   ZERO_ADDRESS,
 } from '../../lib/utils/Constants'
 import { Transfer } from '../generated/BCT/ERC20'
@@ -20,6 +20,7 @@ import { loadOrCreateHolding } from './utils/Holding'
 import { ZERO_BI, BIG_INT_1E18 } from '../../lib/utils/Decimals'
 import { loadOrCreateAccount } from './utils/Account'
 import {
+  saveCCO2Retirement,
   saveICRRetirement,
   saveToucanPuroRetirementRequest,
   saveToucanRetirement,
@@ -38,6 +39,7 @@ import {
   RetirementFinalized,
 } from '../generated/templates/ToucanPuroCarbonOffsets/ToucanPuroCarbonOffsets'
 import { loadOrCreateToucanBridgeRequest } from './utils/Toucan'
+import { burnedCO2Token } from '../generated/CCO2/CCO2'
 
 export function handleCreditTransfer(event: Transfer): void {
   recordTransfer(
@@ -121,6 +123,11 @@ export function handleToucanPuroDetokenizationRequested(): void {}
 export function handleToucanPuroDetokenizationFinalized(): void {}
 
 export function handleToucanPuroDetokenizationReverted(): void {}
+
+export function handleCCO2Retired(event: burnedCO2Token): void {
+  if (event.params.amount == ZERO_BI) return
+  saveCCO2Retirement(event)
+}
 
 export function handle1155CreditTransfer(event: TransferSingle): void {
   if (ICR_MIGRATION_HASHES.indexOf(event.transaction.hash.toHexString()) > 0) return
@@ -210,7 +217,9 @@ function recordTransfer(
   if (amount == ZERO_BI) return
 
   let creditId = Bytes.fromHexString(tokenAddress.toHexString())
+
   if (tokenAddress == MCO2_ERC20_CONTRACT) loadOrCreateCarbonCredit(MCO2_ERC20_CONTRACT, 'MOSS', null)
+  if (tokenAddress == CCO2_ERC20_CONTRACT) loadOrCreateCarbonCredit(CCO2_ERC20_CONTRACT, 'COOREST', null)
 
   if (tokenId !== null) {
     creditId = creditId.concatI32(tokenId.toI32())
@@ -263,7 +272,7 @@ function recordTransfer(
     toHolding.save()
 
     // Exclude MCO2 retirements that are bridged back for one final burn to the zero address on mainnet
-    if (from != ZERO_ADDRESS && tokenAddress != MCO2_ERC20_CONTRACT) {
+    if (from != ZERO_ADDRESS && tokenAddress != MCO2_ERC20_CONTRACT && tokenAddress != CCO2_ERC20_CONTRACT) {
       recordProvenance(hash, tokenAddress, tokenId, from, to, 'TRANSFER', amount, timestamp)
 
       credit.provenanceCount += 1
@@ -291,14 +300,24 @@ function recordTransfer(
   credit.save()
 
   // Also save supply changes for MCO2
-  if (tokenAddress == MCO2_ERC20_CONTRACT && (to == ZERO_ADDRESS || from == ZERO_ADDRESS)) {
+  if (
+    (tokenAddress == MCO2_ERC20_CONTRACT || tokenAddress == CCO2_ERC20_CONTRACT) &&
+    (to == ZERO_ADDRESS || from == ZERO_ADDRESS)
+  ) {
     checkForCarbonPoolSnapshot(tokenAddress, timestamp, blockNumber)
     checkForCarbonPoolCreditSnapshot(tokenAddress, tokenAddress, timestamp, blockNumber)
 
     let pool = loadOrCreateCarbonPool(tokenAddress)
 
     if (to == ZERO_ADDRESS) pool.supply = pool.supply.minus(amount)
-    else pool.supply = pool.supply.plus(amount)
+    else {
+      pool.supply = pool.supply.plus(amount)
+
+      if (tokenAddress == CCO2_ERC20_CONTRACT) {
+        const newAmountBD = pool.supply.plus(amount).toBigDecimal()
+        pool.supplyTonnes = newAmountBD.div(BigDecimal.fromString('1000'))
+      }
+    }
 
     pool.save()
   }

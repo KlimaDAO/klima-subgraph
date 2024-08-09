@@ -1,5 +1,6 @@
 import {
   C3_VERIFIED_CARBON_UNITS_OFFSET,
+  CCO2_ERC20_CONTRACT,
   ICR_MIGRATION_BLOCK,
   MCO2_ERC20_CONTRACT,
   ZERO_ADDRESS,
@@ -11,6 +12,7 @@ import { StartAsyncToken, EndAsyncToken } from '../generated/C3ProjectTokenFacto
 import { RetiredVintage } from '../generated/templates/ICRProjectToken/ICRProjectToken'
 import { Retired, Retired1 as Retired_1_4_0 } from '../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
 import { RetirementRequested } from '../generated/templates/ToucanPuroCarbonOffsets/ToucanPuroCarbonOffsets'
+import { burnedCO2Token } from '../generated/CCO2/CCO2'
 import { incrementAccountRetirements, loadOrCreateAccount } from './utils/Account'
 import { loadCarbonCredit, loadOrCreateCarbonCredit } from './utils/CarbonCredit'
 import { loadOrCreateCarbonProject } from './utils/CarbonProject'
@@ -23,6 +25,7 @@ import { BridgeStatus } from '../utils/enums'
 import { loadOrCreateToucanBridgeRequest } from './utils/Toucan'
 import { C3RetirementMetadata as C3RetirementMetadataTemplate } from '../generated/templates'
 import { extractIpfsHash } from '../utils/ipfs'
+import { returnedPoccID } from '../generated/Coorest/Coorest'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -220,6 +223,56 @@ export function handleMossRetirement(event: CarbonOffset): void {
   incrementAccountRetirements(senderAddress)
 }
 
+export function saveCCO2Retirement(event: burnedCO2Token): void {
+  // Don't process zero amount events
+  if (event.params.amount == ZERO_BI) return
+
+  let credit = loadOrCreateCarbonCredit(CCO2_ERC20_CONTRACT, 'CCO2', null)
+
+  // Set up project/default info for Moss "project"
+
+  if (credit.vintage == 1970) {
+    credit.vintage = 2021
+    credit.project = 'CCO2'
+    credit.save()
+
+    loadOrCreateCarbonProject('CCS', 'CCO2')
+  }
+
+  credit.retired = credit.retired.plus(event.params.amount)
+  credit.save()
+
+  // Ensure account entities are created for all addresses
+  let sender = loadOrCreateAccount(event.transaction.from)
+  let senderAddress = event.transaction.from
+
+  saveRetire(
+    sender.id.concatI32(sender.totalRetirements),
+    CCO2_ERC20_CONTRACT,
+    CCO2_ERC20_CONTRACT,
+    'OTHER',
+    event.params.amount,
+    /** event.transaction.from will save the RA address as the beneficiary for RA retires
+     * This should not an issue however as this field is reassigned in handleCarbonRetired*/
+    event.transaction.from,
+    '',
+    senderAddress,
+    '',
+    event.block.timestamp,
+    event.transaction.hash
+  )
+
+  incrementAccountRetirements(senderAddress)
+}
+
+export function handleReturnedPoccID(event: returnedPoccID): void {
+  log.info('Returned POCC ID event fired {}', [event.transaction.hash.toHexString()])
+  let sender = loadOrCreateAccount(event.transaction.from)
+  let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
+  retire.retirementTokenId = event.params.poccID
+  retire.save()
+}
+
 export function saveICRRetirement(event: RetiredVintage): void {
   let credit = loadOrCreateCarbonCredit(event.address, 'ICR', event.params.tokenId)
 
@@ -310,9 +363,7 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
   let request = loadC3RetireRequest(requestId)
 
   if (request == null) {
-    log.error('No C3RetireRequest found for retireId: {} hash: {}', [
-      event.transaction.hash.toHexString(),
-    ])
+    log.error('No C3RetireRequest found for retireId: {} hash: {}', [event.transaction.hash.toHexString()])
     return
   } else {
     if (request.status == BridgeStatus.REQUESTED && event.params.success == true) {
@@ -337,7 +388,9 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
           requestsArray.push(requestId)
           safeguard.requestsWithoutURI = requestsArray
           safeguard.save()
-          log.error('Initial attempt to retrieve tokenURI is null or empty for nft index {}', [event.params.nftIndex.toString()])
+          log.error('Initial attempt to retrieve tokenURI is null or empty for nft index {}', [
+            event.params.nftIndex.toString(),
+          ])
         } else {
           request.tokenURI = tokenURI
           const hash = extractIpfsHash(tokenURI)
@@ -368,9 +421,8 @@ export function handleVCUOMetaDataUpdated(event: VCUOMetaDataUpdated): void {
   /** Target the request with the index that matches the event.params.tokenId
    * With event.params.tokenId, it's theoretically possible to call .list() on the C3OffsetNFT contract to get the project address
    * However the issue is the request cannot be loaded as the request id is project address.concat(with retirement index)
-   * The retirement index is not available in this event. There is currently no way to call the C3OffsetNFT or 
-   * credit contract with any of the event params to retrieve the retirement index  */ 
-
+   * The retirement index is not available in this event. There is currently no way to call the C3OffsetNFT or
+   * credit contract with any of the event params to retrieve the retirement index  */
 
   for (let i = 0; i < requestsArray.length; i++) {
     let requestId = requestsArray[i]

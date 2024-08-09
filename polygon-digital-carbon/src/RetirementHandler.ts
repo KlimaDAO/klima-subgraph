@@ -23,6 +23,7 @@ import { AsyncRetireRequestStatus } from '../utils/enums'
 import { loadAsyncRetireRequest, loadOrCreateAsyncRetireRequest } from './utils/AsyncRetireRequest'
 import { C3RetirementMetadata as C3RetirementMetadataTemplate } from '../generated/templates'
 import { extractIpfsHash } from '../utils/ipfs'
+import { loadOrCreateHolding } from './utils/Holding'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -363,6 +364,11 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
     } else if (asyncRetireRequest.status == AsyncRetireRequestStatus.REQUESTED && event.params.success == false) {
       asyncRetireRequest.status = AsyncRetireRequestStatus.REVERTED
       retire.asyncRetireStatus = AsyncRetireRequestStatus.REVERTED
+
+      // if the request is reverted, the amount should be credited back to the sending account
+      let accountHolding = loadOrCreateHolding(event.params.account, event.params.fromToken, null)
+      accountHolding.amount = accountHolding.amount.plus(event.params.amount)
+      accountHolding.save()
     }
   }
 

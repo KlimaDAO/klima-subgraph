@@ -370,6 +370,8 @@ type Retire @entity {
 
   ### Additional attributes if applicable ###
 
+  retirementTokenId: BigInt
+
   klimaRetire: KlimaRetire @derivedFrom(field: "retire")
 
   c3RetireRequest: C3RetireRequest

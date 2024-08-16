@@ -10,7 +10,6 @@ USDC = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
 
 KRAKEN = 0x9c2bd617b77961ee2c5e3038dFb0c822cb75d82a
 
-
 DIAMOND = 0x8cE54d9625371fb2a068986d32C85De8E6e995f8
 
 # klima testing profile
@@ -26,19 +25,18 @@ TCO2_HOLDER = 0x34798dd650DD478a801Fc1b0125cD6848F52F693
 
 MARKETPLACE = 0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821
 
-export RPC_URL = http://localhost:8545
+RPC_URL ?= http://localhost:8545
+
+POLYGON_URL ?= http://localhost:8545
+
 
 local-fork:
-	$(eval POLYGON_URL := $(shell grep '^POLYGON_URL' .env | cut -d '=' -f2))
-	anvil --fork-url $(POLYGON_URL) --host 0.0.0.0 --no-storage-caching
+	anvil --fork-url ${POLYGON_URL} --host 0.0.0.0 --no-storage-caching
 
 local-fork-block:
-	$(eval POLYGON_URL := $(shell grep '^POLYGON_URL' .env | cut -d '=' -f2))
-	anvil --fork-url $(POLYGON_URL) --fork-block-number 55637900 --host 0.0.0.0 --no-storage-caching
-
+	anvil --fork-url ${POLYGON_URL} --fork-block-number 55637900 --host 0.0.0.0 --no-storage-caching
 
 impersonate:
-	$(eval RPC_URL := $(shell grep '^RPC_URL' .env | cut -d '=' -f2))
 	cast rpc anvil_impersonateAccount ${PURO_TOKEN_HOLDER} --rpc-url ${RPC_URL}
 
 	cast rpc anvil_impersonateAccount ${OTHER_HOLDER} --rpc-url ${RPC_URL}
@@ -61,10 +59,8 @@ impersonate:
 
 	cast rpc anvil_impersonateAccount 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 --rpc-url ${RPC_URL}
 
+# fund with TCO2 for other erc20 testing
 tco2:
-
-	# fund with TCO2 for other erc20 testing
-
 	cast send ${TCO2} --unlocked --from ${TCO2_HOLDER} "approve(address,uint256)(bool)" ${DIAMOND} 405000000000000000000 --rpc-url ${RPC_URL}
 
 	cast send ${TCO2} --unlocked --from ${TCO2_HOLDER} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 405000000000000000000 --rpc-url ${RPC_URL}
@@ -72,7 +68,6 @@ tco2:
 
 
 transfer:
-	$(eval RPC_URL := $(shell grep '^RPC_URL' .env | cut -d '=' -f2))
 	cast send 0x6960cE1d21f63C4971324B5b611c4De29aCF980C --unlocked --from ${PURO_TOKEN_HOLDER} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 3000000000000000000 --rpc-url ${RPC_URL}
 
 	cast send 0x6960cE1d21f63C4971324B5b611c4De29aCF980C --unlocked --from ${OTHER_HOLDER} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 2000000000000000000 --rpc-url ${RPC_URL}
@@ -99,15 +94,12 @@ transfer:
 	cast send ${TCO2} --unlocked --from ${TCO2_HOLDER} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 8224922846527844 --rpc-url ${RPC_URL}
 
 create_listing:
-
 	cast send ${PURO_TOKEN} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${MARKETPLACE} 5000000000000000000 --rpc-url ${RPC_URL}
 
 	cast send ${MARKETPLACE} --unlocked --from ${ANVIL_PUBLIC_WALLET} "createListing(address,uint256,uint256,uint256,uint256)(bool)" ${PURO_TOKEN} 5000000000000000000 2500000 10000000000000000 1748548281 --rpc-url ${RPC_URL}
 		
+# cast send ${USDC} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${DIAMOND} 500000000000 --rpc-url ${RPC_URL}
 approve:
-
-	# cast send ${USDC} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${DIAMOND} 500000000000 --rpc-url ${RPC_URL}
-
 	cast send ${USDC} --unlocked --from ${DUMMY_SERVER_WALLET} "approve(address,uint256)(bool)" ${DIAMOND} 5000000000000 --rpc-url ${RPC_URL}
 
 	# fund server wallets, production and otherwise
@@ -120,7 +112,6 @@ approve:
 
 
 usdc_transfer:
-
 	cast send ${USDC} --unlocked --from ${KRAKEN} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 500000000000
 	
 	cast send ${USDC} --unlocked --from ${KRAKEN} "transfer(address,uint256)(bool)" ${DUMMY_SERVER_WALLET} 500000000000
@@ -133,10 +124,8 @@ balances:
 
 	cast call ${TCO2} "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET}
 
+# cast call ${USDC} "allowance(address,address)(uint256)" ${DUMMY_SERVER_WALLET} ${DIAMOND}
 approvals:
-
-	# cast call ${USDC} "allowance(address,address)(uint256)" ${DUMMY_SERVER_WALLET} ${DIAMOND}
-
 	cast call ${USDC} "allowance(address,address)(uint256)" ${ANVIL_PUBLIC_WALLET} ${DIAMOND}
 
 	# cast call ${USDC} "allowance(address,address)(uint256)" 0xfb079f82cdd18313f3566fb8ddd6414b3507bda2 ${DIAMOND}

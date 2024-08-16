@@ -27,14 +27,13 @@ MARKETPLACE = 0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821
 
 RPC_URL ?= http://localhost:8545
 
-POLYGON_URL ?= http://localhost:8545
-
+FORK_URL ?= https://polygon-rpc.com
 
 local-fork:
-	anvil --fork-url ${POLYGON_URL} --host 0.0.0.0 --no-storage-caching
+	anvil --fork-url ${FORK_URL} --host 0.0.0.0 --no-storage-caching
 
 local-fork-block:
-	anvil --fork-url ${POLYGON_URL} --fork-block-number 55637900 --host 0.0.0.0 --no-storage-caching
+	anvil --fork-url ${FORK_URL} --fork-block-number 55637900 --host 0.0.0.0 --no-storage-caching
 
 impersonate:
 	cast rpc anvil_impersonateAccount ${PURO_TOKEN_HOLDER} --rpc-url ${RPC_URL}

@@ -76,7 +76,9 @@ dataSources:
         - name: ToucanContractRegistry
           file: ../lib/abis/ToucanContractRegistry.json      
         - name: ToucanCarbonOffsetBatches
-          file: ../lib/abis/ToucanCarbonOffsetBatches.json       
+          file: ../lib/abis/ToucanCarbonOffsetBatches.json  
+        - name: ToucanContractRegistry
+          file: ../lib/abis/ToucanContractRegistry.json       
       eventHandlers:
         - event: TokenCreated(uint256,address)
           handler: handleNewPuroTCO2  
@@ -340,6 +342,10 @@ dataSources:
           handler: handleStartAsyncToken
         - event: EndAsyncToken(address,address,address,uint256,string,string,uint256,uint256,bool,uint256)
           handler: handleEndAsyncToken
+      blockHandlers:
+        - handler: initializeC3Credits
+          filter:
+            kind: once
   - kind: ethereum/contract
     name: UBO
     network: {{network}}

@@ -9,6 +9,7 @@ import { createTokenWithCall } from '../utils/Token'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 import { saveStartAsyncToken, completeC3RetireRequest } from '../RetirementHandler'
 import { ethereum, log, Address } from '@graphprotocol/graph-ts'
+import { loadOrCreateCarbonPool } from '../utils/CarbonPool'
 
 export function handleNewC3T(event: NewTokenProject): void {
   // Start indexing the C3T tokens; `event.params.tokenAddress` is the
@@ -27,6 +28,9 @@ export function initializeC3Credits(block: ethereum.Block): void {
   loadOrCreateCarbonCredit(ecoTokenAddress, 'C3', null)
   createTokenWithCall(ecoTokenAddress, block)
   updateCarbonCreditWithCall(ecoTokenAddress, '')
+
+  // initalize cco2
+  loadOrCreateCarbonPool(Address.fromString('0x82b37070e43c1ba0ea9e2283285b674ef7f1d4e2'));
 }
 
 // asyncToken handling

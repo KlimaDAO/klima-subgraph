@@ -16,7 +16,9 @@ USDC = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
 
 KRAKEN = 0x9c2bd617b77961ee2c5e3038dFb0c822cb75d82a
 
-INFINITY = 0x8cE54d9625371fb2a068986d32C85De8E6e995f8
+DIAMOND = 0x8cE54d9625371fb2a068986d32C85De8E6e995f8
+
+DIAMOND_OWNER = 0xDdfF75A29EB4BFEcF65380de9a75ad08C140eA49
 
 # klima testing profile
 DUMMY_SERVER_WALLET = 0xb5B74972D2011070034005E25e1E264e551A611a
@@ -34,16 +36,26 @@ MERCHANT_WALLET=0x7619b8747AE3d1Bc31a758C5EFFCb86D4C3a1653
 TOUCAN_ADMIN=0xCDe1E9f9c7DCAd2242BD85d158A00181aA89B36b
 
 
+MERCHANT_WALLET=0x7619b8747AE3d1Bc31a758C5EFFCb86D4C3a1653
+
+TOUCAN_ADMIN=0xCDe1E9f9c7DCAd2242BD85d158A00181aA89B36b
+
+CCO2=0x82B37070e43C1BA0EA9e2283285b674eF7f1D4E2
+
+CCO2_HOLDER=0xCFb1189c0b3b3f376B7226d78Ed1a08467810c4B
+
+
 local-fork:
 	$(eval POLYGON_URL := $(shell grep '^POLYGON_URL' .env | cut -d '=' -f2))
 	anvil --fork-url $(POLYGON_URL) --host 0.0.0.0 --no-storage-caching
 
 local-fork-block:
 	$(eval POLYGON_URL := $(shell grep '^POLYGON_URL' .env | cut -d '=' -f2))
-	anvil --fork-url $(POLYGON_URL) --fork-block-number 55637900 --host 0.0.0.0 --no-storage-caching
+	anvil --fork-url $(POLYGON_URL) --fork-block-number 60542813 --host 0.0.0.0 --no-storage-caching
 
 
 impersonate:
+	@echo "Using RPC_URL: ${RPC_URL}"
 	$(eval RPC_URL := $(shell grep '^RPC_URL' .env | cut -d '=' -f2))
 	cast rpc anvil_impersonateAccount ${PURO_TOKEN_HOLDER} --rpc-url ${RPC_URL}
 
@@ -54,10 +66,13 @@ impersonate:
 
 	cast rpc anvil_impersonateAccount ${ANVIL_PUBLIC_WALLET} --rpc-url ${RPC_URL}
 
-	cast rpc anvil_impersonateAccount ${DUMMY_SERVER_WALLET}
+	cast rpc anvil_impersonateAccount ${DUMMY_SERVER_WALLET} --rpc-url ${RPC_URL}
 
 	# BCT holder
 	cast rpc anvil_impersonateAccount ${TCO2_HOLDER} --rpc-url ${RPC_URL}
+
+	# CCO2 holder
+	cast rpc anvil_impersonateAccount ${CCO2_HOLDER} --rpc-url ${RPC_URL}
 
 	# impersonate server wallets
 
@@ -65,15 +80,19 @@ impersonate:
 
 	cast rpc anvil_impersonateAccount 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 --rpc-url ${RPC_URL}
 
-	cast rpc anvil_impersonateAccount ${ECO_114_HOLDER}
+	cast rpc anvil_impersonateAccount ${ECO_114_HOLDER} --rpc-url ${RPC_URL}
+
+	# impersonate diamond owner
+	cast rpc anvil_impersonateAccount ${DIAMOND_OWNER} --rpc-url ${RPC_URL}
 
 	# CM wallet with PURO_TOKEN
 
-	cast rpc anvil_impersonateAccount ${MERCHANT_WALLET}
+	cast rpc anvil_impersonateAccount ${MERCHANT_WALLET} --rpc-url ${RPC_URL}
 
-	cast rpc anvil_impersonateAccount ${TOUCAN_ADMIN}
+	cast rpc anvil_impersonateAccount ${TOUCAN_ADMIN} --rpc-url ${RPC_URL}
 
-	cast send ${TOUCAN_ADMIN} --unlocked --from ${ANVIL_PUBLIC_WALLET} --value 1000000000000000000
+	cast send ${TOUCAN_ADMIN} --unlocked --from ${ANVIL_PUBLIC_WALLET} --value 1000000000000000000 --rpc-url ${RPC_URL}
+	
 
 tco2:
 
@@ -83,6 +102,13 @@ tco2:
 
 	cast send ${TCO2} --unlocked --from ${TCO2_HOLDER} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 405000000000000000000 --rpc-url ${RPC_URL}
 
+cco2:
+
+	# fund with CCO2 for other erc20 testing
+
+	cast send ${CCO2} --unlocked --from ${CCO2_HOLDER} "approve(address,uint256)(bool)" ${DIAMOND} 405000000000000000000 --rpc-url ${RPC_URL}
+
+	cast send ${CCO2} --unlocked --from ${CCO2_HOLDER} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 405000000000000000000 --rpc-url ${RPC_URL}
 
 transfer:
 	$(eval RPC_URL := $(shell grep '^RPC_URL' .env | cut -d '=' -f2))
@@ -117,6 +143,14 @@ transfer:
 
 	cast send ${PURO_175613} --unlocked --from ${MERCHANT_WALLET} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 5000000000000000000 --rpc-url http://localhost:8545
 
+	cast send ${MARKETPLACE} --unlocked --from ${ANVIL_PUBLIC_WALLET} "createListing(address,uint256,uint256,uint256,uint256)(bool)" ${PURO_TOKEN} 5000000000000000000 2500000 10000000000000000 1748548281 --rpc-url ${RPC_URL}
+
+	# fund with puro from merchant wallet
+
+	cast send ${PURO_175613} --unlocked --from ${MERCHANT_WALLET} "approve(address,uint256)(bool)" ${DIAMOND} 5000000000000000000 --rpc-url http://localhost:8545
+
+	cast send ${PURO_175613} --unlocked --from ${MERCHANT_WALLET} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 5000000000000000000 --rpc-url http://localhost:8545
+		
 approve:
 
 	# cast send ${USDC} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${INFINITY} 500000000000 --rpc-url http://localhost:8545
@@ -169,32 +203,32 @@ create_eco_listing:
 # puro retirements
 retire_puro_one:
 
-	cast send ${PURO_TOKEN} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${INFINITY} 1000000000000000000
+	cast send ${PURO_TOKEN} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${DIAMOND} 1000000000000000000
 
-	cast send ${INFINITY} --unlocked --from ${ANVIL_PUBLIC_WALLET} "toucanRetireExactPuroTCO2(address,uint256,uint256,(address,string,address,string,string,string,string,uint256,uint256),uint8)(uint256)" ${PURO_TOKEN} 1713 1000000000000000000 "(${ANVIL_PUBLIC_WALLET},'',${OTHER_HOLDER},'test','test_msg','Canada','CA',1720812615,1720912615)" 0
+	cast send ${DIAMOND} --unlocked --from ${ANVIL_PUBLIC_WALLET} "toucanRetireExactPuroTCO2(address,uint256,uint256,(address,string,address,string,string,string,string,uint256,uint256),uint8)(uint256)" ${PURO_TOKEN} 1713 1000000000000000000 "(${ANVIL_PUBLIC_WALLET},'',${OTHER_HOLDER},'test','test_msg','Canada','CA',1720812615,1720912615)" 0
 
 retire_puro_five:
 
-	cast send ${PURO_TOKEN} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${INFINITY} 5000000000000000000
+	cast send ${PURO_TOKEN} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${DIAMOND} 5000000000000000000
 
-	cast send ${INFINITY} --unlocked --from ${ANVIL_PUBLIC_WALLET} "toucanRetireExactPuroTCO2(address,uint256,uint256,(address,string,address,string,string,string,string,uint256,uint256),uint8)(uint256)" ${PURO_TOKEN} 1713 5000000000000000000 "(${ANVIL_PUBLIC_WALLET},'',${OTHER_HOLDER},'test','test_msg','Canada','CA',1720812615,1720912615)" 0
+	cast send ${DIAMOND} --unlocked --from ${ANVIL_PUBLIC_WALLET} "toucanRetireExactPuroTCO2(address,uint256,uint256,(address,string,address,string,string,string,string,uint256,uint256),uint8)(uint256)" ${PURO_TOKEN} 1713 5000000000000000000 "(${ANVIL_PUBLIC_WALLET},'',${OTHER_HOLDER},'test','test_msg','Canada','CA',1720812615,1720912615)" 0
 
 retire_puro_five_175613:
 
-	cast send ${PURO_175613} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${INFINITY} 5000000000000000000
+	cast send ${PURO_175613} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${DIAMOND} 5000000000000000000
 
-	cast send ${INFINITY} --unlocked --from ${ANVIL_PUBLIC_WALLET} "toucanRetireExactPuroTCO2(address,uint256,uint256,(address,string,address,string,string,string,string,uint256,uint256),uint8)(uint256)" ${PURO_175613} 1716 5000000000000000000 "(${ANVIL_PUBLIC_WALLET},'',${OTHER_HOLDER},'test','test_msg','Canada','CA',1720812615,1720912615)" 0
+	cast send ${DIAMOND} --unlocked --from ${ANVIL_PUBLIC_WALLET} "toucanRetireExactPuroTCO2(address,uint256,uint256,(address,string,address,string,string,string,string,uint256,uint256),uint8)(uint256)" ${PURO_175613} 1716 5000000000000000000 "(${ANVIL_PUBLIC_WALLET},'',${OTHER_HOLDER},'test','test_msg','Canada','CA',1720812615,1720912615)" 0
 
 # utils
 approvals:
 
-	# cast call ${USDC} "allowance(address,address)(uint256)" ${DUMMY_SERVER_WALLET} ${INFINITY}
+	# cast call ${USDC} "allowance(address,address)(uint256)" ${DUMMY_SERVER_WALLET} ${DIAMOND}
 
-	cast call ${USDC} "allowance(address,address)(uint256)" ${ANVIL_PUBLIC_WALLET} ${INFINITY}
+	cast call ${USDC} "allowance(address,address)(uint256)" ${ANVIL_PUBLIC_WALLET} ${DIAMOND}
 
-	# cast call ${USDC} "allowance(address,address)(uint256)" 0xfb079f82cdd18313f3566fb8ddd6414b3507bda2 ${INFINITY}
+	# cast call ${USDC} "allowance(address,address)(uint256)" 0xfb079f82cdd18313f3566fb8ddd6414b3507bda2 ${DIAMOND}
 
-	# cast call ${USDC} "allowance(address,address)(uint256)" 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 ${INFINITY}
+	# cast call ${USDC} "allowance(address,address)(uint256)" 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 ${DIAMOND}
 
 balances:
 	cast call ${PURO_TOKEN} "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET}
@@ -202,6 +236,21 @@ balances:
 	cast call ${TCO2} "balanceOf(address)(uint256)" ${TCO2_HOLDER}
 
 	cast call ${TCO2} "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET}
+
+	cast call ${CCO2} "balanceOf(address)(uint256)" ${CCO2_HOLDER}
+
+	cast call ${CCO2} "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET}
+
+cco2_quote:
+
+	cast call ${DIAMOND} "getSourceAmountSpecificRetirement(address,address,uint256)(uint256)" ${USDC} ${CCO2} 1000000000000000000 --rpc-url ${RPC_URL}
+
+cco2_klima_retire:
+
+	cast send ${USDC} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${DIAMOND} 12603 --rpc-url ${RPC_URL}
+
+	cast send ${DIAMOND} --unlocked --from ${ANVIL_PUBLIC_WALLET} "retireExactCarbonSpecific(address,address,address,uint256,uint256,string,address,string,string,uint8)" ${USDC} ${CCO2} ${CCO2} 12603 1000000000000000000 "Test Entity" ${ANVIL_PUBLIC_WALLET} "Beneficiary Name" "Retirement Message" 0 --rpc-url ${RPC_URL}
+
 
 
 

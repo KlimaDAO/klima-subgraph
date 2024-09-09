@@ -260,12 +260,8 @@ export function saveCCO2Retirement(event: burnedCO2Token): void {
 
   // Set up project/default info for Coorest "project"
 
-  if (credit.vintage == 1970) {
-    credit.project = 'CCO2'
-    credit.save()
-
-    loadOrCreateCarbonProject('CCS', 'CCO2')
-  }
+  let project = loadOrCreateCarbonProject('CCS', 'CCO2')
+  credit.project = project.id
 
   credit.retired = credit.retired.plus(event.params.amount)
   credit.save()

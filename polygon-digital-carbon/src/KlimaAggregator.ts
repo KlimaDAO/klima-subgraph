@@ -1,11 +1,16 @@
+import { KlimaRetire, DailyKlimaRetireSnapshot } from '../generated/schema'
 import { MossRetired } from '../generated/RetireMossCarbon/RetireMossCarbon'
 import { ToucanRetired } from '../generated/RetireToucanCarbon/RetireToucanCarbon'
 import { C3Retired } from '../generated/RetireC3Carbon/RetireC3Carbon'
 import { CarbonRetired, CarbonRetired1 as CarbonRetiredTokenId } from '../generated/KlimaInfinity/KlimaInfinity'
 import { KlimaCarbonRetirements } from '../generated/RetireC3Carbon/KlimaCarbonRetirements'
-import { BigInt, dataSource } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, dataSource } from '@graphprotocol/graph-ts'
+import { CarbonMetricUtils } from './utils/CarbonMetrics'
+import { PoolTokenFactory } from './utils/pool_token/PoolTokenFactory'
 import { loadOrCreateAccount } from './utils/Account'
 import { loadRetire } from './utils/Retire'
+import { loadOrCreateDailyKlimaRetireSnapshot } from './utils/DailyKlimaRetireSnapshot'
+import { dayTimestamp as dayTimestampString } from '../../lib/utils/Dates'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { saveKlimaRetire } from './utils/KlimaRetire'
 import { ZERO_BI } from '../../lib/utils/Decimals'
@@ -34,6 +39,12 @@ export function handleMossRetired(event: MossRetired): void {
   retire.beneficiaryName = event.params.beneficiaryString
   retire.retiringAddress = event.params.retiringAddress
   retire.retirementMessage = event.params.retirementMessage
+
+  const dailyRetirement = generateDailyKlimaRetirement(retire)
+  dailyRetirement.save()
+
+  updateKlimaRetirementProtocolMetrics(retire.pool, event.block.timestamp, event.params.retiredAmount)
+
   retire.save()
 
   saveKlimaRetire(
@@ -43,6 +54,7 @@ export function handleMossRetired(event: MossRetired): void {
     event.params.retiredAmount.div(BigInt.fromI32(100)),
     false
   )
+
 }
 
 export function handleToucanRetired(event: ToucanRetired): void {
@@ -178,4 +190,25 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
     event.params.retiredAmount.div(BigInt.fromI32(100)),
     false
   )
+}
+
+function generateDailyKlimaRetirement(klimaRetire: KlimaRetire): DailyKlimaRetireSnapshot {
+  const retire = loadRetire(klimaRetire.retire)
+  const dayTimestamp = dayTimestampString(retire.timestamp)
+  const id = dayTimestamp + retire.credit
+
+  const dailyKlimaRetirement = loadOrCreateDailyKlimaRetireSnapshot(id)
+  dailyKlimaRetirement.amount = dailyKlimaRetirement.amount.plus(klimaRetire.amount)
+  dailyKlimaRetirement.feeAmount = dailyKlimaRetirement.feeAmount.plus(klimaRetire.feeAmount)
+  dailyKlimaRetirement.credit = klimaRetire.credit
+  dailyKlimaRetirement.pool = klimaRetire.pool
+  dailyKlimaRetirement.token = klimaRetire.token
+  dailyKlimaRetirement.timestamp = BigInt.fromString(dayTimestamp)
+
+  return dailyKlimaRetirement
+}
+
+function updateKlimaRetirementProtocolMetrics(pool: Bytes, timestamp: BigInt, retiredAmount: BigInt): void {
+  const token = new PoolTokenFactory().getTokenForAddress(Address.fromString(pool))
+  CarbonMetricUtils.updateKlimaRetirements(token, timestamp, retiredAmount)
 }

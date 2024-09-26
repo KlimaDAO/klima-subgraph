@@ -10,6 +10,7 @@ import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { saveKlimaRetire } from './utils/KlimaRetire'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { getRetirementsContractAddress } from '../utils/helpers'
+import { createDebug } from './utils/Debug'
 
 export function handleMossRetired(event: MossRetired): void {
   // Ignore zero value retirements
@@ -26,6 +27,11 @@ export function handleMossRetired(event: MossRetired): void {
   loadOrCreateAccount(event.params.retiringAddress)
 
   let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
+
+  if (!retire) {
+    createDebug('handleMossRetired', 'Retire not found', event.block.number, event.transaction.hash)
+    return
+  }
 
   if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
 
@@ -61,6 +67,11 @@ export function handleToucanRetired(event: ToucanRetired): void {
 
   let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
 
+  if (!retire) {
+    createDebug('handleToucanRetired', 'Retire not found', event.block.number, event.transaction.hash)
+    return
+  }
+
   if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
 
   retire.source = 'KLIMA'
@@ -94,6 +105,11 @@ export function handleC3Retired(event: C3Retired): void {
   loadOrCreateAccount(event.params.beneficiaryAddress)
 
   let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
+
+  if (!retire) {
+    createDebug('handleC3Retired', 'Retire not found', event.block.number, event.transaction.hash)
+    return
+  }
 
   if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
 
@@ -129,6 +145,11 @@ export function handleCarbonRetired(event: CarbonRetired): void {
 
   let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
 
+  if (!retire) {
+    createDebug('handleCarbonRetired', 'Retire not found', event.block.number, event.transaction.hash)
+    return
+  }
+
   if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
 
   retire.source = 'KLIMA'
@@ -160,7 +181,12 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
   loadOrCreateAccount(event.params.retiringAddress)
   loadOrCreateAccount(event.params.beneficiaryAddress)
 
-  let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
+    let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
+
+  if (!retire) {
+    createDebug('handleCarbonRetiredWithTokenId', 'Retire not found', event.block.number, event.transaction.hash)
+    return
+  }
 
   if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
 

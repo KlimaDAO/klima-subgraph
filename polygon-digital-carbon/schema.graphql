@@ -761,8 +761,20 @@ type PuroIdMigration @entity {
 
 # Subgraph Versioning
 
-type SubgraphVersion @entity(immutable: true)  {
+type SubgraphVersion @entity(immutable: true) {
   id: ID!
   schemaVersion: String!
   publishedVersion: String!
+}
+
+# Custom Error to assist with debugging
+
+type Debug @entity(immutable: true) {
+  id: ID!
+  functionName: String!
+  error: String!
+  # 0 if not available
+  blockNumber: BigInt!
+  # 0x if not available
+  transactionHash: Bytes!
 }

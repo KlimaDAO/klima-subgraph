@@ -42,6 +42,7 @@ import { loadOrCreateAsyncRetireRequest } from './utils/AsyncRetireRequest'
 import { AsyncRetireRequestStatus } from '../utils/enums'
 import { convertToAmountTonnes, createAsyncRetireRequestId } from '../utils/helpers'
 import { burnedCO2Token } from '../generated/CCO2/CCO2'
+import { createDebug } from './utils/Debug'
 
 export function handleCreditTransfer(event: Transfer): void {
   recordTransfer(
@@ -115,6 +116,12 @@ export function handleToucanPuroRetirementFinalized(event: RetirementFinalized):
 
   if (request.retire !== null) {
     let retire = loadRetire(request.retire)
+
+    if (!retire) {
+      createDebug('handleToucanPuroRetirementFinalized', 'Retire not found', event.block.number, event.transaction.hash)
+      return
+    }
+
     retire.asyncRetireStatus = AsyncRetireRequestStatus.FINALIZED
     retire.save()
   }

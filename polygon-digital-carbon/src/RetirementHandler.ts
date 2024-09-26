@@ -26,6 +26,7 @@ import { loadAsyncRetireRequest, loadOrCreateAsyncRetireRequest } from './utils/
 import { C3RetirementMetadata as C3RetirementMetadataTemplate } from '../generated/templates'
 import { extractIpfsHash } from '../utils/ipfs'
 import { returnedPoccID } from '../generated/Coorest/Coorest'
+import { createDebug } from './utils/Debug'
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
@@ -134,6 +135,12 @@ export function saveToucanPuroRetirementRequest(event: RetirementRequested): voi
   let request = loadOrCreateAsyncRetireRequest(requestId)
 
   let retire = loadRetire(retireId)
+
+  if (!retire) {
+    createDebug('saveToucanPuroRetirementRequest', 'Retire not found', event.block.number, event.transaction.hash)
+    return
+  }
+
   retire.beneficiaryLocation = event.params.params.beneficiaryLocation
   retire.consumptionCountryCode = event.params.params.consumptionCountryCode
   retire.consumptionPeriodStart = event.params.params.consumptionPeriodStart
@@ -277,6 +284,12 @@ export function handleReturnedPoccID(event: returnedPoccID): void {
   log.info('Returned POCC ID event fired {}', [event.transaction.hash.toHexString()])
   let sender = loadOrCreateAccount(event.transaction.from)
   let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
+
+  if (!retire) {
+    createDebug('handleReturnedPoccID', 'Retire not found', event.block.number, event.transaction.hash)
+    return
+  }
+
   retire.retirementTokenId = event.params.poccID
   retire.save()
 }
@@ -349,6 +362,11 @@ export function saveStartAsyncToken(event: StartAsyncToken): void {
 
   let retire = loadRetire(retireId)
 
+  if (!retire) {
+    createDebug('saveStartAsyncToken', 'Retire not found', event.block.number, event.transaction.hash)
+    return
+  }
+
   let requestId = createAsyncRetireRequestId(event.params.fromToken, event.params.index)
 
   let c3RetireRequestDetails = loadOrCreateC3RetireRequestDetails(requestId)
@@ -381,6 +399,11 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
 
   let retireId: Bytes = asyncRetireRequest.retire
   let retire = loadRetire(retireId)
+
+  if (!retire) {
+    createDebug('completeC3RetireRequest', 'Retire not found', event.block.number, event.transaction.hash)
+    return
+  }
 
   if (c3RetireRequestDetails == null) {
     log.error('No C3RetireRequest found for retireId: {} hash: {}', [event.transaction.hash.toHexString()])

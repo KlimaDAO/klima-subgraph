@@ -758,3 +758,15 @@ type PuroIdMigration @entity {
   id: ID!
   tokenIds: [Bytes!]!
 }
+
+# Custom Error to assist with debugging
+
+type Debug @entity(immutable: true) {
+  id: ID!
+  functionName: String!
+  error: String!
+  # 0 if not available
+  blockNumber: BigInt!
+  # 0x if not available
+  transactionHash: Bytes!
+}

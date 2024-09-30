@@ -73,6 +73,9 @@ typings/
 # thegraph generated
 **/generated/
 
+# .bin files in tests
+**/tests/**/.bin/
+
 # env files
 .env.local
 

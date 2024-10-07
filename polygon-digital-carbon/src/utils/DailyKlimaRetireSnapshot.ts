@@ -6,10 +6,10 @@ export function loadOrCreateDailyKlimaRetireSnapshot(id: string): DailyKlimaReti
   if (retire == null) {
     retire = new DailyKlimaRetireSnapshot(id)
     retire.timestamp = BigInt.zero()
-    retire.pool = ""
-    retire.credit = new Bytes()
-    retire.amount = BigDecimal.fromString('0')
-    retire.feeAmount = BigDecimal.fromString('0')
+    retire.pool = new Bytes(0x0)
+    retire.credit = new Bytes(0x0)
+    retire.amount = BigInt.fromString('0')
+    retire.feeAmount = BigInt.fromString('0')
   }
 
   return retire as DailyKlimaRetireSnapshot

@@ -413,11 +413,10 @@ type KlimaRetire @entity {
 type DailyKlimaRetireSnapshot @entity {
   id: ID!
   timestamp: BigInt!
-  pool: String!
-  token: String!
+  pool: Bytes!
   credit: CarbonCredit!
-  amount: BigDecimal!
-  feeAmount: BigDecimal!
+  amount: BigInt!
+  feeAmount: BigInt!
 }
 
 type CarbonMetric @entity {

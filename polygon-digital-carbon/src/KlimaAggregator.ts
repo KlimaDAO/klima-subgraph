@@ -49,18 +49,6 @@ export function handleMossRetired(event: MossRetired): void {
     event.params.retiredAmount.div(BigInt.fromI32(100)),
     false
   )
-
-  let klimaRetire = loadKlimaRetire(retire.klimaRetire._id)
-  if (klimaRetire !== null ){
-    const dailyRetirement = generateDailyKlimaRetirement(klimaRetire)
-    if (dailyRetirement !== null) {
-      dailyRetirement.save()
-    }
-  }
-
-  if (retire.pool !== null) {
-    updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
-  }
 }
 
 export function handleToucanRetired(event: ToucanRetired): void {
@@ -163,6 +151,19 @@ export function handleCarbonRetired(event: CarbonRetired): void {
     event.params.retiredAmount.div(BigInt.fromI32(100)),
     false
   )
+
+  let klimaRetire = loadKlimaRetire(retire.klimaRetire._id)
+  if (klimaRetire !== null ){
+    const dailyRetirement = generateDailyKlimaRetirement(klimaRetire)
+    if (dailyRetirement !== null) {
+      dailyRetirement.save()
+    }
+  }
+
+  if (retire.pool !== null) {
+    updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
+  }
+
 }
 
 export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): void {
@@ -196,6 +197,19 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
     event.params.retiredAmount.div(BigInt.fromI32(100)),
     false
   )
+
+  let klimaRetire = loadKlimaRetire(retire.klimaRetire._id)
+  if (klimaRetire !== null ){
+    const dailyRetirement = generateDailyKlimaRetirement(klimaRetire)
+    if (dailyRetirement !== null) {
+      dailyRetirement.save()
+    }
+  }
+
+  if (retire.pool !== null) {
+    updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
+  }
+
 }
 
 function generateDailyKlimaRetirement(klimaRetire: KlimaRetire): DailyKlimaRetireSnapshot | null {

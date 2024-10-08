@@ -425,6 +425,7 @@ type CarbonMetric @entity {
   bctSupply: BigDecimal!
   nctSupply: BigDecimal!
   mco2Supply: BigDecimal!
+  cco2Supply: BigDecimal!
   uboSupply: BigDecimal!
   nboSupply: BigDecimal!
   bctRedeemed: BigDecimal!
@@ -437,11 +438,13 @@ type CarbonMetric @entity {
   totalCrosschainSupply: BigDecimal!
   tco2Retired: BigDecimal!
   mco2Retired: BigDecimal!
+  cco2Retired: BigDecimal!
   c3tRetired: BigDecimal!
   totalRetirements: BigDecimal!
   bctKlimaRetired: BigDecimal!
   nctKlimaRetired: BigDecimal!
   mco2KlimaRetired: BigDecimal!
+  cco2KlimaRetired: BigDecimal!
   uboKlimaRetired: BigDecimal!
   nboKlimaRetired: BigDecimal!
   totalKlimaRetirements: BigDecimal!

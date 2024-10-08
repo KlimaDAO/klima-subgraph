@@ -243,3 +243,10 @@ export function handleSetSubgraphVersion(block: ethereum.Block): void {
   version.publishedVersion = PUBLISHED_VERSION
   version.save()
 }
+
+export function handleSetSubgraphVersion(block: ethereum.Block): void {
+  let version = new SubgraphVersion('polygon-digital-carbon')
+  version.schemaVersion = version.schemaVersion
+  version.publishedVersion = version.publishedVersion
+  version.save()
+}

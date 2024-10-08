@@ -3,6 +3,7 @@ import { Address } from '@graphprotocol/graph-ts'
 import * as constants from '../Constants'
 import { IPoolToken } from './IPoolToken'
 import { BCT } from './impl/BCT'
+import { CCO2 } from './impl/CCO2'
 import { MCO2 } from './impl/MCO2'
 import { NBO } from './impl/NBO'
 import { NCT } from './impl/NCT'
@@ -26,6 +27,9 @@ export class PoolTokenFactory {
     }
     if (address.equals(Address.fromHexString(constants.NBO_ERC20_CONTRACT))) {
       return new NBO(address)
+    }
+    if (address.equals(Address.fromHexString(constants.CCO2_ERC20_CONTRACT))) {
+      return new CCO2(address)
     }
 
     throw new Error('[Carbon Factory] Failed to get Carbon Token for address: ' + address.toHexString())

@@ -77,6 +77,7 @@ export class CarbonMetricUtils {
     carbonMetrics.bctSupply = BigDecimal.zero()
     carbonMetrics.nctSupply = BigDecimal.zero()
     carbonMetrics.mco2Supply = BigDecimal.zero()
+    carbonMetrics.cco2Supply = BigDecimal.zero()
     carbonMetrics.uboSupply = BigDecimal.zero()
     carbonMetrics.nboSupply = BigDecimal.zero()
     carbonMetrics.bctRedeemed = BigDecimal.zero()
@@ -91,11 +92,13 @@ export class CarbonMetricUtils {
 
     carbonMetrics.tco2Retired = BigDecimal.zero()
     carbonMetrics.mco2Retired = BigDecimal.zero()
+    carbonMetrics.cco2Retired = BigDecimal.zero()
     carbonMetrics.c3tRetired = BigDecimal.zero()
 
     carbonMetrics.totalRetirements = BigDecimal.zero()
     carbonMetrics.bctKlimaRetired = BigDecimal.zero()
     carbonMetrics.nctKlimaRetired = BigDecimal.zero()
+    carbonMetrics.cco2KlimaRetired = BigDecimal.zero()
     carbonMetrics.mco2KlimaRetired = BigDecimal.zero()
     carbonMetrics.uboKlimaRetired = BigDecimal.zero()
     carbonMetrics.nboKlimaRetired = BigDecimal.zero()

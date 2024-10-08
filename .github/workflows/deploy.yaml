@@ -23,11 +23,15 @@
 
 name: Deployment
 
-on:
-  push:
-    branches:
-      - main
-      - staging
+# on:
+#   push:
+#     branches:
+#       - main
+#       - staging
+#       # @todo remove this before any merge. Only for testing actions
+#       - test-staging
+
+on: [push]
 
 jobs:
   compile:
@@ -52,6 +56,8 @@ jobs:
             'celo-bridged-carbon',
             'ethereum-bridged-carbon',
           ]
+    env:
+      VERSIONED_SUBGRAPHS: 'carbonmark polygon-digital-carbonm pairs,'
     steps:
       - name: Check out source repository
         uses: actions/checkout@v2
@@ -227,18 +233,24 @@ jobs:
         if: ${{ steps.compare_versions.outputs.should_deploy == 'true'}}
         id: staging_or_not
         run: |
-          echo "short_sha=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
+          LAST_VERSION=${{ steps.get_last_tag.outputs.last_tag }}
+          SCHEMA_VERSION=${{ steps.get_schema_version.outputs.schema_version }}
 
           if [[ "${{ env.IS_STAGING }}" == "true" ]]
           then
               PREFIX="staging-"
           fi;
 
-          if [[ "${{ matrix.value }}" =~ .*"-".*"-carbon".* ]]
-          then
-              echo "subgraph=${PREFIX}${{ matrix.value }}" >> $GITHUB_OUTPUT
+          # determine version increment
+          if [[ "$SCHEMA_VERSION" == *"major"* ]]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [[ "$SCHEMA_VERSION" == *"minor"* ]]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
           else
-              echo "subgraph=${PREFIX}klimadao-${{ matrix.value }}" >> $GITHUB_OUTPUT
+            PATCH=$((PATCH + 1))
           fi
         env:
           REF: ${{ github.ref }}

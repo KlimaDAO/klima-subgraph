@@ -148,7 +148,7 @@ export function handleCarbonRetired(event: CarbonRetired): void {
     event.params.beneficiaryAddress,
     retire.id,
     index,
-    event.params.retiredAmount.div(BigInt.fromI32(100)),
+    event.params.retiredAmount.div(BigInt.fromI32(100)), // hard-coded 1% fee
     false
   )
 
@@ -160,7 +160,7 @@ export function handleCarbonRetired(event: CarbonRetired): void {
     }
   }
 
-  if (retire.pool !== null && retire.pool !== Bytes.fromUTF8('0x0')) {
+  if (retire.pool !== null && retire.pool !== Bytes.fromUTF8('0x0000000000000000000000000000000000000000')) {
     updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
   }
 
@@ -194,7 +194,7 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
     event.params.beneficiaryAddress,
     retire.id,
     index,
-    event.params.retiredAmount.div(BigInt.fromI32(100)),
+    event.params.retiredAmount.div(BigInt.fromI32(100)), // hard-coded 1% fee
     false
   )
 
@@ -206,7 +206,7 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
     }
   }
 
-  if (retire.pool !== null && retire.pool !== Bytes.fromUTF8('0x0')) {
+  if (retire.pool !== null && retire.pool !== Bytes.fromUTF8('0x0000000000000000000000000000000000000000')) {
     updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
   }
 

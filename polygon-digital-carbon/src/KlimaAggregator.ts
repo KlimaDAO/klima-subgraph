@@ -160,7 +160,7 @@ export function handleCarbonRetired(event: CarbonRetired): void {
     }
   }
 
-  if (retire.pool !== null) {
+  if (retire.pool !== null && retire.pool !== Bytes.fromUTF8('0x0')) {
     updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
   }
 
@@ -206,7 +206,7 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
     }
   }
 
-  if (retire.pool !== null) {
+  if (retire.pool !== null && retire.pool !== Bytes.fromUTF8('0x0')) {
     updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
   }
 

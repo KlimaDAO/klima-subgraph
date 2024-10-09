@@ -34,6 +34,8 @@ jobs:
     steps:
       - name: Check out source repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
@@ -45,6 +47,12 @@ jobs:
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
         run: npm run set-version
         working-directory: '${{ matrix.value }}'
+      - name: Fetch all tags
+        run: git fetch --tags
+      - name: List all git tags
+        run: |
+          echo "Listing all tags:"
+          git tag --list
       - name: Get last release tag
         id: get_last_tag
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)

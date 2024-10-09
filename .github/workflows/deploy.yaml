@@ -54,6 +54,7 @@ jobs:
             LAST_TAG="0.0.0"  # Fallback for no existing tags
           fi
           echo "last_tag=$LAST_TAG" >> $GITHUB_OUTPUT
+          echo "Fetched LAST_TAG: $LAST_TAG"
         working-directory: '${{ matrix.value }}'
       - name: Get schema version from package.json
         id: get_schema_version
@@ -61,6 +62,7 @@ jobs:
         run: |
           SCHEMA_VERSION=$(cat package.json | grep '"version":' | cut -d'"' -f4)
           echo "schema_version=$SCHEMA_VERSION" >> $GITHUB_OUTPUT
+          echo "Fetched SCHEMA_VERSION: $SCHEMA_VERSION"
         working-directory: '${{ matrix.value }}'
       - name: Compare schema versions and determine new version
         id: compare_versions
@@ -68,6 +70,9 @@ jobs:
         run: |
           LAST_VERSION=${{ steps.get_last_tag.outputs.last_tag }}
           SCHEMA_VERSION=${{ steps.get_schema_version.outputs.schema_version }}
+
+          echo "Fetched LAST_VERSION: $LAST_VERSION"
+          echo "Schema version: $SCHEMA_VERSION"
 
           IFS='.' read -ra VERSION_PARTS <<< "$LAST_VERSION"
           MAJOR=${VERSION_PARTS[0]}

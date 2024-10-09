@@ -130,15 +130,21 @@ jobs:
             echo "Unsupported GITHUB_REF format: ${GITHUB_REF}"
             exit 1
           fi
-
-          git push origin $BRANCH_NAME
+          
+          # git push origin $BRANCH_NAME
+          # @todo remove this before any merge. Only for testing actions
+          git push --force origin $BRANCH_NAME
+          
         working-directory: '${{ matrix.value }}'
       - name: Tag the commit with the new version
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
         run: |
           NEW_VERSION=${{ steps.compare_versions.outputs.new_published_version }}
           git tag -a "v${NEW_VERSION}" -m "Version ${NEW_VERSION}"
-          git push origin $BRANCH_NAME
+
+          # git push origin $BRANCH_NAME
+          # @todo remove this before any merge. Only for testing actions
+          git push --force origin $BRANCH_NAME
         working-directory: '${{ matrix.value }}'
       # - name: Prepare Manifest
       #   if: matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark'

@@ -76,26 +76,38 @@ jobs:
         id: compare_versions
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
         run: |
-          LAST_VERSION=${{ steps.get_last_tag.outputs.last_tag }}
+          LAST_PUBLISHED_VERSION=${{ steps.get_last_tag.outputs.last_tag }}
           SCHEMA_VERSION=${{ steps.get_schema_version.outputs.schema_version }}
 
-          echo "Fetched LAST_VERSION: $LAST_VERSION"
+          echo "Fetched LAST_PUBLISHED_VERSION: $LAST_PUBLISHED_VERSION"
           echo "Schema version: $SCHEMA_VERSION"
 
-          IFS='.' read -ra VERSION_PARTS <<< "$LAST_VERSION"
-          echo "VERSION_PARTS: $VERSION_PARTS"
-          MAJOR=${VERSION_PARTS[0]}
-          MINOR=${VERSION_PARTS[1]}
-          PATCH=${VERSION_PARTS[2]}
+          IFS='.' read -ra LAST_PUBLISHED_VERSION_PARTS <<< "$LAST_PUBLISHED_VERSION"
+          echo "LAST_PUBLISHED_VERSION_PARTS: $LAST_PUBLISHED_VERSION_PARTS"
+          MAJOR=${LAST_PUBLISHED_VERSION_PARTS[0]}
+          MINOR=${LAST_PUBLISHED_VERSION_PARTS[1]}
+          PATCH=${LAST_PUBLISHED_VERSION_PARTS[2]}
+
           echo "MAJOR: $MAJOR"
           echo "MINOR: $MINOR"
           echo "PATCH: $PATCH"
+
+          IFS='.' read -ra SCHEMA_VERSION_PARTS <<< "$SCHEMA_VERSION"
+          echo "SCHEMA_VERSION_PARTS: $SCHEMA_VERSION_PARTS"
+          SCHEMA_MAJOR=${SCHEMA_VERSION_PARTS[0]}
+          SCHEMA_MINOR=${SCHEMA_VERSION_PARTS[1]}
+          SCHEMA_PATCH=${SCHEMA_VERSION_PARTS[2]}
+
+          echo "SCHEMA_MAJOR: $SCHEMA_MAJOR"
+          echo "SCHEMA_MINOR: $SCHEMA_MINOR"
+          echo "SCHEMA_PATCH: $SCHEMA_PATCH"
+
           # determine version increment
-          if [[ "$SCHEMA_VERSION" == *"major"* ]]; then
+          if [[ "$SCHEMA_MAJOR" > "$MAJOR" ]]; then
             MAJOR=$((MAJOR + 1))
             MINOR=0
             PATCH=0
-          elif [[ "$SCHEMA_VERSION" == *"minor"* ]]; then
+          elif [[ "$SCHEMA_MAJOR" == "$MAJOR" && "$SCHEMA_MINOR" > "$MINOR" ]]; then
             MINOR=$((MINOR + 1))
             PATCH=0
           else

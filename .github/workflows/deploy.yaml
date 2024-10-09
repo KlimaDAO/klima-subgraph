@@ -76,31 +76,42 @@ jobs:
         id: compare_versions
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
         run: |
-          LAST_VERSION=${{ steps.get_last_tag.outputs.last_tag }}
+          LAST_PUBLISHED_VERSION=${{ steps.get_last_tag.outputs.last_tag }}
           SCHEMA_VERSION=${{ steps.get_schema_version.outputs.schema_version }}
 
-          echo "Fetched LAST_VERSION: $LAST_VERSION"
+          echo "Fetched LAST_VERSION: $LAST_PUBLISHED_VERSION"
           echo "Schema version: $SCHEMA_VERSION"
 
-          IFS='.' read -ra VERSION_PARTS <<< "$LAST_VERSION"
+          # Extract version numbers from LAST_PUBLISHED_VERSION
+          IFS='-v' read -ra LAST_PUBLISHED_VERSION_PARTS <<< "$LAST_PUBLISHED_VERSION"
+          IFS='.' read -ra VERSION_PARTS <<< "${LAST_PUBLISHED_VERSION_PARTS[1]}"
           MAJOR=${VERSION_PARTS[0]}
           MINOR=${VERSION_PARTS[1]}
           PATCH=${VERSION_PARTS[2]}
 
-          # determine version increment
-          if [[ "$SCHEMA_VERSION" == *"major"* ]]; then
-            MAJOR=$((MAJOR + 1))
+          # Extract version numbers from SCHEMA_VERSION
+          IFS='.' read -ra SCHEMA_VERSION_PARTS <<< "$SCHEMA_VERSION"
+          SCHEMA_MAJOR=${SCHEMA_VERSION_PARTS[0]}
+          SCHEMA_MINOR=${SCHEMA_VERSION_PARTS[1]}
+          SCHEMA_PATCH=${SCHEMA_VERSION_PARTS[2]}
+
+          # Determine version increment
+          if [ "$SCHEMA_MAJOR" -gt "$MAJOR" ]; then
+            MAJOR=$SCHEMA_MAJOR
             MINOR=0
             PATCH=0
-          elif [[ "$SCHEMA_VERSION" == *"minor"* ]]; then
-            MINOR=$((MINOR + 1))
+          elif [ "$SCHEMA_MINOR" -gt "$MINOR" ]; then
+            MINOR=$SCHEMA_MINOR
             PATCH=0
+          elif [ "$SCHEMA_PATCH" -gt "$PATCH" ]; then
+            PATCH=$SCHEMA_PATCH
           else
             PATCH=$((PATCH + 1))
           fi
 
-          NEW_PUBLISHED_VERSION="$MAJOR.$MINOR.$PATCH"
+          NEW_PUBLISHED_VERSION="${LAST_VERSION_PARTS[0]}-v$MAJOR.$MINOR.$PATCH"
           echo "NEW_PUBLISHED_VERSION=$NEW_PUBLISHED_VERSION" >> $GITHUB_OUTPUT
+          echo "New published version: $NEW_PUBLISHED_VERSION"
         working-directory: '${{ matrix.value }}'
       - name: Set version in version.json
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
@@ -134,7 +145,7 @@ jobs:
           # git push origin $BRANCH_NAME
           # @todo remove this before any merge. Only for testing actions
           git push --force origin $BRANCH_NAME
-          
+
         working-directory: '${{ matrix.value }}'
       - name: Tag the commit with the new version
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)

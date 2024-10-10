@@ -98,7 +98,7 @@ jobs:
             PATCH=$((PATCH + 1))
           else
             echo "Schema version is not greater than last published version. No deployment needed."
-            exit 1
+            exit 0
           fi
 
 

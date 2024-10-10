@@ -43,16 +43,6 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
         working-directory: '${{ matrix.value }}'
-      - name: Set Version
-        if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
-        run: npm run set-version
-        working-directory: '${{ matrix.value }}'
-      - name: Fetch all tags
-        run: git fetch --tags
-      - name: List all git tags
-        run: |
-          echo "Listing all tags:"
-          git tag --list
       - name: Get last release tag
         id: get_last_tag
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
@@ -149,22 +139,27 @@ jobs:
           
           # git push origin $BRANCH_NAME
           # @todo remove this before any merge. Only for testing actions
-          git push --force origin $BRANCH_NAME
-          
+          git push --force origin $BRANCH_NAME   
         working-directory: '${{ matrix.value }}'
-      - name: List tags before push
-        run: git tag --list
-        working-directory: '${{ matrix.value }}'
-
       - name: Tag the commit with the new version
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
         run: |
           NEW_VERSION=${{ steps.compare_versions.outputs.new_published_version }}
+          echo "NEW_VERSION: $NEW_VERSION"
           git tag -a "${{ matrix.value }}-v${NEW_VERSION}" -m "${{ matrix.value }} version: ${NEW_VERSION}"
+
+          # List tags to verify the tag has been created
+          echo "Tags after creation:"
+          git fetch --tags
+          git tag --list | grep "${{ matrix.value }}-v"
 
           # git push origin $BRANCH_NAME
           # @todo remove this before any merge. Only for testing actions
           git push --force origin $BRANCH_NAME --tags
+        working-directory: '${{ matrix.value }}'
+      - name: Set Version in version.ts for version entity
+        if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
+        run: npm run set-version
         working-directory: '${{ matrix.value }}'
       # - name: Prepare Manifest
       #   if: matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark'

@@ -82,21 +82,23 @@ jobs:
           echo "Fetched LAST_PUBLISHED_VERSION: $LAST_PUBLISHED_VERSION"
           echo "Schema version: $SCHEMA_VERSION"
 
-          IFS='.' read -ra LAST_PUBLISHED_VERSION_PARTS <<< "$LAST_PUBLISHED_VERSION"
-          echo "LAST_PUBLISHED_VERSION_PARTS: $LAST_PUBLISHED_VERSION_PARTS"
           NUMERIC_LAST_PUBLISHED_VERSION=$(echo $LAST_PUBLISHED_VERSION | sed 's/.*-v//')
+          IFS='.' read -ra LAST_PUBLISHED_VERSION_PARTS <<< "$NUMERIC_LAST_PUBLISHED_VERSION"
+          echo "LAST_PUBLISHED_VERSION_PARTS: ${LAST_PUBLISHED_VERSION_PARTS[@]}"
+
           echo "Extracted NUMERIC_LAST_PUBLISHED_VERSION: $NUMERIC_LAST_PUBLISHED_VERSION"
 
-          MAJOR=${NUMERIC_LAST_PUBLISHED_VERSION_PARTS[0]}
-          MINOR=${NUMERIC_LAST_PUBLISHED_VERSION_PARTS[1]}
-          PATCH=${NUMERIC_LAST_PUBLISHED_VERSION_PARTS[2]}
+          # need to reextract the numeric version from the last published version
+
+          MAJOR=${LAST_PUBLISHED_VERSION_PARTS[0]}
+          MINOR=${LAST_PUBLISHED_VERSION_PARTS[1]}
+          PATCH=${LAST_PUBLISHED_VERSION_PARTS[2]}
 
           echo "MAJOR: $MAJOR"
           echo "MINOR: $MINOR"
           echo "PATCH: $PATCH"
 
           IFS='.' read -ra SCHEMA_VERSION_PARTS <<< "$SCHEMA_VERSION"
-          echo "SCHEMA_VERSION_PARTS: $SCHEMA_VERSION_PARTS"
           SCHEMA_MAJOR=${SCHEMA_VERSION_PARTS[0]}
           SCHEMA_MINOR=${SCHEMA_VERSION_PARTS[1]}
           SCHEMA_PATCH=${SCHEMA_VERSION_PARTS[2]}
@@ -106,11 +108,11 @@ jobs:
           echo "SCHEMA_PATCH: $SCHEMA_PATCH"
 
           # determine version increment
-          if [[ "$SCHEMA_MAJOR" > "$MAJOR" ]]; then
+          if [[ "$SCHEMA_MAJOR" -gt "$MAJOR" ]]; then
             MAJOR=$((MAJOR + 1))
             MINOR=0
             PATCH=0
-          elif [[ "$SCHEMA_MAJOR" == "$MAJOR" && "$SCHEMA_MINOR" > "$MINOR" ]]; then
+          elif [[ "$SCHEMA_MAJOR" -eq "$MAJOR" && "$SCHEMA_MINOR" -gt "$MINOR" ]]; then
             MINOR=$((MINOR + 1))
             PATCH=0
           else
@@ -162,7 +164,7 @@ jobs:
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
         run: |
           NEW_VERSION=${{ steps.compare_versions.outputs.new_published_version }}
-          git tag -a "v${NEW_VERSION}" -m "Version ${NEW_VERSION}"
+          git tag -a "${{ matrix.value }}-v${NEW_VERSION}" -m "${{ matrix.value }} version: ${NEW_VERSION}"
 
           # git push origin $BRANCH_NAME
           # @todo remove this before any merge. Only for testing actions

@@ -94,8 +94,11 @@ jobs:
           elif [[ "$SCHEMA_MAJOR" -eq "$MAJOR" && "$SCHEMA_MINOR" -gt "$MINOR" ]]; then
             MINOR=$((MINOR + 1))
             PATCH=0
-          else
+          elif [[ "$SCHEMA_MAJOR" -eq "$MAJOR" && "$SCHEMA_MINOR" -eq "$MINOR" && "$SCHEMA_PATCH" -gt "$PATCH" ]]; then
             PATCH=$((PATCH + 1))
+          else
+            echo "Schema version is not greater than last published version. No deployment needed."
+            exit 1
           fi
 
 

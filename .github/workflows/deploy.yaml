@@ -84,28 +84,17 @@ jobs:
 
           NUMERIC_LAST_PUBLISHED_VERSION=$(echo $LAST_PUBLISHED_VERSION | sed 's/.*-v//')
           IFS='.' read -ra LAST_PUBLISHED_VERSION_PARTS <<< "$NUMERIC_LAST_PUBLISHED_VERSION"
-          echo "LAST_PUBLISHED_VERSION_PARTS: ${LAST_PUBLISHED_VERSION_PARTS[@]}"
-
-          echo "Extracted NUMERIC_LAST_PUBLISHED_VERSION: $NUMERIC_LAST_PUBLISHED_VERSION"
-
-          # need to reextract the numeric version from the last published version
 
           MAJOR=${LAST_PUBLISHED_VERSION_PARTS[0]}
           MINOR=${LAST_PUBLISHED_VERSION_PARTS[1]}
           PATCH=${LAST_PUBLISHED_VERSION_PARTS[2]}
 
-          echo "MAJOR: $MAJOR"
-          echo "MINOR: $MINOR"
-          echo "PATCH: $PATCH"
 
           IFS='.' read -ra SCHEMA_VERSION_PARTS <<< "$SCHEMA_VERSION"
           SCHEMA_MAJOR=${SCHEMA_VERSION_PARTS[0]}
           SCHEMA_MINOR=${SCHEMA_VERSION_PARTS[1]}
           SCHEMA_PATCH=${SCHEMA_VERSION_PARTS[2]}
 
-          echo "SCHEMA_MAJOR: $SCHEMA_MAJOR"
-          echo "SCHEMA_MINOR: $SCHEMA_MINOR"
-          echo "SCHEMA_PATCH: $SCHEMA_PATCH"
 
           # determine version increment
           if [[ "$SCHEMA_MAJOR" -gt "$MAJOR" ]]; then
@@ -119,12 +108,13 @@ jobs:
             PATCH=$((PATCH + 1))
           fi
 
-          echo "MAJOR1: $MAJOR"
-          echo "MINOR1: $MINOR"
-          echo "PATCH1: $PATCH"
 
           NEW_PUBLISHED_VERSION="$MAJOR.$MINOR.$PATCH"
           echo "NEW_PUBLISHED_VERSION=$NEW_PUBLISHED_VERSION" >> $GITHUB_OUTPUT
+        working-directory: '${{ matrix.value }}'
+      - name: Verify new published version
+        run: |
+          echo "NEW_PUBLISHED_VERSION: ${{ steps.compare_versions.outputs.new_published_version }}"
         working-directory: '${{ matrix.value }}'
       - name: Set version in version.json
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
@@ -154,12 +144,18 @@ jobs:
             echo "Unsupported GITHUB_REF format: ${GITHUB_REF}"
             exit 1
           fi
+
+          echo "Pushing to branch: $BRANCH_NAME"
           
           # git push origin $BRANCH_NAME
           # @todo remove this before any merge. Only for testing actions
           git push --force origin $BRANCH_NAME
           
         working-directory: '${{ matrix.value }}'
+      - name: List tags before push
+        run: git tag --list
+        working-directory: '${{ matrix.value }}'
+
       - name: Tag the commit with the new version
         if: contains(env.VERSIONED_SUBGRAPHS, matrix.value)
         run: |
@@ -168,7 +164,7 @@ jobs:
 
           # git push origin $BRANCH_NAME
           # @todo remove this before any merge. Only for testing actions
-          git push --force origin $BRANCH_NAME
+          git push --force origin $BRANCH_NAME --tags
         working-directory: '${{ matrix.value }}'
       # - name: Prepare Manifest
       #   if: matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark'

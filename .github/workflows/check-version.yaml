@@ -28,7 +28,7 @@ jobs:
 
       - name: Fetch base branch
         run: |
-          git fetch origin ${{ github.base_ref }}
+          git fetch origin ${{ github.base_ref }}  # Fetch the base branch explicitly
 
       - name: Initialize error log
         run: |

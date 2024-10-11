@@ -83,17 +83,12 @@ jobs:
           echo "PR version: $PR_VERSION"
 
           if [ "$BASE_VERSION" = "$PR_VERSION" ]; then
+            # Only write error if there's a mismatch, avoiding empty spaces or newlines
             echo "Error: Version in package.json for ${{ matrix.value }} has not been updated." >> errors.log
-            echo "Base version: $BASE_VERSION" >> errors.log
-            echo "PR version: $PR_VERSION" >> errors.log
           else
             echo "Version has been updated for ${{ matrix.value }}."
-            echo "Base version: $BASE_VERSION"
-            echo "PR version: $PR_VERSION"
           fi
-          
-          # Adding exit code debug:
-          echo "Exit code for version check: $?"
+
       - name: Ensure errors.log is created
         run: |
           if [ ! -f errors.log ]; then
@@ -103,17 +98,17 @@ jobs:
           fi
 
 
-      - name: Output error log for debugging
+      - name: Final version check summary
         if: env.changes == 'true'
         run: |
-          echo "Checking contents of errors.log for debugging..."
-          if [ -f errors.log ]; then  # Check if the file exists
-            echo "errors.log file exists"
-            echo "File size: $(stat -c%s errors.log) bytes"
+          if grep -q "Error:" errors.log; then  # Only fail if the log contains a real error
+            echo "Errors detected in errors.log. Exiting."
             cat errors.log
+            exit 1
           else
-            echo "errors.log file does not exist"
+            echo "No real errors found. All subgraphs are up to date."
           fi
+
 
 
       - name: Final version check summary

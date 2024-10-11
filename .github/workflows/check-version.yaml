@@ -24,7 +24,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  
+          fetch-depth: 0
 
       - name: Initialize error log
         run: |
@@ -33,33 +33,35 @@ jobs:
       - name: Check for changes in subgraph folder
         id: check_changes
         run: |
-          git diff --name-only origin/${{ github.base_ref }} ${{ github.event.pull_request.head.sha }} | grep "^${{ matrix.value }}/" || echo "no-changes" > no_changes.log
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.event.pull_request.head.sha }} | grep "^${{ matrix.value }}/" || true)
+          if [ -n "$CHANGED" ]; then
+            echo "changes=true" >> $GITHUB_ENV
+          else
+            echo "changes=false" >> $GITHUB_ENV
+          fi
 
       - name: Check version update if changes exist
-        if: steps.check_changes.outputs.changed == 'true'
+        if: env.changes == 'true'
         run: |
-          if [ -f no_changes.log ]; then
-            echo "No changes in ${{ matrix.value }}. Skipping version check."
-          else
-            BASE_VERSION=$(git show origin/${{ github.base_ref }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
-            PR_VERSION=$(git show ${{ github.event.pull_request.head.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+          BASE_VERSION=$(git show origin/${{ github.base_ref }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+          PR_VERSION=$(git show ${{ github.event.pull_request.head.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
 
-            if [ "$BASE_VERSION" = "$PR_VERSION" ]; then
-              echo "Error: Version in package.json for ${{ matrix.value }} has not been updated." >> errors.log
-              echo "Base version: $BASE_VERSION" >> errors.log
-              echo "PR version: $PR_VERSION" >> errors.log
-            else
-              echo "Version has been updated for ${{ matrix.value }}."
-              echo "Base version: $BASE_VERSION"
-              echo "PR version: $PR_VERSION"
-            fi
+          if [ "$BASE_VERSION" = "$PR_VERSION" ]; then
+            echo "Error: Version in package.json for ${{ matrix.value }} has not been updated." >> errors.log
+            echo "Base version: $BASE_VERSION" >> errors.log
+            echo "PR version: $PR_VERSION" >> errors.log
+          else
+            echo "Version has been updated for ${{ matrix.value }}."
+            echo "Base version: $BASE_VERSION"
+            echo "PR version: $PR_VERSION"
           fi
 
       - name: Final version check summary
+        if: env.changes == 'true'
         run: |
           if [ -s errors.log ]; then
             cat errors.log
             exit 1
           else
-            echo "All relevant subgraphs have been successfully updated."
+            echo "All subgraphs have been successfully updated."
           fi

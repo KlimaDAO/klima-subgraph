@@ -90,22 +90,22 @@ jobs:
           fi
 
       - name: Output error log for debugging
-          if: env.changes == 'true'
-          run: |
-            echo "Checking contents of errors.log for debugging..."
-            if [ -s errors.log ]; then
-              echo "Errors detected:"
-              cat errors.log
-            else
-              echo "No errors in errors.log"
-            fi
+        if: env.changes == 'true'
+        run: |
+          echo "Checking contents of errors.log for debugging..."
+          if [ -s errors.log ]; then
+            echo "Errors detected:"
+            cat errors.log
+          else
+            echo "No errors in errors.log"
+          fi
 
-        - name: Final version check summary
-          if: env.changes == 'true'
-          run: |
-            if [ -s errors.log ]; then
-              echo "Exiting with failure due to errors in errors.log"
-              exit 1
-            else
-              echo "All subgraphs have been successfully updated."
-            fi
+      - name: Final version check summary
+        if: env.changes == 'true'
+        run: |
+          if [ -s errors.log ]; then
+            echo "Exiting with failure due to errors in errors.log"
+            exit 1
+          else
+            echo "All subgraphs have been successfully updated."
+          fi

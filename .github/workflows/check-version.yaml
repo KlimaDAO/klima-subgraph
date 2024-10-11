@@ -30,7 +30,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch the full history
+          fetch-depth: 0  # Fetch full history
 
       - name: Determine if it's a PR or a push
         id: event_type
@@ -101,7 +101,7 @@ jobs:
       - name: Final version check summary
         if: env.changes == 'true'
         run: |
-          if grep -q "Error:" errors.log; then  # Only fail if the log contains a real error
+          if grep -q "Error:" errors.log; then  # Only fail if the log contains a real error. Otherwise the creation of the log is 1 byte, thus -s returns a false positive
             echo "Errors detected in errors.log. Exiting."
             cat errors.log
             exit 1

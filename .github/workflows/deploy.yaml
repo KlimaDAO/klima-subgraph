@@ -29,7 +29,6 @@ name: Deployment
 #       - main
 #       - staging
 #       # @todo remove this before any merge. Only for testing actions
-#       - test-staging
 
 on: [push]
 
@@ -56,8 +55,6 @@ jobs:
             'celo-bridged-carbon',
             'ethereum-bridged-carbon',
           ]
-    env:
-      VERSIONED_SUBGRAPHS: 'carbonmark polygon-digital-carbon pairs'
     steps:
       - name: Check out source repository
         uses: actions/checkout@v2

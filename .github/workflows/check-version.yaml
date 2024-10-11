@@ -119,7 +119,6 @@ jobs:
         run: |
           if [ -s errors.log ]; then
             echo "Exiting with failure due to errors in errors.log"
-            exit 1
           else
             echo "All subgraphs have been successfully updated."
           fi

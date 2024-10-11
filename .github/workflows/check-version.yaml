@@ -91,6 +91,17 @@ jobs:
             echo "Base version: $BASE_VERSION"
             echo "PR version: $PR_VERSION"
           fi
+          
+          # Adding exit code debug:
+          echo "Exit code for version check: $?"
+      - name: Ensure errors.log is created
+        run: |
+          if [ ! -f errors.log ]; then
+            echo "No errors.log file created"
+          else
+            echo "errors.log file exists"
+          fi
+
 
       - name: Output error log for debugging
         if: env.changes == 'true'

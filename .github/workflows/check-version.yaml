@@ -1,11 +1,6 @@
 name: Check Version Update
 
-on:
-  pull_request:
-    paths:
-      - "polygon-digital-carbon/**"
-      - "carbonmark/**"
-      - "pairs/**"
+on: [push, pull_request]
 
 jobs:
   check-version-update:
@@ -13,10 +8,18 @@ jobs:
     strategy:
       matrix:
         value:
-          - 'carbonmark'
-          - 'pairs'
-          - 'polygon-digital-carbon'
-
+          [
+            'bonds',
+            'carbonmark',
+            'protocol-metrics',
+            'vesting',
+            'user-carbon',
+            'pairs',
+            'celo-bridged-carbon',
+            'ethereum-bridged-carbon',
+            'polygon-bridged-carbon',
+            'polygon-digital-carbon',
+          ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

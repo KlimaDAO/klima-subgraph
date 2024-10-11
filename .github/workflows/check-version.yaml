@@ -24,7 +24,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch full history to compare against the base branch
+          fetch-depth: 0  
 
       - name: Fetch base branch
         run: |
@@ -37,7 +37,7 @@ jobs:
       - name: Check for changes in subgraph folder
         id: check_changes
         run: |
-          CHANGED=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.event.pull_request.head.sha }} -- | grep "^${{ matrix.value }}/" || true)
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.sha }} -- | grep "^${{ matrix.value }}/" || true)
           if [ -n "$CHANGED" ]; then
             echo "changes=true" >> $GITHUB_ENV
           else
@@ -48,7 +48,7 @@ jobs:
         if: env.changes == 'true'
         run: |
           BASE_VERSION=$(git show origin/${{ github.base_ref }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
-          PR_VERSION=$(git show ${{ github.event.pull_request.head.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+          PR_VERSION=$(git show ${{ github.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
 
           if [ "$BASE_VERSION" = "$PR_VERSION" ]; then
             echo "Error: Version in package.json for ${{ matrix.value }} has not been updated." >> errors.log

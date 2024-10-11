@@ -41,20 +41,9 @@ jobs:
             echo "is_pr=false" >> $GITHUB_ENV
           fi
 
-      - name: Fetch base and head branches for PRs
-        if: env.is_pr == 'true'
+      - name: Fetch main branch
         run: |
-          # Fetch the base branch
-          git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
-
-          # Fetch the PR's head branch
-          git fetch origin ${{ github.event.pull_request.head.ref }}:${{ github.event.pull_request.head.ref }}
-
-      - name: Fetch base branch for pushes
-        if: env.is_pr == 'false'
-        run: |
-          # Fetch the default branch (e.g., main or master) for pushes
-          git fetch origin main:main
+          git fetch origin main:main  # Fetch main branch for comparison
 
       - name: Initialize error log
         run: |
@@ -66,10 +55,10 @@ jobs:
           echo "Checking for changes in ${{ matrix.value }}"
 
           if [[ "${{ env.is_pr }}" == "true" ]]; then
-            # Compare the base branch with the PR's head branch (for pull requests)
-            CHANGED=$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.event.pull_request.head.ref }} -- "${{ matrix.value }}/" || true)
+            # For PRs: Compare the base branch (main) with the PR's head branch
+            CHANGED=$(git diff --name-only origin/main ${{ github.event.pull_request.head.sha }} -- "${{ matrix.value }}/" || true)
           else
-            # Compare the current branch with the default branch (for pushes)
+            # For pushes: Compare the main branch with the latest commit in the push
             CHANGED=$(git diff --name-only origin/main ${{ github.sha }} -- "${{ matrix.value }}/" || true)
           fi
 
@@ -82,8 +71,13 @@ jobs:
       - name: Check version update if changes exist
         if: env.changes == 'true'
         run: |
-          BASE_VERSION=$(git show origin/${{ github.base_ref }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
-          PR_VERSION=$(git show ${{ github.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+          BASE_VERSION=$(git show origin/main:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+
+          if [[ "${{ env.is_pr }}" == "true" ]]; then
+            PR_VERSION=$(git show ${{ github.event.pull_request.head.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+          else
+            PR_VERSION=$(git show ${{ github.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+          fi
 
           if [ "$BASE_VERSION" = "$PR_VERSION" ]; then
             echo "Error: Version in package.json for ${{ matrix.value }} has not been updated." >> errors.log

@@ -24,25 +24,35 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # We need this for fetching all history for all branches and tags
+          fetch-depth: 0  
 
       - name: Initialize error log
         run: |
           echo "" > errors.log
 
-      - name: Check version update
+      - name: Check for changes in subgraph folder
+        id: check_changes
         run: |
-          BASE_VERSION=$(git show origin/${{ github.base_ref }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
-          PR_VERSION=$(git show ${{ github.event.pull_request.head.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+          git diff --name-only origin/${{ github.base_ref }} ${{ github.event.pull_request.head.sha }} | grep "^${{ matrix.value }}/" || echo "no-changes" > no_changes.log
 
-          if [ "$BASE_VERSION" = "$PR_VERSION" ]; then
-            echo "Error: Version in package.json for ${{ matrix.value }} has not been updated." >> errors.log
-            echo "Base version: $BASE_VERSION" >> errors.log
-            echo "PR version: $PR_VERSION" >> errors.log
+      - name: Check version update if changes exist
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          if [ -f no_changes.log ]; then
+            echo "No changes in ${{ matrix.value }}. Skipping version check."
           else
-            echo "Version has been updated for ${{ matrix.value }}."
-            echo "Base version: $BASE_VERSION"
-            echo "PR version: $PR_VERSION"
+            BASE_VERSION=$(git show origin/${{ github.base_ref }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+            PR_VERSION=$(git show ${{ github.event.pull_request.head.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+
+            if [ "$BASE_VERSION" = "$PR_VERSION" ]; then
+              echo "Error: Version in package.json for ${{ matrix.value }} has not been updated." >> errors.log
+              echo "Base version: $BASE_VERSION" >> errors.log
+              echo "PR version: $PR_VERSION" >> errors.log
+            else
+              echo "Version has been updated for ${{ matrix.value }}."
+              echo "Base version: $BASE_VERSION"
+              echo "PR version: $PR_VERSION"
+            fi
           fi
 
       - name: Final version check summary
@@ -51,5 +61,5 @@ jobs:
             cat errors.log
             exit 1
           else
-            echo "All subgraphs have been successfully updated."
+            echo "All relevant subgraphs have been successfully updated."
           fi

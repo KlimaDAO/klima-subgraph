@@ -1,6 +1,12 @@
 name: Check Version Update
 
-on: [push, pull_request]
+on: 
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   check-version-update:
@@ -24,16 +30,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch full history so we have the branch histories
+          fetch-depth: 0  # Fetch the full history
 
-      - name: Fetch base and head branches
+      - name: Determine if it's a PR or a push
+        id: event_type
         run: |
-          # Fetch the base branch and ensure the PR's head commit is available
-          git fetch origin ${{ github.base_ref }}  # Fetch the base branch explicitly
-          git fetch origin ${{ github.event.pull_request.head.ref }}  # Fetch PR's head commit
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "is_pr=true" >> $GITHUB_ENV
+          else
+            echo "is_pr=false" >> $GITHUB_ENV
+          fi
 
-          echo "Base branch: origin/${{ github.base_ref }}"
-          echo "PR head branch: origin/${{ github.event.pull_request.head.ref }}"
+      - name: Fetch base and head branches for PRs
+        if: env.is_pr == 'true'
+        run: |
+          # Fetch the base branch
+          git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
+
+          # Fetch the PR's head branch
+          git fetch origin ${{ github.event.pull_request.head.ref }}:${{ github.event.pull_request.head.ref }}
+
+      - name: Fetch base branch for pushes
+        if: env.is_pr == 'false'
+        run: |
+          # Fetch the default branch (e.g., main or master) for pushes
+          git fetch origin main:main
 
       - name: Initialize error log
         run: |
@@ -43,20 +64,26 @@ jobs:
         id: check_changes
         run: |
           echo "Checking for changes in ${{ matrix.value }}"
-          # Compare changes only in the subgraph folder
-          CHANGED=$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.event.pull_request.head.ref }} -- "${{ matrix.value }}/" || true)
+
+          if [[ "${{ env.is_pr }}" == "true" ]]; then
+            # Compare the base branch with the PR's head branch (for pull requests)
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.event.pull_request.head.ref }} -- "${{ matrix.value }}/" || true)
+          else
+            # Compare the current branch with the default branch (for pushes)
+            CHANGED=$(git diff --name-only origin/main ${{ github.sha }} -- "${{ matrix.value }}/" || true)
+          fi
+
           if [ -n "$CHANGED" ]; then
             echo "changes=true" >> $GITHUB_ENV
           else
             echo "changes=false" >> $GITHUB_ENV
           fi
 
-
       - name: Check version update if changes exist
         if: env.changes == 'true'
         run: |
           BASE_VERSION=$(git show origin/${{ github.base_ref }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
-          PR_VERSION=$(git show origin/${{ github.event.pull_request.head.ref }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+          PR_VERSION=$(git show ${{ github.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
 
           if [ "$BASE_VERSION" = "$PR_VERSION" ]; then
             echo "Error: Version in package.json for ${{ matrix.value }} has not been updated." >> errors.log

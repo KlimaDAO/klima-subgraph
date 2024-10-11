@@ -24,11 +24,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  
+          fetch-depth: 0  # Fetch full history so we have the branch histories
 
-      - name: Fetch base branch
+      - name: Fetch base and head branches
         run: |
+          # Fetch the base branch and ensure the PR's head commit is available
           git fetch origin ${{ github.base_ref }}  # Fetch the base branch explicitly
+          git fetch origin ${{ github.event.pull_request.head.ref }}  # Fetch PR's head commit
+
+          echo "Base branch: ${{ github.base_ref }}"
+          echo "PR head branch: ${{ github.event.pull_request.head.ref }}"
 
       - name: Initialize error log
         run: |
@@ -37,7 +42,12 @@ jobs:
       - name: Check for changes in subgraph folder
         id: check_changes
         run: |
-          CHANGED=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.sha }} -- | grep "^${{ matrix.value }}/" || true)
+          # Compare the base branch with the PR's head commit
+          echo "Checking for changes in ${matrix.value}"
+          echo "Base branch: origin/${{ github.base_ref }}"
+          echo "PR head branch: origin/${{ github.event.pull_request.head.ref }}"
+
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.event.pull_request.head.ref }} -- | grep "^${{ matrix.value }}/" || true)
           if [ -n "$CHANGED" ]; then
             echo "changes=true" >> $GITHUB_ENV
           else
@@ -48,7 +58,7 @@ jobs:
         if: env.changes == 'true'
         run: |
           BASE_VERSION=$(git show origin/${{ github.base_ref }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
-          PR_VERSION=$(git show ${{ github.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
+          PR_VERSION=$(git show origin/${{ github.event.pull_request.head.ref }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
 
           if [ "$BASE_VERSION" = "$PR_VERSION" ]; then
             echo "Error: Version in package.json for ${{ matrix.value }} has not been updated." >> errors.log

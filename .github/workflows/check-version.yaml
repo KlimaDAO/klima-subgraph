@@ -109,16 +109,3 @@ jobs:
             echo "No real errors found. All subgraphs are up to date."
           fi
 
-
-
-      - name: Final version check summary
-        if: env.changes == 'true'
-        run: |
-          if [ -s errors.log ]; then
-            echo "Errors detected in errors.log. Exiting."
-            cat errors.log
-            exit 1  # Fail the job only if the file has content
-          else
-            echo "No errors found. All subgraphs are up to date."
-            stat errors.log  # Check the file details for debugging
-          fi

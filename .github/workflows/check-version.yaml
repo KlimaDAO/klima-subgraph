@@ -25,6 +25,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.base_ref }}  
+
+      - name: Fetch base branch
+        run: |
+          git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
 
       - name: Initialize error log
         run: |
@@ -33,7 +38,7 @@ jobs:
       - name: Check for changes in subgraph folder
         id: check_changes
         run: |
-          CHANGED=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.event.pull_request.head.sha }} | grep "^${{ matrix.value }}/" || true)
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.event.pull_request.head.sha }} -- | grep "^${{ matrix.value }}/" || true)
           if [ -n "$CHANGED" ]; then
             echo "changes=true" >> $GITHUB_ENV
           else

@@ -32,8 +32,8 @@ jobs:
           git fetch origin ${{ github.base_ref }}  # Fetch the base branch explicitly
           git fetch origin ${{ github.event.pull_request.head.ref }}  # Fetch PR's head commit
 
-          echo "Base branch: ${{ github.base_ref }}"
-          echo "PR head branch: ${{ github.event.pull_request.head.ref }}"
+          echo "Base branch: origin/${{ github.base_ref }}"
+          echo "PR head branch: origin/${{ github.event.pull_request.head.ref }}"
 
       - name: Initialize error log
         run: |
@@ -42,17 +42,15 @@ jobs:
       - name: Check for changes in subgraph folder
         id: check_changes
         run: |
-          # Compare the base branch with the PR's head commit
-          echo "Checking for changes in ${matrix.value}"
-          echo "Base branch: origin/${{ github.base_ref }}"
-          echo "PR head branch: origin/${{ github.event.pull_request.head.ref }}"
-
-          CHANGED=$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.event.pull_request.head.ref }} -- | grep "^${{ matrix.value }}/" || true)
+          echo "Checking for changes in ${{ matrix.value }}"
+          # Compare changes only in the subgraph folder
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.event.pull_request.head.ref }} -- "${{ matrix.value }}/" || true)
           if [ -n "$CHANGED" ]; then
             echo "changes=true" >> $GITHUB_ENV
           else
             echo "changes=false" >> $GITHUB_ENV
           fi
+
 
       - name: Check version update if changes exist
         if: env.changes == 'true'

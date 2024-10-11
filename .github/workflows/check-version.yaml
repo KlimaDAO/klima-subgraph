@@ -118,8 +118,9 @@ jobs:
         if: env.changes == 'true'
         run: |
           if [ -s errors.log ]; then
-            echo "Exiting with failure due to errors in errors.log"
-            exit 1
+            echo "Errors detected in errors.log. Exiting."
+            cat errors.log
+            exit 1  # This correctly causes the job to fail
           else
-            echo "All subgraphs have been successfully updated."
+            echo "No errors found. All subgraphs are up to date."
           fi

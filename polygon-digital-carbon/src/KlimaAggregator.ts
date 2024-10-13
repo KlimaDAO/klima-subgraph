@@ -160,7 +160,7 @@ export function handleCarbonRetired(event: CarbonRetired): void {
     }
   }
 
-  if (retire.pool !== null && retire.pool !== Bytes.fromHexString(ZERO_ADDRESS.toHexString())) {
+  if (retire.pool !== null && Address.fromBytes(retire.pool as Bytes) != ZERO_ADDRESS) {
     updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
   }
 
@@ -206,7 +206,7 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
     }
   }
 
-  if (retire.pool !== null && retire.pool !== Bytes.fromHexString(ZERO_ADDRESS.toHexString())) {
+  if (retire.pool !== null && Address.fromBytes(retire.pool as Bytes) != ZERO_ADDRESS) {
     updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
   }
 

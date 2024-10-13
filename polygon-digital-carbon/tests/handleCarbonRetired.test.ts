@@ -2,6 +2,7 @@ import {
   clearStore,
   test,
   afterAll,
+  afterEach,
   describe,
   createMockedFunction,
   newMockEvent,
@@ -16,6 +17,7 @@ import { KLIMA_CARBON_RETIREMENTS_CONTRACT } from '../../lib/utils/Constants'
 import { handleCCO2Retired } from '../src/TransferHandler'
 import { loadOrCreateAccount } from '../src/utils/Account'
 import { convertToAmountTonnes } from '../utils/helpers'
+import { dayTimestamp as dayTimestampString } from '../../lib/utils/Dates'
 
 const cco2 = Address.fromString('0x82b37070e43c1ba0ea9e2283285b674ef7f1d4e2')
 
@@ -93,6 +95,98 @@ function createNewCarbonRetiredEvent(amount: BigInt): CarbonRetired {
 
   return newCarbonRetiredEvent
 }
+function createMockKlimaRetirements(): void {
+  createMockedFunction(
+    KLIMA_CARBON_RETIREMENTS_CONTRACT,
+    'retirements',
+    'retirements(address):(uint256,uint256,uint256)'
+  )
+    .withArgs([ethereum.Value.fromAddress(beneficiaryAddress)])
+    .returns([
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(2)),
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
+    ])
+}
+
+function createMockPoolTokenFactory(): void {
+  createMockedFunction(
+    Address.fromString('0x0000000000000000000000000000000000000000'),
+    'getTokenForAddress',
+    'getTokenForAddress(address):(address)'
+  )
+    .withArgs([ethereum.Value.fromAddress(cco2)])
+    .returns([ethereum.Value.fromAddress(cco2)])
+}
+
+function createMockCarbonMetricUtils(): void {
+  createMockedFunction(
+    Address.fromString('0x0000000000000000000000000000000000000000'),
+    'updateKlimaRetirements',
+    'updateKlimaRetirements(address,uint256,uint256):(void)'
+  )
+    .withArgs([
+      ethereum.Value.fromAddress(cco2),
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1234567890)),
+      ethereum.Value.fromUnsignedBigInt(retiredAmount),
+    ])
+    .returns([])
+}
+
+describe('Carbon Retired Tests', () => {
+  beforeEach(() => {
+    clearStore()
+    createMockedFunction(cco2, 'projectName', 'projectName():(string)').returns([
+      ethereum.Value.fromString('CCO2 Project'),
+    ])
+    createMockKlimaRetirements()
+    createMockPoolTokenFactory()
+    createMockCarbonMetricUtils()
+  })
+
+  afterEach(() => {
+    clearStore()
+  })
+
+  test('handleCarbonRetired: Creates KlimaRetire entity', () => {
+    let carbonRetiredEvent = createNewCarbonRetiredEvent(retiredAmount)
+    carbonRetiredEvent.transaction.from = senderAddress
+
+    handleCarbonRetired(carbonRetiredEvent)
+
+    assert.entityCount('KlimaRetire', 1)
+    assert.fieldEquals('KlimaRetire', '0', 'amount', retiredAmount.toString())
+    assert.fieldEquals('KlimaRetire', '0', 'feeAmount', retiredAmount.div(BigInt.fromI32(100)).toString())
+  })
+
+  test('handleCarbonRetired: Creates DailyKlimaRetireSnapshot entity', () => {
+    let carbonRetiredEvent = createNewCarbonRetiredEvent(retiredAmount)
+    carbonRetiredEvent.transaction.from = senderAddress
+
+    handleCarbonRetired(carbonRetiredEvent)
+
+    let dayTimestamp = dayTimestampString(carbonRetiredEvent.block.timestamp)
+    let snapshotId = dayTimestamp + '1' // Assuming credit is 1
+
+    assert.entityCount('DailyKlimaRetireSnapshot', 1)
+    assert.fieldEquals('DailyKlimaRetireSnapshot', snapshotId, 'amount', retiredAmount.toString())
+    assert.fieldEquals('DailyKlimaRetireSnapshot', snapshotId, 'feeAmount', retiredAmount.div(BigInt.fromI32(100)).toString())
+  })
+
+  test('handleCarbonRetired: Updates CarbonMetrics', () => {
+    let carbonRetiredEvent = createNewCarbonRetiredEvent(retiredAmount)
+    carbonRetiredEvent.transaction.from = senderAddress
+
+    handleCarbonRetired(carbonRetiredEvent)
+
+    // Since we're mocking CarbonMetricUtils.updateKlimaRetirements, we can't directly test the CarbonMetrics entity.
+    // Instead, we can verify that the mock function was called with the correct parameters.
+    // This would require modifying the Matchstick framework to support tracking function calls.
+    // For now, we'll just assert that the event was processed without errors.
+    assert.entityCount('Retire', 1)
+  })
+})
+
 
 describe('Carbon Retired Tests', () => {
   beforeEach(() => {

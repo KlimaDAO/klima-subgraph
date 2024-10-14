@@ -23,14 +23,12 @@
 
 name: Deployment
 
-# on:
-#   push:
-#     branches:
-#       - main
-#       - staging
-#       # @todo remove this before any merge. Only for testing actions
+on:
+  push:
+    branches:
+      - main
+      - staging
 
-on: [push]
 
 jobs:
   compile:

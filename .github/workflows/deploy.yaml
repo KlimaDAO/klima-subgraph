@@ -17,16 +17,18 @@ jobs:
     strategy:
       matrix:
         value:
-          - bonds
-          - carbonmark
-          - protocol-metrics
-          - vesting
-          - user-carbon
-          - pairs
-          - celo-bridged-carbon
-          - ethereum-bridged-carbon
-          - polygon-bridged-carbon
-          - polygon-digital-carbon
+          [
+            'bonds',
+            'carbonmark',
+            'protocol-metrics',
+            'vesting',
+            'user-carbon',
+            'pairs',
+            'celo-bridged-carbon',
+            'ethereum-bridged-carbon',
+            'polygon-bridged-carbon',
+            'polygon-digital-carbon',
+          ]
     steps:
       - name: Check out source repository
         uses: actions/checkout@v2
@@ -319,18 +321,18 @@ jobs:
           fi
         working-directory: '${{ matrix.value }}'
 
-    - name: Create GitHub Release
-      if: steps.compare_versions.outputs.should_deploy == 'true'
-      uses: actions/create-release@v1
-      id: create_release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: "${{ matrix.value }}-v${{ steps.compare_versions.outputs.new_published_version }}"
-        release_name: "${{ matrix.value }} v${{ steps.compare_versions.outputs.new_published_version }}"
-        body: ${{ steps.generate_changelog.outputs.changelog }}
-        draft: true
-        prerelease: ${{ startsWith(github.ref, 'refs/heads/staging') }}
+      - name: Create GitHub Release
+        if: steps.compare_versions.outputs.should_deploy == 'true'
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "${{ matrix.value }}-v${{ steps.compare_versions.outputs.new_published_version }}"
+          release_name: "${{ matrix.value }} v${{ steps.compare_versions.outputs.new_published_version }}"
+          body: ${{ steps.generate_changelog.outputs.changelog }}
+          draft: true
+          prerelease: ${{ startsWith(github.ref, 'refs/heads/staging') }}
 
 
 

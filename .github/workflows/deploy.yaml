@@ -225,6 +225,9 @@ jobs:
           body: |
             This issue tracks the deployment and publication and promotion steps for ${{ matrix.value }} version ${{ steps.compare_versions.outputs.new_published_version }}.
             Apply labels according to versioning-release-process.md as the process progresses.
-          labels: ["alchemy: 🚧 needs-promotion", "graph: 🚧 needs-publish"]
+          labels:
+            - "alchemy: 🚧 needs-promotion"
+            - "graph: 🚧 needs-publish"
+
 
 

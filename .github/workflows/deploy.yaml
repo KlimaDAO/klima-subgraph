@@ -219,6 +219,8 @@ jobs:
       #   working-directory: '${{ matrix.value }}'
       - name: Create GitHub Issue
         uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "Deployment tracking issue for ${{ matrix.value }} version ${{ steps.compare_versions.outputs.new_published_version }}"

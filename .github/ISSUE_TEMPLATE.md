@@ -1,7 +1,7 @@
 ---
 title: Deployment tracking issue for {{ env.SUBGRAPH_NAME }} version {{ env.PUBLISHED_VERSION }}
 assignees: psparacino
-labels: alchemy:%F0%9F%9A%A7 needs-promotion, graph:%F0%9F%9A%A7 needs-publish
+labels: alchemy:🚧 needs-promotion, graph:🚧 needs-publish
 ---
 
 This issue tracks the deployment and publication and promotion steps for {{ env.SUBGRAPH_NAME }} version {{ env.PUBLISHED_VERSION }}.

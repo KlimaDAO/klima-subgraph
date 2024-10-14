@@ -256,7 +256,6 @@ jobs:
           # Fetch commit messages between LAST_TAG and NEW_TAG that match the specified patterns
           COMMITS=$(git log ${LAST_TAG}..${NEW_TAG} --pretty=format:"%s" | grep -E '^(feat|fix|docs|chore|refactor|style|test):' || true)
 
-          # Initialize variables for categorized changelog entries
           FEAT=""
           FIX=""
           DOCS=""

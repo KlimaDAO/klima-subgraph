@@ -41,8 +41,8 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
         working-directory: '${{ matrix.value }}'
-      - name: Configure Git Safe Directory
-        run: git config --global --add safe.directory /github/workspace
+      # - name: Configure Git Safe Directory
+      #   run: git config --global --add safe.directory /github/workspace
 
       - name: Get last release tag
         id: get_last_tag

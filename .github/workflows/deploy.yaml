@@ -217,4 +217,15 @@ jobs:
 
       #     ../node_modules/.bin/graph deploy "${{ steps.staging_or_not.outputs.subgraph }}" --deploy-key ${{ secrets.SUBGRAPH_ALCHEMY_HOSTED_SERVICE_DEPLOY_KEY }} --node https://subgraphs.alchemy.com/api/subgraphs/deploy --ipfs https://ipfs.satsuma.xyz --version-label "$VERSION_LABEL"
       #   working-directory: '${{ matrix.value }}'
+      - name: Create GitHub Issue
+        uses: JasonEtco/create-an-issue@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Deployment tracking issue for ${{ matrix.value }} version ${{ steps.compare_versions.outputs.new_published_version }}"
+          body: |
+            This issue tracks the deployment and publication and promotion steps for ${{ matrix.value }} version ${{ steps.compare_versions.outputs.new_published_version }}.
+            Apply labels according to versioning-release-process.md as the process progresses.
+          labels: ["alchemy: 🚧 needs-promotion", "graph: 🚧 needs-publish"]
+        working-directory: '${{ matrix.value }}'
+
 

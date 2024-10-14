@@ -219,6 +219,7 @@ jobs:
       #   working-directory: '${{ matrix.value }}'
       - name: Create GitHub Issue
         uses: JasonEtco/create-an-issue@v2
+        if: steps.compare_versions.outputs.should_deploy == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLISHED_VERSION: ${{ steps.compare_versions.outputs.new_published_version }}

@@ -340,7 +340,7 @@ jobs:
           body: ${{ steps.generate_changelog.outputs.changelog }}
           draft: true
           prerelease: false
-        working-directory: '${{ matrix.value }}'
+        
     
 
 

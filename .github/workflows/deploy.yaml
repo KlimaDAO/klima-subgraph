@@ -41,8 +41,8 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
         working-directory: '${{ matrix.value }}'
-      # - name: Configure Git Safe Directory
-      #   run: git config --global --add safe.directory /github/workspace
+      - name: Configure Git Safe Directory
+        run: git config --global --add safe.directory /github/workspace
 
       - name: Get last release tag
         id: get_last_tag
@@ -253,10 +253,10 @@ jobs:
 
           echo "Generating changelog from $LAST_TAG to $NEW_TAG"
 
+          # Fetch commit messages between LAST_TAG and NEW_TAG that match the specified patterns
+          COMMITS=$(git log ${LAST_TAG}..${NEW_TAG} --pretty=format:"%s" | grep -E '^(feat|fix|docs|chore|refactor|style|test):' || true)
 
-          COMMITS=$(git log ${LAST_TAG}..${NEW_TAG} --pretty=format:"%s" | grep -E '^(feat|fix|docs|chore|refactor|style|test):')
-
-    
+          # Initialize variables for categorized changelog entries
           FEAT=""
           FIX=""
           DOCS=""
@@ -265,9 +265,10 @@ jobs:
           STYLE=""
           TEST=""
 
+          # Iterate over each commit and categorize them
           for COMMIT in $COMMITS; do
-            TYPE=$(echo $COMMIT | cut -d':' -f1)
-            MESSAGE=$(echo $COMMIT | cut -d':' -f2-)
+            TYPE=$(echo "$COMMIT" | cut -d':' -f1)
+            MESSAGE=$(echo "$COMMIT" | cut -d':' -f2-)
             case $TYPE in
               feat)
                 FEAT="${FEAT}\n- ${MESSAGE}"
@@ -317,8 +318,10 @@ jobs:
             CHANGELOG="${CHANGELOG}\n### Tests\n${TEST}"
           fi
         
+          # Remove leading and trailing blank lines
           CHANGELOG=$(echo -e "$CHANGELOG" | sed '/^$/d')
 
+          # Handle the case where no changelog entries are found
           if [ -z "$CHANGELOG" ]; then
             echo "No changelog entries found."
             echo "changelog=No changes." >> $GITHUB_OUTPUT
@@ -326,6 +329,7 @@ jobs:
             echo "changelog=$CHANGELOG" >> $GITHUB_OUTPUT
           fi
         working-directory: '${{ matrix.value }}'
+
 
       - name: Create GitHub Release
         if: steps.compare_versions.outputs.should_deploy == 'true'

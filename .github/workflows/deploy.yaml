@@ -231,6 +231,32 @@ jobs:
         #     This issue tracks the deployment and publication and promotion steps for ${{ matrix.value }} version ${{ steps.compare_versions.outputs.new_published_version }}.
         #     Apply labels according to versioning-release-process.md as the process progresses.
         #   labels: alchemy:%F0%9F%9A%A7 needs-promotion, graph:%F0%9F%9A%A7 needs-publish
+      - name: Generate Changelog
+        if: steps.compare_versions.outputs.should_deploy == 'true'
+        id: generate_changelog
+        run: |
+          LAST_TAG=${{ steps.get_last_tag.outputs.last_tag }}
+          CURRENT_TAG="${{ matrix.value }}-v${{ steps.compare_versions.outputs.new_published_version }}"
+          
+          CHANGELOG=$(conventional-changelog -p angular -i CHANGELOG.md -s -r 0)
+          
+          CHANGELOG_CONTENT=$(cat CHANGELOG.md)
+          
+          # Set the changelog as an output
+          echo "changelog=${CHANGELOG_CONTENT}" >> $GITHUB_OUTPUT
+        working-directory: '${{ matrix.value }}'
+      - name: Create GitHub Release
+        if: steps.compare_versions.outputs.should_deploy == 'true'
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "${{ matrix.value }}-v${{ steps.compare_versions.outputs.new_published_version }}"
+          release_name: "${{ matrix.value }} v${{ steps.compare_versions.outputs.new_published_version }}"
+          body: ${{ steps.generate_changelog.outputs.changelog }}
+          draft: true
+          prerelease: ${{ startsWith(github.ref, 'refs/heads/staging') }}
 
 
 

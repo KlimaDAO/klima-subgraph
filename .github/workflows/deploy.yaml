@@ -125,7 +125,7 @@ jobs:
           git config user.email "deploy-action@carbonmark.com"
           git config user.name "deploy-action"
 
-          git add version.json src/version.ts
+          git add version.json src/utils/version.ts
 
           git commit -m "action: update to publishedVersion: $NEW_PUBLISHED_VERSION for ${{ matrix.value }}"
 

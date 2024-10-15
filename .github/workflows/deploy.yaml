@@ -139,6 +139,9 @@ jobs:
             exit 1
           fi
 
+          echo "Pulling latest changes for branch: $BRANCH_NAME"
+          git pull --rebase origin $BRANCH_NAME
+
           echo "Pushing to branch: $BRANCH_NAME"
 
           git push origin $BRANCH_NAME

@@ -5,8 +5,7 @@ on:
     branches:
       - main
       - staging
-      # @todo remove after testing
-      - repo/versioning-and-releases
+      - TESTING-repo/versioning-and-releases
 
 jobs:
   compile:

@@ -29,7 +29,6 @@ on:
       - main
       - staging
 
-
 jobs:
   compile:
     runs-on: ubuntu-latest

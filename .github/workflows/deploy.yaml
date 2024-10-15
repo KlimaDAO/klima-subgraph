@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - staging
+      - TESTING-repo/versioning-and-releases
 
 jobs:
   compile:

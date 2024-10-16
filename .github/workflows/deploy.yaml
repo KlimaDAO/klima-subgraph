@@ -38,6 +38,8 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
         working-directory: '${{ matrix.value }}'
+      - name: Install octokit at root
+        run: yarn add octokit 
       - name: Get last release tag
         id: get_last_tag
         run: |
@@ -226,11 +228,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLISHED_VERSION: ${{ steps.compare_versions.outputs.new_published_version }}
-          SUBGRAPH_NAME: ${{ matrix.value }}
-      - name: Setup Node for Changelog
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'         
+          SUBGRAPH_NAME: ${{ matrix.value }}      
       - name: Generate Changelog
         if: steps.compare_versions.outputs.should_deploy == 'true'
         id: generate_changelog

@@ -193,7 +193,7 @@ export function handleListingFilled(event: ListingFilled): void {
   purchase.listing = listing.id
   purchase.save()
 }
-// random comment. v1.0.12
+// random comment. v1.0.13
 export function handleListingCancelled(event: ListingCancelled): void {
   let listing = loadOrCreateListing(event.params.id.toHexString())
 

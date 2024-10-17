@@ -128,7 +128,6 @@ async function generateChangelog() {
     console.error('Error generating changelog', error)
     setOutput('changelog', 'Error generating changelog')
   }
-  return changelogEntries
 }
 
 const changelogEntries = await generateChangelog()

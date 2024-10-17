@@ -5,7 +5,7 @@ import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
 import { PROJECT_INFO } from './Projects'
 
 export function loadOrCreateProject(token: Address, tokenId: BigInt): Project {
-  // Find the project + vintage ID from token address
+  // Find the project + vintage ID from token address. extra comment for testing
   let tokenAddress = token.toHexString()
   let id = ''
   let registry = ''

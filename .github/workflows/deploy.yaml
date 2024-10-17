@@ -49,7 +49,6 @@ jobs:
             'polygon-bridged-carbon',
             'protocol-metrics',
             'vesting',
-            'user-carbon',
             'pairs',
             'celo-bridged-carbon',
             'ethereum-bridged-carbon',

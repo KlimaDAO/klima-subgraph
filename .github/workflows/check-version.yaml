@@ -101,4 +101,3 @@ jobs:
           else
             echo "No real errors found. All subgraphs are up to date."
           fi
-

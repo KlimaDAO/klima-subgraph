@@ -67,7 +67,7 @@ jobs:
       - name: Install octokit at root
         run: yarn add octokit
       - name: Get last release tag
-        if: ${{ env.IS_MAIN }}
+        if: ${{ env.IS_MAIN == 'true' }}
         id: get_last_tag
         run: |
           LAST_TAG=$(git tag --list "${{ matrix.value }}-v*" | sort -V | tail -n 1)
@@ -79,7 +79,7 @@ jobs:
         working-directory: '${{ matrix.value }}'
       - name: Get schema version from package.json
         id: get_schema_version
-        if: ${{ env.IS_MAIN }}
+        if: ${{ env.IS_MAIN == 'true' }}
         run: |
           SCHEMA_VERSION=$(cat package.json | grep '"version":' | cut -d'"' -f4)
           echo "schema_version=$SCHEMA_VERSION" >> $GITHUB_OUTPUT
@@ -87,7 +87,7 @@ jobs:
         working-directory: '${{ matrix.value }}'
       - name: Compare schema versions and determine new version
         id: compare_versions
-        if: ${{ env.IS_MAIN }}
+        if: ${{ env.IS_MAIN == 'true' }}
         run: |
           SHOULD_DEPLOY=false
           LAST_PUBLISHED_VERSION_TAG=${{ steps.get_last_tag.outputs.last_tag }}
@@ -134,14 +134,14 @@ jobs:
           echo "should_deploy is set to: ${{ steps.compare_versions.outputs.should_deploy }}"
         
       - name: Set version in version.json
-        if: ${{ env.IS_MAIN && steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
           NEW_PUBLISHED_VERSION=${{ steps.compare_versions.outputs.new_published_version }}
           SCHEMA_VERSION=${{ steps.get_schema_version.outputs.schema_version }}
           echo "{\"schemaVersion\": \"$SCHEMA_VERSION\", \"publishedVersion\": \"$NEW_PUBLISHED_VERSION\"}" > version.json
         working-directory: '${{ matrix.value }}'
       - name: Set Version in version.ts for version entity
-        if: ${{ env.IS_MAIN && steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         # Updating version.ts files because the subgraph handlers can't read .json directly
         run: npm run set-version
         working-directory: '${{ matrix.value }}'
@@ -150,7 +150,7 @@ jobs:
         run: npm run prepare-matic
         working-directory: '${{ matrix.value }}'
       - name: Commit all changes
-        if: steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
           set -x  # Enable debugging output
           NEW_PUBLISHED_VERSION=${{ steps.compare_versions.outputs.new_published_version }}
@@ -183,7 +183,7 @@ jobs:
           fi
         working-directory: '${{ matrix.value }}'
       - name: Tag the commit with the new version
-        if: ${{ env.IS_STAGING && steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ env.IS_STAGING == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
           NEW_VERSION=${{ steps.compare_versions.outputs.new_published_version }}
           echo "NEW_VERSION: $NEW_VERSION"
@@ -255,7 +255,7 @@ jobs:
       #   working-directory: '${{ matrix.value }}'
       - name: Create issue for deployment tracking
         uses: JasonEtco/create-an-issue@v2
-        if: ${{ env.IS_MAIN && steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLISHED_VERSION: ${{ steps.compare_versions.outputs.new_published_version }}
@@ -267,7 +267,7 @@ jobs:
       - name: Check Node.js version (debugging)
         run: node -v
       - name: Generate Changelog
-        if: ${{ env.IS_MAIN && steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         id: generate_changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -278,7 +278,7 @@ jobs:
           echo "Generating changelog for ${{ matrix.value }} v${{ steps.compare_versions.outputs.new_published_version }}"
           node .github/actions-scripts/generateChangelog.mjs
       - name: Create GitHub Release
-        if: ${{ env.IS_MAIN && steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         uses: actions/create-release@v1
         id: create_release
         env:

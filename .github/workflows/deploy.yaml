@@ -130,7 +130,8 @@ jobs:
           echo "NEW_PUBLISHED_VERSION=$NEW_PUBLISHED_VERSION" >> $GITHUB_OUTPUT
           echo "should_deploy=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
       - name: Debug should_deploy output
-        run: echo "should_deploy is set to: ${{ steps.compare_versions.outputs.should_deploy }}"
+        run: |
+          echo "should_deploy is set to: ${{ steps.compare_versions.outputs.should_deploy }}"
         
       - name: Set version in version.json
         if: ${{ env.IS_MAIN && steps.compare_versions.outputs.should_deploy == 'true' }}

@@ -26,16 +26,16 @@ name: Deployment
 on:
   push:
     branches:
-      - main
-      - staging
+      - main-testing-only
+      - staging-testing-only
 
 jobs:
   compile:
     runs-on: ubuntu-latest
     name: Deploy
     env:
-      IS_MAIN: ${{ github.ref == 'refs/heads/main' }}
-      IS_STAGING: ${{ github.ref == 'refs/heads/staging' }}
+      IS_MAIN: ${{ github.ref == 'refs/heads/main-testing-only' }}
+      IS_STAGING: ${{ github.ref == 'refs/heads/staging-testing-only' }}
     strategy:
       max-parallel: 1
       matrix:

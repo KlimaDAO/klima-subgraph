@@ -89,6 +89,7 @@ jobs:
         id: compare_versions
         if: ${{ env.IS_MAIN }}
         run: |
+          SHOULD_DEPLOY=false
           LAST_PUBLISHED_VERSION_TAG=${{ steps.get_last_tag.outputs.last_tag }}
           SCHEMA_VERSION=${{ steps.get_schema_version.outputs.schema_version }}
 

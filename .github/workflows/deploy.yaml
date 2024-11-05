@@ -129,21 +129,23 @@ jobs:
           NEW_PUBLISHED_VERSION="$LAST_TAG_MAJOR.$LAST_TAG_MINOR.$LAST_TAG_PATCH"
           echo "NEW_PUBLISHED_VERSION=$NEW_PUBLISHED_VERSION" >> $GITHUB_OUTPUT
           echo "should_deploy=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
-
+      - name: Debug should_deploy output
+        run: echo "should_deploy is set to: ${{ steps.compare_versions.outputs.should_deploy }}"
+        
       - name: Set version in version.json
-        if: ${{ env.IS_MAIN }} && steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ env.IS_MAIN && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
           NEW_PUBLISHED_VERSION=${{ steps.compare_versions.outputs.new_published_version }}
           SCHEMA_VERSION=${{ steps.get_schema_version.outputs.schema_version }}
           echo "{\"schemaVersion\": \"$SCHEMA_VERSION\", \"publishedVersion\": \"$NEW_PUBLISHED_VERSION\"}" > version.json
         working-directory: '${{ matrix.value }}'
       - name: Set Version in version.ts for version entity
-        if: ${{ env.IS_MAIN }} && steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ env.IS_MAIN && steps.compare_versions.outputs.should_deploy == 'true' }}
         # Updating version.ts files because the subgraph handlers can't read .json directly
         run: npm run set-version
         working-directory: '${{ matrix.value }}'
       - name: Prepare Manifest if polygon-digital-carbon or carbonmark
-        if: (matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark') && steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ (matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark') && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: npm run prepare-matic
         working-directory: '${{ matrix.value }}'
       - name: Commit all changes
@@ -180,7 +182,7 @@ jobs:
           fi
         working-directory: '${{ matrix.value }}'
       - name: Tag the commit with the new version
-        if: ${{ env.IS_STAGING }} && steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ env.IS_STAGING && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
           NEW_VERSION=${{ steps.compare_versions.outputs.new_published_version }}
           echo "NEW_VERSION: $NEW_VERSION"
@@ -196,19 +198,19 @@ jobs:
       # Generate code and check for uncommitted changes
       # https://github.com/marketplace/actions/check-uncommitted-changes
       - name: Generate Subgraph Code
-        if: steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' }}
         run: npm run codegen
         working-directory: '${{ matrix.value }}'
       - name: Check for uncommitted changes
-        if: steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' }}
         id: check-changes
         uses: mskri/check-uncommitted-changes-action@v1.0.1
       - name: Evaluate if there are changes
-        if: steps.check-changes.outputs.outcome == failure()
+        if: ${{ steps.check-changes.outputs.outcome == 'failure' }}
         run: echo "There are uncommitted changes - execute 'npm run codegen' locally and commit the generated files!"
 
       - name: Build Subgraph
-        if: steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' }}
         run: npm run build
         working-directory: '${{ matrix.value }}'
       # TODO: add matchstick test suite
@@ -217,7 +219,7 @@ jobs:
       #   working-directory: "${{ matrix.value }}"
 
       - name: Staging or not
-        if: steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' }}
         id: staging_or_not
         run: |
           echo "short_sha=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
@@ -252,7 +254,7 @@ jobs:
       #   working-directory: '${{ matrix.value }}'
       - name: Create issue for deployment tracking
         uses: JasonEtco/create-an-issue@v2
-        if: ${{ env.IS_MAIN }} && steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ env.IS_MAIN && steps.compare_versions.outputs.should_deploy == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLISHED_VERSION: ${{ steps.compare_versions.outputs.new_published_version }}
@@ -264,7 +266,7 @@ jobs:
       - name: Check Node.js version (debugging)
         run: node -v
       - name: Generate Changelog
-        if: ${{ env.IS_MAIN }} && steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ env.IS_MAIN && steps.compare_versions.outputs.should_deploy == 'true' }}
         id: generate_changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -275,7 +277,7 @@ jobs:
           echo "Generating changelog for ${{ matrix.value }} v${{ steps.compare_versions.outputs.new_published_version }}"
           node .github/actions-scripts/generateChangelog.mjs
       - name: Create GitHub Release
-        if: ${{ env.IS_MAIN }} && steps.compare_versions.outputs.should_deploy == 'true'
+        if: ${{ env.IS_MAIN && steps.compare_versions.outputs.should_deploy == 'true' }}
         uses: actions/create-release@v1
         id: create_release
         env:

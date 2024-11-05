@@ -132,7 +132,7 @@ jobs:
       - name: Debug should_deploy output
         run: |
           echo "should_deploy is set to: ${{ steps.compare_versions.outputs.should_deploy }}"
-        
+
       - name: Set version in version.json
         if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
@@ -146,11 +146,11 @@ jobs:
         run: npm run set-version
         working-directory: '${{ matrix.value }}'
       - name: Prepare Manifest if polygon-digital-carbon or carbonmark
-        if: ${{ (matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark') && steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ (matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark') && steps.compare_versions.outputs.should_deploy == 'true' && env.IS_MAIN == 'true' || env.IS_STAGING == 'true' }}
         run: npm run prepare-matic
         working-directory: '${{ matrix.value }}'
       - name: Commit all changes
-        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' && env.IS_MAIN == 'true' }}
         run: |
           set -x  # Enable debugging output
           NEW_PUBLISHED_VERSION=${{ steps.compare_versions.outputs.new_published_version }}
@@ -183,7 +183,7 @@ jobs:
           fi
         working-directory: '${{ matrix.value }}'
       - name: Tag the commit with the new version
-        if: ${{ env.IS_STAGING == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
           NEW_VERSION=${{ steps.compare_versions.outputs.new_published_version }}
           echo "NEW_VERSION: $NEW_VERSION"
@@ -199,11 +199,11 @@ jobs:
       # Generate code and check for uncommitted changes
       # https://github.com/marketplace/actions/check-uncommitted-changes
       - name: Generate Subgraph Code
-        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' && (env.IS_MAIN == 'true' || env.IS_STAGING == 'true') }}
         run: npm run codegen
         working-directory: '${{ matrix.value }}'
       - name: Check for uncommitted changes
-        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' && (env.IS_MAIN == 'true' || env.IS_STAGING == 'true') }}
         id: check-changes
         uses: mskri/check-uncommitted-changes-action@v1.0.1
       - name: Evaluate if there are changes
@@ -211,7 +211,7 @@ jobs:
         run: echo "There are uncommitted changes - execute 'npm run codegen' locally and commit the generated files!"
 
       - name: Build Subgraph
-        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' && (env.IS_MAIN == 'true' || env.IS_STAGING == 'true') }}
         run: npm run build
         working-directory: '${{ matrix.value }}'
       # TODO: add matchstick test suite
@@ -220,7 +220,7 @@ jobs:
       #   working-directory: "${{ matrix.value }}"
 
       - name: Staging or not
-        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ steps.compare_versions.outputs.should_deploy == 'true' && (env.IS_MAIN == 'true' || env.IS_STAGING == 'true') }}
         id: staging_or_not
         run: |
           echo "short_sha=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT

@@ -28,6 +28,7 @@ on:
     branches:
       - main
       - staging
+      - dev
 
 jobs:
   compile:
@@ -227,12 +228,14 @@ jobs:
         if: ${{ steps.compare_versions.outputs.should_deploy == 'true'}}
         id: staging_or_not
         run: |
-          echo "short_sha=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
+          short_sha=$(git rev-parse --short "$GITHUB_SHA")
+          echo "short_sha=${short_sha}" >> $GITHUB_OUTPUT
 
           if [[ "${{ env.IS_STAGING }}" == "true" ]]
           then
               PREFIX="staging-"
           fi;
+
 
           if [[ "${{ matrix.value }}" =~ .*"-".*"-carbon".* ]]
           then
@@ -242,6 +245,10 @@ jobs:
           fi
         env:
           REF: ${{ github.ref }}
+      - name: Deploy Dev Subgraph to Studio
+        if: ${{ env.IS_DEV == 'true' }}
+        run: ../node_modules/.bin/graph deploy --studio --deploy-key ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY }} dev --version-label ${{ steps.determine_subgraph.outputs.subgraph  }}
+        working-directory: '${{ matrix.value }}'
       - name: Deploy Subgraph to Studio
         if: steps.compare_versions.outputs.should_deploy == 'true'
         run: |

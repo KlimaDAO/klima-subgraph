@@ -20,11 +20,3 @@ type Transaction @entity {
   from: Bytes!
   to: Bytes
 }
-
-# Subgraph Versioning
-
-type SubgraphVersion @entity(immutable: true) {
-  id: ID!
-  schemaVersion: String!
-  publishedVersion: String!
-}

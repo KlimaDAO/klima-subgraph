@@ -1,4 +1,4 @@
-specVersion: 0.0.8
+specVersion: 0.0.4
 description: Carbonmark
 repository: https://github.com/KlimaDAO/klima-subgraph
 schema:
@@ -34,7 +34,3 @@ dataSources:
           handler: handleListingFilled
         - event: ListingCancelled(bytes32)
           handler: handleListingCancelled
-      blockHandlers:
-        - handler: handleSetSubgraphVersion
-          filter:
-            kind: once

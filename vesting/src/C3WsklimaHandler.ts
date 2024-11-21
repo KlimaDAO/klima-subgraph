@@ -1,6 +1,4 @@
 import { StakeLocked, WithdrawLocked } from '../generated/C3WsKlimaVesting/C3WsKlimaVesting'
-import { SubgraphVersion } from '../generated/schema'
-import { SCHEMA_VERSION, PUBLISHED_VERSION } from './utils/version'
 import { VestingMetricUtils } from './utils/VestingMetrics'
 import { loadOrCreateLock, loadOrCreateUnlock } from './utils/Lock'
 import { dayTimestamp } from '../../lib/utils/Dates'
@@ -8,7 +6,7 @@ import { toDecimal } from '../../lib/utils/Decimals'
 import { BigInt } from '@graphprotocol/graph-ts'
 import { Lock } from '../generated/schema'
 import { C3Wsklima } from './utils/vesting_platforms/impl/C3Wsklima'
-import { ethereum } from '@graphprotocol/graph-ts'
+
 export function handleStakeLocked(event: StakeLocked): void {
   const lock = loadOrCreateLock(event.params.kek_id.toHexString())
 
@@ -55,11 +53,4 @@ export function handleWithdrawLocked(event: WithdrawLocked): void {
 
   //Update vesting metrics for today
   VestingMetricUtils.updateUnlockMetric(c3Wsklima, event.block.timestamp, lock.lockedAmount)
-}
-
-export function handleSetSubgraphVersion(block: ethereum.Block): void {
-  let version = new SubgraphVersion('vesting')
-  version.schemaVersion = SCHEMA_VERSION
-  version.publishedVersion = PUBLISHED_VERSION
-  version.save()
 }

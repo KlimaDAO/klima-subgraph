@@ -244,7 +244,7 @@ function recordTransfer(
 
       saveBridge(hash, logIndex, tokenAddress, to, amount, timestamp)
 
-      if (tokenAddress != MCO2_ERC20_CONTRACT) {
+      if (tokenAddress != MCO2_ERC20_CONTRACT && tokenAddress != CCO2_ERC20_CONTRACT) {
         recordProvenance(hash, tokenAddress, tokenId, from, to, 'ORIGINATION', amount, timestamp)
 
         credit.provenanceCount += 1

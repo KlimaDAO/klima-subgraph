@@ -2,7 +2,7 @@ import { Address, BigInt, Bytes, dataSource } from '@graphprotocol/graph-ts'
 import { stdYearFromTimestampNew as stdYearFromTimestamp } from '../../../lib/utils/Dates'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 import { C3ProjectToken } from '../../generated/templates/C3ProjectToken/C3ProjectToken'
-import { CarbonCredit, CarbonProject } from '../../generated/schema'
+import { CarbonCredit, CarbonProject, Debug } from '../../generated/schema'
 import { ToucanCarbonOffsets } from '../../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
 import { loadOrCreateCarbonProject } from './CarbonProject'
 import { MethodologyCategories } from './MethodologyCategories'
@@ -170,6 +170,16 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
   else if (attributes.registry == 'JCS' || attributes.registry == 'JPN') registry = 'J_CREDIT'
   else if (attributes.registry == 'ACR') registry = 'AMERICAN_CARBON_REGISTRY'
   else if (attributes.registry == 'ECO') registry = 'ECO_REGISTRY'
+  else registry = 'UNSUPPORTED_REGISTRY'
+
+  if (registry == 'UNSUPPORTED_REGISTRY') {
+    let debug = new Debug(`UNSUPPORTED_REGISTRY. tokenAddress: ${tokenAddress.toHexString()}`)
+    debug.functionName = 'updateC3Call'
+    debug.error = 'Unsupported registry found in updateC3Call'
+    debug.blockNumber = BigInt.fromI32(0)
+    debug.transactionHash = Bytes.fromI32(0)
+    debug.save()
+  }
 
   let projectID: string
 
@@ -192,7 +202,8 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
   carbonCredit.save()
 
   project.methodologies = attributes.methodology
-  project.category = project.category != '' ? project.category : MethodologyCategories.getMethodologyCategory(project.methodologies)
+  project.category =
+    project.category != '' ? project.category : MethodologyCategories.getMethodologyCategory(project.methodologies)
   project.region = attributes.region
   project.save()
 

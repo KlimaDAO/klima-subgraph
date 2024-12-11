@@ -339,6 +339,37 @@ dataSources:
         - event: EndAsyncToken(address,address,address,uint256,string,string,uint256,uint256,bool,uint256)
           handler: handleEndAsyncToken
   - kind: ethereum/contract
+    name: CarbonmarkCreditTokenFactory
+    network: matic
+    source:
+      address: '0xa4c951B30952f5E2feFC8a92F4d3c7551925A63B'
+      abi: CarbonmarkCreditTokenFactory
+      startBlock: 65350000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/templates/CarbonmarkCreditTokenFactory.ts
+      entities:
+        - CarbonmarkCreditTokenFactory
+      abis:
+        - name: CarbonmarkCreditTokenFactory
+          file: ../lib/abis/CarbonmarkCreditTokenFactory.json
+        - name: C3ProjectToken
+          file: ../lib/abis/CarbonmarkCreditToken.json
+        - name: ERC20
+          file: ../lib/abis/ERC20.json
+        # TODO: determine whether to include
+        # - name: CarbonmarkCertificateNFT
+        #   file: ../lib/abis/CarbonmarkCertificateNFT.json
+      eventHandlers:
+        # TODO: implement this handler
+        - event: Issued(string,uint256,address,address)
+          handler: handleNewCarbonmarkCredit
+        # TODO: determine if we need a handler for cancellation event
+        # - event: Issued(string,uint256,address,address)
+        #   handler: handleCancelledCMARK
+  - kind: ethereum/contract
     name: UBO
     network: matic
     source:
@@ -637,6 +668,26 @@ templates:
       abis:
         - name: C3ProjectToken
           file: ../lib/abis/C3ProjectToken.json
+        - name: ERC20
+          file: ../lib/abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleCreditTransfer
+      file: ./src/TransferHandler.ts
+  - name: CarbonmarkCreditToken
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: CarbonmarkCreditToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CarbonmarkCreditToken
+      abis:
+        - name: CarbonmarkCreditToken
+          file: ../lib/abis/CarbonmarkCreditToken.json
         - name: ERC20
           file: ../lib/abis/ERC20.json
       eventHandlers:

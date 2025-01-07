@@ -4,7 +4,7 @@ import { ToucanRetired } from '../generated/RetireToucanCarbon/RetireToucanCarbo
 import { C3Retired } from '../generated/RetireC3Carbon/RetireC3Carbon'
 import { CarbonRetired, CarbonRetired1 as CarbonRetiredTokenId } from '../generated/KlimaInfinity/KlimaInfinity'
 import { KlimaCarbonRetirements } from '../generated/RetireC3Carbon/KlimaCarbonRetirements'
-import { Address, BigInt, Bytes, dataSource, ethereum } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, dataSource, ethereum, log } from '@graphprotocol/graph-ts'
 import { CarbonMetricUtils } from './utils/CarbonMetrics'
 import { PoolTokenFactory } from './utils/pool_token/PoolTokenFactory'
 import { loadOrCreateAccount } from './utils/Account'
@@ -216,7 +216,7 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
 function generateDailyKlimaRetirement(klimaRetire: KlimaRetire): DailyKlimaRetireSnapshot | null {
   const retire = loadRetire(klimaRetire.retire)
   const dayTimestamp = dayTimestampString(retire.timestamp)
-  const id = dayTimestamp + retire.credit.toString()
+  const id = dayTimestamp + retire.credit.toHexString()
 
   if (retire.pool !== null) {
     const dailyKlimaRetirement = loadOrCreateDailyKlimaRetireSnapshot(id)

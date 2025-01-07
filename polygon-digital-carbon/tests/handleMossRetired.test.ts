@@ -14,7 +14,7 @@ import { handleMossRetirement } from '../src/RetirementHandler'
 import { CarbonOffset } from '../generated/MossCarbonOffset/CarbonChain'
 import { loadOrCreateCarbonCredit } from '../src/utils/CarbonCredit'
 import { MCO2_ERC20_CONTRACT, METRICS_INIT_TIMESTAMP } from '../src/utils/Constants'
-import { CarbonMetric, CarbonPool, CarbonPoolDailySnapshot } from '../generated/schema'
+import { CarbonMetric } from '../generated/schema'
 import { dayTimestamp } from '../../lib/utils/Dates'
 
 function createCarbonOffsetEvent(
@@ -96,21 +96,11 @@ describe('Test handleMossRetirement', () => {
     assert.assertNotNull(credit)
     assert.bigIntEquals(credit.retired, carbonTon)
 
-    // let snapshot = CarbonPoolDailySnapshot.load(Address.fromString(MCO2_ERC20_CONTRACT))
-    // assert.assertNotNull(snapshot)
-
-    // if (snapshot != null) {
-    //   log.info('123snapshot.dailySnapshots: {}', [snapshot.pool.toString()])
-    // }
-
     let carbonMetrics = CarbonMetric.load(dayTimestamp(timestamp))
 
     assert.assertNotNull(carbonMetrics)
 
     if (carbonMetrics != null) {
-      log.info('123carbonMetrics.mco2Retired: {}', [carbonMetrics.mco2Retired.toString()])
-      log.info('123carbonMetrics.timestamp: {}', [carbonMetrics.timestamp.toString()])
-      log.info('123carbonTon: {}', [carbonMetrics.id.toString()])
       assert.bigIntEquals(BigInt.fromString(carbonMetrics.mco2Retired.toString()), carbonTon)
     }
   })

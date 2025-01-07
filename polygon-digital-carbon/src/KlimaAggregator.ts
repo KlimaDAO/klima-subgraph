@@ -4,7 +4,7 @@ import { ToucanRetired } from '../generated/RetireToucanCarbon/RetireToucanCarbo
 import { C3Retired } from '../generated/RetireC3Carbon/RetireC3Carbon'
 import { CarbonRetired, CarbonRetired1 as CarbonRetiredTokenId } from '../generated/KlimaInfinity/KlimaInfinity'
 import { KlimaCarbonRetirements } from '../generated/RetireC3Carbon/KlimaCarbonRetirements'
-import { Address, BigInt, Bytes, dataSource, ethereum, log } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, dataSource, ethereum } from '@graphprotocol/graph-ts'
 import { CarbonMetricUtils } from './utils/CarbonMetrics'
 import { PoolTokenFactory } from './utils/pool_token/PoolTokenFactory'
 import { loadOrCreateAccount } from './utils/Account'

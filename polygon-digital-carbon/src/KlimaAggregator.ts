@@ -146,7 +146,7 @@ export function handleCarbonRetired(event: CarbonRetired): void {
   retire.retirementMessage = event.params.retirementMessage
   retire.save()
 
-  saveKlimaRetire(
+  const klimaRetire = saveKlimaRetire(
     event.params.beneficiaryAddress,
     retire.id,
     index,
@@ -154,7 +154,6 @@ export function handleCarbonRetired(event: CarbonRetired): void {
     false
   )
 
-  let klimaRetire = loadKlimaRetire(retire.klimaRetire._id)
   if (klimaRetire !== null ){
     const dailyRetirement = generateDailyKlimaRetirement(klimaRetire)
     if (dailyRetirement !== null) {
@@ -217,7 +216,7 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
 function generateDailyKlimaRetirement(klimaRetire: KlimaRetire): DailyKlimaRetireSnapshot | null {
   const retire = loadRetire(klimaRetire.retire)
   const dayTimestamp = dayTimestampString(retire.timestamp)
-  const id = dayTimestamp + retire.credit.toString()
+  const id = dayTimestamp + retire.credit.toHexString()
 
   if (retire.pool !== null) {
     const dailyKlimaRetirement = loadOrCreateDailyKlimaRetireSnapshot(id)

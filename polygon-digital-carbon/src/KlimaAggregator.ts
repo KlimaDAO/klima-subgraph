@@ -112,7 +112,7 @@ export function handleC3Retired(event: C3Retired): void {
   retire.retirementMessage = event.params.retirementMessage
   retire.save()
 
-  saveKlimaRetire(
+  const klimaRetire = saveKlimaRetire(
     event.params.beneficiaryAddress,
     retire.id,
     index,
@@ -199,7 +199,6 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
     false
   )
 
-  let klimaRetire = loadKlimaRetire(retire.klimaRetire._id)
   if (klimaRetire !== null ){
     const dailyRetirement = generateDailyKlimaRetirement(klimaRetire)
     if (dailyRetirement !== null) {

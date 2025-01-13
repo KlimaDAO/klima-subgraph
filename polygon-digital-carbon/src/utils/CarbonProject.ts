@@ -18,6 +18,7 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
 
     // Set known values for Verra projects
     if (registry == 'VERRA') {
+      // TODO: We should use an HashMap here or subgraph does not care?
       for (let i = 0; i < VERRA_PROJECT_NAMES.length; i++) {
         if (projectID == VERRA_PROJECT_NAMES[i][0]) {
           project.name = VERRA_PROJECT_NAMES[i][1]
@@ -28,6 +29,7 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
     }
 
     if (registry == 'PURO_EARTH') {
+      /// TODO: We should use an HashMap here or subgraph does not care?
       for (let i = 0; i < PURO_PROJECT_INFO.length; i++) {
         if (projectID == PURO_PROJECT_INFO[i][0]) {
           project.name = PURO_PROJECT_INFO[i][1]
@@ -38,6 +40,7 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
     }
 
     if (registry == 'ECO_REGISTRY') {
+      // TODO: We should use an HashMap here or subgraph does not care?
       for (let i = 0; i < ECO_REGISTRY_PROJECT_INFO.length; i++) {
         if (projectID == ECO_REGISTRY_PROJECT_INFO[i][0]) {
           project.name = ECO_REGISTRY_PROJECT_INFO[i][1]

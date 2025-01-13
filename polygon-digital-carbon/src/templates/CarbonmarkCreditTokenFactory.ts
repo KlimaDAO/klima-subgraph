@@ -7,7 +7,7 @@ import { createTokenWithCall } from '../utils/Token'
 
 
 export function handleNewCarbonmarkCredit(event: NewTokenProject): void {
-  // Start indexing the C3T tokens; `event.params.tokenAddress` is the
+  // Start indexing the Carbonmak tokens; `event.params.tokenAddress` is the
   // address of the new token contract
   CarbonmarkCreditToken.create(event.params.tokenAddress)
   loadOrCreateCarbonCredit(event.params.tokenAddress, 'CMARK', null)

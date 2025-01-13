@@ -37,7 +37,7 @@ export class CCO2 implements IPoolToken {
     const newKlimaRetired = carbonMetrics.cco2KlimaRetired.plus(toDecimal(amount, this.getDecimals())).div(BigDecimal.fromString('1000'))
 
     const delta = newKlimaRetired.minus(oldKlimaRetired)
-    carbonMetrics.mco2KlimaRetired = newKlimaRetired
+    carbonMetrics.cco2KlimaRetired = newKlimaRetired
     carbonMetrics.totalKlimaRetirements = carbonMetrics.totalKlimaRetirements.plus(delta)
 
     return carbonMetrics

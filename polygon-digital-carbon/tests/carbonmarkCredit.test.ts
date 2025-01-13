@@ -12,9 +12,13 @@ import { Address, ethereum } from '@graphprotocol/graph-ts'
 import {Issued} from '../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditTokenFactory'
 import { handleNewCarbonmarkCredit } from '../src/templates/CarbonmarkCreditTokenFactory'
 import { CMARK_PROJECT_INFO } from '../../lib/utils/CMARKProjectInfo'
+import { Transfer } from '../generated/BCT/ERC20'
+import { handleCreditTransfer } from '../src/TransferHandler'
+import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 
 
 const ISSUED_TOKEN_ADDRESS = '0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9'
+//const ISSUED_TOKEN_CONTRACT = CarbonmarkCreditToken.bind(ISSUED_TOKEN_ADDRESS)
 const ISSUED_TOKEN_BENEFICIARY = '0x3Da300661Eb0f04a4044A4fB01d79E66C8c81ED9'
 const ISSUED_TOKEN_PROJECT_ID = 'CMARK-1'
 const ISSUED_TOKEN_VINTAGE = '2025'
@@ -22,9 +26,14 @@ const ISSUED_TOKEN_CREDIT_ID = `${ISSUED_TOKEN_PROJECT_ID}-${ISSUED_TOKEN_VINTAG
 const ISSUED_TOKEN_SYMBOL = `CMARK-${ISSUED_TOKEN_CREDIT_ID}`
 const ISSUED_TOKEN_NAME = `CMARK: ${ISSUED_TOKEN_CREDIT_ID}`
 const ISSUED_TOKEN_DECIMALS = 18
-const ISSUED_AMOUNT = 115221
+const ISSUED_TOKEN_AMOUNT = 115221
+
+const ISSUED_TOKEN_TRANSFER_TO = '0xBFEE1A7e6cB1DC7164910914c8971388D2521142'
+const ISSUED_TOKEN_TRANSFER_VALUE = 55435
 
 const issuedTokenAddress=Address.fromString(ISSUED_TOKEN_ADDRESS)
+const issuedTokenBeneficiary=Address.fromString(ISSUED_TOKEN_BENEFICIARY)
+const issuedTokenTransferTo=Address.fromString(ISSUED_TOKEN_TRANSFER_TO)
 
 export function createNewIssuedEvent(): Issued {
   let mockEvent = newMockEvent()
@@ -41,8 +50,8 @@ export function createNewIssuedEvent(): Issued {
   )
   
   let creditId = new ethereum.EventParam('creditId', ethereum.Value.fromString(ISSUED_TOKEN_CREDIT_ID))
-  let amount = new ethereum.EventParam('amount', ethereum.Value.fromI32(ISSUED_AMOUNT))
-  let to = new ethereum.EventParam('to', ethereum.Value.fromAddress(Address.fromString(ISSUED_TOKEN_BENEFICIARY)))
+  let amount = new ethereum.EventParam('amount', ethereum.Value.fromI32(ISSUED_TOKEN_AMOUNT))
+  let to = new ethereum.EventParam('to', ethereum.Value.fromAddress(issuedTokenBeneficiary))
   let creditTokenAddress = new ethereum.EventParam('creditTokenAddress', ethereum.Value.fromAddress(issuedTokenAddress))
   issuedEvent.parameters = new Array()
   issuedEvent.parameters.push(creditId)
@@ -51,6 +60,31 @@ export function createNewIssuedEvent(): Issued {
   issuedEvent.parameters.push(creditTokenAddress)
   
   return issuedEvent
+}
+
+export function createNewTransferEvent(from: Address, to: Address, value: i32): Transfer {
+  let mockEvent = newMockEvent()
+
+  let transferEvent = new Transfer(
+    issuedTokenAddress,
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    mockEvent.block,
+    mockEvent.transaction,
+    mockEvent.parameters,
+    mockEvent.receipt
+  )
+  
+  let eventFrom = new ethereum.EventParam('from', ethereum.Value.fromAddress(from))
+  let eventTo = new ethereum.EventParam('to', ethereum.Value.fromAddress(to))
+  let eventValue = new ethereum.EventParam('value', ethereum.Value.fromI32(value))
+  transferEvent.parameters = new Array()
+  transferEvent.parameters.push(eventFrom)
+  transferEvent.parameters.push(eventTo)
+  transferEvent.parameters.push(eventValue)
+  
+  return transferEvent
 }
 
 describe('handleNewCarbonmarkCredit Tests', () => {
@@ -102,4 +136,27 @@ describe('handleNewCarbonmarkCredit Tests', () => {
 
     clearStore()
   })
+
+  test('Transfer from Zero address increases supply', () => {
+    // Create token
+    const createTokenEvent = createNewIssuedEvent()
+    handleNewCarbonmarkCredit(createTokenEvent)
+
+    // Initial transfer to beneficiary
+    const createInitialTransferEvent = createNewTransferEvent(ZERO_ADDRESS, issuedTokenBeneficiary, ISSUED_TOKEN_AMOUNT)
+    handleCreditTransfer(createInitialTransferEvent)
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'currentSupply', ISSUED_TOKEN_AMOUNT.toString())
+
+    // Transfer from beneficiary to third party
+    const createTransferEvent = createNewTransferEvent(issuedTokenBeneficiary, issuedTokenTransferTo, ISSUED_TOKEN_TRANSFER_VALUE)
+    handleCreditTransfer(createTransferEvent)
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'currentSupply', ISSUED_TOKEN_AMOUNT.toString())
+
+    // Transfer to Zero address
+    const createToZeroTransferEvent = createNewTransferEvent(issuedTokenTransferTo, ZERO_ADDRESS, ISSUED_TOKEN_TRANSFER_VALUE)
+    handleCreditTransfer(createToZeroTransferEvent)
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'currentSupply', (ISSUED_TOKEN_AMOUNT - ISSUED_TOKEN_TRANSFER_VALUE).toString())
+    
+  })
+
 })

@@ -9,7 +9,6 @@ import { MethodologyCategories } from './MethodologyCategories'
 import { ToucanCarbonOffsetBatches } from '../../generated/ToucanCarbonOffsetBatch/ToucanCarbonOffsetBatches'
 import { ToucanContractRegistry } from '../../generated/ToucanPuroFactory/ToucanContractRegistry'
 import { loadOrCreateToken } from './Token'
-import { log } from 'matchstick-as'
 
 export function loadOrCreateCarbonCredit(tokenAddress: Address, bridge: string, tokenId: BigInt | null): CarbonCredit {
   let id = Bytes.fromHexString(tokenAddress.toHexString())
@@ -229,6 +228,7 @@ export function updateICRCredit(tokenAddress: Address, tokenId: BigInt, timestam
   credit.save()
 }
 
+// TODO: This seems to be never called
 export function updateCarbonCreditCrossChain(creditAddress: Address, amount: BigInt): void {
   let credit = loadCarbonCredit(creditAddress)
   credit.crossChainSupply = credit.crossChainSupply.plus(amount)

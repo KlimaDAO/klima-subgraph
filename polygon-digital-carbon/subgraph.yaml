@@ -673,9 +673,7 @@ templates:
     kind: ethereum/contract
     network: matic
     source:
-      address: '0x103A806A88199ED11f16f1ECc7aC40fEFE12feb5'
       abi: CarbonmarkCreditToken
-      startBlock: 65332317
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

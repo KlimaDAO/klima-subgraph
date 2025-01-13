@@ -20,12 +20,15 @@ import { handleNewCarbonmarkCredit } from '../src/templates/CarbonmarkCreditToke
 import { Token } from '../generated/schema'
 import { log } from '@graphprotocol/graph-ts'
 import { ZERO_BI } from '../../lib/utils/Decimals'
+import { CMARK_PROJECT_INFO } from '../../lib/utils/CMARKProjectInfo'
 
 
 const ISSUED_TOKEN_ADDRESS = '0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9'
 //const ISSUED_TOKEN_CONTRACT = CarbonmarkCreditToken.bind(ISSUED_TOKEN_ADDRESS)
 const ISSUED_TOKEN_BENEFICIARY = '0x3Da300661Eb0f04a4044A4fB01d79E66C8c81ED9'
-const ISSUED_TOKEN_CREDIT_ID = "CMARK-1-2025"
+const ISSUED_TOKEN_PROJECT_ID = 'CMARK-1'
+const ISSUED_TOKEN_VINTAGE = '2025'
+const ISSUED_TOKEN_CREDIT_ID = `${ISSUED_TOKEN_PROJECT_ID}-${ISSUED_TOKEN_VINTAGE}`
 const ISSUED_TOKEN_SYMBOL = `CMARK-${ISSUED_TOKEN_CREDIT_ID}`
 const ISSUED_TOKEN_NAME = `CMARK: ${ISSUED_TOKEN_CREDIT_ID}`
 const ISSUED_TOKEN_DECIMALS = 18
@@ -84,8 +87,8 @@ describe('handleNewCarbonmarkCredit Tests', () => {
     handleNewCarbonmarkCredit(event)
     assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'tokenAddress', ISSUED_TOKEN_ADDRESS)
     assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'bridgeProtocol', 'CMARK')
-    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'project', 'CMARK-1')
-    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'vintage', '2025')
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'project', ISSUED_TOKEN_PROJECT_ID)
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'vintage', ISSUED_TOKEN_VINTAGE)
     assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'currentSupply', '0')
     assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'crossChainSupply', '0')
     assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'bridged', '0')
@@ -94,7 +97,13 @@ describe('handleNewCarbonmarkCredit Tests', () => {
     assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'lastBatchId', '0')
     assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'isExAnte', 'false')
 
-    
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'registry', 'CMARK')
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'name', CMARK_PROJECT_INFO[0][1])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'methodologies', CMARK_PROJECT_INFO[0][2])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'category', CMARK_PROJECT_INFO[0][3])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'country', CMARK_PROJECT_INFO[0][4])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'region', CMARK_PROJECT_INFO[0][5])
+
     assert.fieldEquals('Token', issuedTokenAddress.toHexString(), 'tokenAddress', ISSUED_TOKEN_ADDRESS)
     assert.fieldEquals('Token', issuedTokenAddress.toHexString(), 'name', ISSUED_TOKEN_NAME)
     assert.fieldEquals('Token', issuedTokenAddress.toHexString(), 'symbol', ISSUED_TOKEN_SYMBOL)

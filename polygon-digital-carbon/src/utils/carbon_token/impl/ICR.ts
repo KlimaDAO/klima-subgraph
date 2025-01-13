@@ -9,7 +9,7 @@ export class ICR implements ICarbonToken {
   }
 
   returnUpdatedRetirementMetrics(carbonMetrics: CarbonMetric, amount: BigInt): CarbonMetric {
-    carbonMetrics.mco2Retired = carbonMetrics.icrRetired.plus(toDecimal(amount, this.getDecimals()))
+    carbonMetrics.icrRetired = carbonMetrics.icrRetired.plus(toDecimal(amount, this.getDecimals()))
     carbonMetrics.totalRetirements = carbonMetrics.totalRetirements.plus(toDecimal(amount, this.getDecimals()))
 
     return carbonMetrics

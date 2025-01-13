@@ -48,7 +48,7 @@ export function loadCarbonCredit(id: Bytes): CarbonCredit {
 export function updateCarbonCreditWithCall(tokenAddress: Address, registry: string): CarbonCredit {
   let credit = loadCarbonCredit(tokenAddress)
   if (credit.bridgeProtocol == 'TOUCAN') credit = updateToucanCall(tokenAddress, credit, registry)
-  // TODO: This seems to be ever called
+  // TODO: This seems to be never called
   else if (credit.bridgeProtocol == 'C3') credit = updateC3Call(tokenAddress, credit)
   else if (credit.bridgeProtocol == 'CMARK') credit = updateCMARKCall(tokenAddress, credit)
 

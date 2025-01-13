@@ -50,7 +50,6 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
       }
     }
 
-    // TODO: implement recovery of CMARK projects from the CMS
     if (registry == 'CMARK') {
       for (let i = 0; i < CMARK_PROJECT_INFO.length; i++) {
         let projectInfo = CMARK_PROJECT_INFO[i]
@@ -62,7 +61,6 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
           project.region = projectInfo[5]
         }
       }
-
     }
 
     project.save()

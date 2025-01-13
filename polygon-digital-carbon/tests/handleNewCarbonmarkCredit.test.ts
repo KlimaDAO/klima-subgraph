@@ -1,7 +1,6 @@
 import {
   clearStore,
   test,
-  log,
   afterAll,
   describe,
   createMockedFunction,
@@ -9,22 +8,13 @@ import {
   beforeEach,
   assert,
 } from 'matchstick-as'
-import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
-import { ICRProjectToken } from '../generated/ICRCarbonContractRegistry/ICRProjectToken'
-import { ExPostCreated } from '../generated/templates/ICRProjectToken/ICRProjectToken'
-import { handleExPostCreated } from '../src/TransferHandler'
-import { createICRTokenWithCall, createICRTokenID } from '../src/utils/Token'
-import { CarbonmarkCreditToken } from '../generated/templates'
+import { Address, ethereum } from '@graphprotocol/graph-ts'
 import {Issued} from '../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditTokenFactory'
 import { handleNewCarbonmarkCredit } from '../src/templates/CarbonmarkCreditTokenFactory'
-import { Token } from '../generated/schema'
-import { log } from '@graphprotocol/graph-ts'
-import { ZERO_BI } from '../../lib/utils/Decimals'
 import { CMARK_PROJECT_INFO } from '../../lib/utils/CMARKProjectInfo'
 
 
 const ISSUED_TOKEN_ADDRESS = '0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9'
-//const ISSUED_TOKEN_CONTRACT = CarbonmarkCreditToken.bind(ISSUED_TOKEN_ADDRESS)
 const ISSUED_TOKEN_BENEFICIARY = '0x3Da300661Eb0f04a4044A4fB01d79E66C8c81ED9'
 const ISSUED_TOKEN_PROJECT_ID = 'CMARK-1'
 const ISSUED_TOKEN_VINTAGE = '2025'

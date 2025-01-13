@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts'
 import {
   clearStore,
   test,
@@ -16,6 +16,7 @@ import { loadOrCreateCarbonCredit } from '../src/utils/CarbonCredit'
 import { MCO2_ERC20_CONTRACT, METRICS_INIT_TIMESTAMP } from '../src/utils/Constants'
 import { CarbonMetric } from '../generated/schema'
 import { dayTimestamp } from '../../lib/utils/Dates'
+import { toDecimal } from '../../lib/utils/Decimals'
 
 function createCarbonOffsetEvent(
   carbonTon: BigInt,
@@ -101,7 +102,10 @@ describe('Test handleMossRetirement', () => {
     assert.assertNotNull(carbonMetrics)
 
     if (carbonMetrics != null) {
-      assert.bigIntEquals(BigInt.fromString(carbonMetrics.mco2Retired.toString()), carbonTon)
+      assert.stringEquals(
+        carbonMetrics.mco2Retired.toString(),
+        toDecimal(carbonTon).toString()
+      )
     }
   })
 })

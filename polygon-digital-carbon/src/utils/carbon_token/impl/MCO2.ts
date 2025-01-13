@@ -8,10 +8,10 @@ export class MCO2 implements ICarbonToken {
     return 18
   }
 
-  returnUpdatedRetirementMetrics(carbonMetrics: CarbonMetric, carbonTon: BigInt): CarbonMetric {
-    const carbonTonDecimal = new BigDecimal(carbonTon)
-    carbonMetrics.mco2Retired = carbonMetrics.mco2Retired.plus(carbonTonDecimal)
-    carbonMetrics.totalRetirements = carbonMetrics.totalRetirements.plus(carbonTonDecimal)
+  returnUpdatedRetirementMetrics(carbonMetrics: CarbonMetric, amount: BigInt): CarbonMetric {
+    const amountTonnes = toDecimal(amount, this.getDecimals())
+    carbonMetrics.mco2Retired = carbonMetrics.mco2Retired.plus(amountTonnes)
+    carbonMetrics.totalRetirements = carbonMetrics.totalRetirements.plus(amountTonnes)
 
     return carbonMetrics
   }

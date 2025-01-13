@@ -191,7 +191,7 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
   retire.retirementMessage = event.params.retirementMessage
   retire.save()
 
-  saveKlimaRetire(
+  const klimaRetire = saveKlimaRetire(
     event.params.beneficiaryAddress,
     retire.id,
     index,

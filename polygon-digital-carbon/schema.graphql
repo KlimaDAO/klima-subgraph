@@ -338,10 +338,10 @@ type Retire @entity {
   "Source of the retirement"
   source: RetireSource!
 
-  "Amount of carbon retired"
+  "Amount of carbon retired in native units"
   amount: BigInt!
 
-  "Amount of carbon Retired in Tonnes"
+  "Amount of carbon Retired in tonnes"
   amountTonnes: BigDecimal!
 
   "Beneficiary address"
@@ -407,6 +407,9 @@ type KlimaRetire @entity {
   "Fee charged for retirement in native units"
   feeAmount: BigInt!
 
+  "Fee charged for retirement in tonnes"
+  feeAmountTonnes: BigDecimal!
+
   "Selective retirement"
   specific: Boolean!
 }
@@ -416,8 +419,8 @@ type DailyKlimaRetireSnapshot @entity {
   timestamp: BigInt!
   pool: Bytes!
   credit: CarbonCredit!
-  amount: BigInt!
-  feeAmount: BigInt!
+  amount: BigDecimal!
+  feeAmount: BigDecimal!
 }
 
 type CarbonMetric @entity {

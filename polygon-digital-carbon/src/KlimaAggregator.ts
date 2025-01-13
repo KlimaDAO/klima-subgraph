@@ -219,11 +219,10 @@ function generateDailyKlimaRetirement(klimaRetire: KlimaRetire): DailyKlimaRetir
 
   if (retire.pool !== null) {
     const dailyKlimaRetirement = loadOrCreateDailyKlimaRetireSnapshot(id)
-    dailyKlimaRetirement.amount = dailyKlimaRetirement.amount.plus(retire.amount)
-    dailyKlimaRetirement.feeAmount = dailyKlimaRetirement.feeAmount.plus(klimaRetire.feeAmount)
+    dailyKlimaRetirement.amount = dailyKlimaRetirement.amount.plus(retire.amountTonnes)
+    dailyKlimaRetirement.feeAmount = dailyKlimaRetirement.feeAmount.plus(klimaRetire.feeAmountTonnes)
     dailyKlimaRetirement.credit = retire.credit
     dailyKlimaRetirement.pool = retire.pool as Bytes
-    dailyKlimaRetirement.credit = retire.credit
     dailyKlimaRetirement.timestamp = BigInt.fromString(dayTimestamp)
 
     return dailyKlimaRetirement

@@ -9,6 +9,7 @@ import { MethodologyCategories } from './MethodologyCategories'
 import { ToucanCarbonOffsetBatches } from '../../generated/ToucanCarbonOffsetBatch/ToucanCarbonOffsetBatches'
 import { ToucanContractRegistry } from '../../generated/ToucanPuroFactory/ToucanContractRegistry'
 import { loadOrCreateToken } from './Token'
+import { log } from 'matchstick-as'
 
 export function loadOrCreateCarbonCredit(tokenAddress: Address, bridge: string, tokenId: BigInt | null): CarbonCredit {
   let id = Bytes.fromHexString(tokenAddress.toHexString())
@@ -204,12 +205,15 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
 
 function updateCMARKCall(tokenAddress: Address, carbonCredit: CarbonCredit): CarbonCredit {
   let token = loadOrCreateToken(tokenAddress)
-  let projectId = token.symbol.split("-").slice(0,2).join("-")
+  let splittedSymbol = token.symbol.split("-")
+  let projectId = splittedSymbol.slice(1,3).join("-")
+  let vintage = splittedSymbol[3]
 
   let project = loadOrCreateCarbonProject('CMARK', projectId)
   project.save()
 
   carbonCredit.project = project.id
+  carbonCredit.vintage = BigInt.fromString(vintage).toI32()
   carbonCredit.save()
 
   return carbonCredit

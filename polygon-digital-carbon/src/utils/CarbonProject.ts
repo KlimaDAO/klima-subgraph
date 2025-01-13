@@ -1,3 +1,5 @@
+import { log } from 'matchstick-as'
+import { CMARK_PROJECT_INFO } from '../../../lib/utils/CMARKProjectInfo'
 import { ECO_REGISTRY_PROJECT_INFO } from '../../../lib/utils/EcoRegistryProjectInfo'
 import { PURO_PROJECT_INFO } from '../../../lib/utils/PuroProjectInfo'
 import { VERRA_PROJECT_NAMES } from '../../../lib/utils/VerraProjectInfo'
@@ -18,7 +20,6 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
 
     // Set known values for Verra projects
     if (registry == 'VERRA') {
-      // TODO: We should use an HashMap here or subgraph does not care?
       for (let i = 0; i < VERRA_PROJECT_NAMES.length; i++) {
         if (projectID == VERRA_PROJECT_NAMES[i][0]) {
           project.name = VERRA_PROJECT_NAMES[i][1]
@@ -29,7 +30,6 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
     }
 
     if (registry == 'PURO_EARTH') {
-      /// TODO: We should use an HashMap here or subgraph does not care?
       for (let i = 0; i < PURO_PROJECT_INFO.length; i++) {
         if (projectID == PURO_PROJECT_INFO[i][0]) {
           project.name = PURO_PROJECT_INFO[i][1]
@@ -40,7 +40,6 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
     }
 
     if (registry == 'ECO_REGISTRY') {
-      // TODO: We should use an HashMap here or subgraph does not care?
       for (let i = 0; i < ECO_REGISTRY_PROJECT_INFO.length; i++) {
         if (projectID == ECO_REGISTRY_PROJECT_INFO[i][0]) {
           project.name = ECO_REGISTRY_PROJECT_INFO[i][1]
@@ -49,6 +48,21 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
           break
         }
       }
+    }
+
+    // TODO: implement recovery of CMARK projects from the CMS
+    if (registry == 'CMARK') {
+      for (let i = 0; i < CMARK_PROJECT_INFO.length; i++) {
+        let projectInfo = CMARK_PROJECT_INFO[i]
+        if (projectID == projectInfo[0]) {
+          project.name = projectInfo[1]
+          project.methodologies = projectInfo[2]
+          project.category = projectInfo[3]
+          project.country = projectInfo[4]
+          project.region = projectInfo[5]
+        }
+      }
+
     }
 
     project.save()

@@ -19,12 +19,13 @@ import {Issued} from '../generated/CarbonmarkCreditTokenFactory/CarbonmarkCredit
 import { handleNewCarbonmarkCredit } from '../src/templates/CarbonmarkCreditTokenFactory'
 import { Token } from '../generated/schema'
 import { log } from '@graphprotocol/graph-ts'
+import { ZERO_BI } from '../../lib/utils/Decimals'
 
 
 const ISSUED_TOKEN_ADDRESS = '0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9'
 //const ISSUED_TOKEN_CONTRACT = CarbonmarkCreditToken.bind(ISSUED_TOKEN_ADDRESS)
 const ISSUED_TOKEN_BENEFICIARY = '0x3Da300661Eb0f04a4044A4fB01d79E66C8c81ED9'
-const ISSUED_TOKEN_CREDIT_ID = "CMARK-15-2025"
+const ISSUED_TOKEN_CREDIT_ID = "CMARK-1-2025"
 const ISSUED_TOKEN_SYMBOL = `CMARK-${ISSUED_TOKEN_CREDIT_ID}`
 const ISSUED_TOKEN_NAME = `CMARK: ${ISSUED_TOKEN_CREDIT_ID}`
 const ISSUED_TOKEN_DECIMALS = 18
@@ -81,9 +82,18 @@ describe('handleNewCarbonmarkCredit Tests', () => {
     const event = createNewIssuedEvent()
 
     handleNewCarbonmarkCredit(event)
-    let token = Token.load(issuedTokenAddress)
-    if (token)
-    log.debug(token.name, [])
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'tokenAddress', ISSUED_TOKEN_ADDRESS)
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'bridgeProtocol', 'CMARK')
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'project', 'CMARK-1')
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'vintage', '2025')
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'currentSupply', '0')
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'crossChainSupply', '0')
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'bridged', '0')
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'retired', '0')
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'provenanceCount', '0')
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'lastBatchId', '0')
+    assert.fieldEquals('CarbonCredit', issuedTokenAddress.toHexString(), 'isExAnte', 'false')
+
     
     assert.fieldEquals('Token', issuedTokenAddress.toHexString(), 'tokenAddress', ISSUED_TOKEN_ADDRESS)
     assert.fieldEquals('Token', issuedTokenAddress.toHexString(), 'name', ISSUED_TOKEN_NAME)

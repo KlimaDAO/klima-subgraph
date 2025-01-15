@@ -158,7 +158,8 @@ describe('handleNewCarbonmarkCredit Tests', () => {
     clearStore()
   })
 
-  test('Create Carbonmark Token entity', () => {
+  test('Issuance of a carbonmark Token entity', () => {
+    // Issuance event
     const event = newIssuedEvent()
     let id = issuedTokenAddress.toHexString()
 
@@ -188,28 +189,44 @@ describe('handleNewCarbonmarkCredit Tests', () => {
     assert.fieldEquals('Token', id, 'decimals', ISSUED_TOKEN_DECIMALS.toString())
     assert.fieldEquals('Token', id, 'isExAnte', 'false')
 
+    // Initial transfer to owner event
+    const createInitialTransferEvent = createNewTransferEvent(ZERO_ADDRESS, issuedTokenOwner, ISSUED_TOKEN_AMOUNT)
+    handleCarbonmarkCreditTransfer(createInitialTransferEvent)
+
+    let creditId = issuedTokenAddress.toHexString()
+    assert.fieldEquals('CarbonCredit', creditId, 'currentSupply', ISSUED_TOKEN_AMOUNT.toString())
+
+    let provenanceId = issuedTokenAddress.concat(issuedTokenOwner).concat(Bytes.fromI32(0)).toHexString()
+    assert.fieldEquals('ProvenanceRecord', provenanceId, 'transactionType', 'ORIGINATION')
+
     clearStore()
   })
 
-  test('Transfers', () => {
+  test('Transfer from beneficiary to third party', () => {
     setup();
-    let id = issuedTokenAddress.toHexString()
-    assert.fieldEquals('CarbonCredit', id, 'currentSupply', ISSUED_TOKEN_AMOUNT.toString())
+    let creditId = issuedTokenAddress.toHexString()
 
-    // Transfer from beneficiary to third party
     const transferEvent = createNewTransferEvent(issuedTokenOwner, issuedTokenTransferTo, ISSUED_TOKEN_TRANSFER_VALUE)
     handleCarbonmarkCreditTransfer(transferEvent)
-    assert.fieldEquals('CarbonCredit', id, 'currentSupply', ISSUED_TOKEN_AMOUNT.toString())
+    assert.fieldEquals('CarbonCredit', creditId, 'currentSupply', ISSUED_TOKEN_AMOUNT.toString())
 
-    // Transfer to Zero address
-    const zeroTransferEvent = createNewTransferEvent(issuedTokenTransferTo, ZERO_ADDRESS, ISSUED_TOKEN_TRANSFER_VALUE)
-    handleCarbonmarkCreditTransfer(zeroTransferEvent)
-    assert.fieldEquals('CarbonCredit', id, 'currentSupply', (ISSUED_TOKEN_AMOUNT - ISSUED_TOKEN_TRANSFER_VALUE).toString())
+    let provenanceId = issuedTokenAddress.concat(issuedTokenTransferTo).concat(Bytes.fromI32(1)).toHexString()
+    assert.fieldEquals('ProvenanceRecord', provenanceId, 'transactionType', 'TRANSFER')
+
   })
 
-  test('Retirement', () => {
+  test('Token owner retires with the CMARK Token contract', () => {
     setup();
     
+    // Transfer to Zero address event
+    let creditId = issuedTokenAddress.toHexString()
+    const zeroTransferEvent = createNewTransferEvent(issuedTokenTransferTo, ZERO_ADDRESS, ISSUED_TOKEN_TRANSFER_VALUE)
+    handleCarbonmarkCreditTransfer(zeroTransferEvent)
+    assert.fieldEquals('CarbonCredit', creditId, 'currentSupply', (ISSUED_TOKEN_AMOUNT - ISSUED_TOKEN_TRANSFER_VALUE).toString())
+
+    let provenanceId = issuedTokenAddress.concat(ZERO_ADDRESS).concat(Bytes.fromI32(1)).toHexString()
+    assert.fieldEquals('ProvenanceRecord', provenanceId, 'transactionType', 'TRANSFER')
+
     // Retire with the token's retire function
     const retirementEvent = createNewTokenRetiredEvent()
     handleCarbonmarkCreditRetirement(retirementEvent)
@@ -231,7 +248,9 @@ describe('handleNewCarbonmarkCredit Tests', () => {
     assert.fieldEquals('Retire', id, 'retiringName', '')
     assert.fieldEquals('Retire', id, 'hash', retirementEvent.transaction.hash.toHexString().toLowerCase())
     assert.fieldEquals('Retire', id, 'timestamp', retirementEvent.block.timestamp.toString())
-    //assert.fieldEquals('Retire', id, 'provenance', RETIREMENT_AMOUNT.toString())
+    assert.fieldEquals('Retire', id, 'provenance', provenanceId)
+
+    assert.fieldEquals('ProvenanceRecord', provenanceId, 'transactionType', 'RETIREMENT')
 
   })
 

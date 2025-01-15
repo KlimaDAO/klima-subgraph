@@ -16,7 +16,6 @@ import { Transfer } from '../generated/BCT/ERC20'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Retired } from '../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditToken'
 import { handleCarbonmarkCreditRetirement, handleCarbonmarkCreditTransfer } from '../src/templates/CarbonmarkCreditToken'
-import { ZERO_BI } from '../../lib/utils/Decimals'
 
 
 const ISSUED_TOKEN_ADDRESS = '0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9'

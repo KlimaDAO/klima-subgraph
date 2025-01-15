@@ -48,7 +48,6 @@ export function loadCarbonCredit(id: Bytes): CarbonCredit {
 export function updateCarbonCreditWithCall(tokenAddress: Address, registry: string): CarbonCredit {
   let credit = loadCarbonCredit(tokenAddress)
   if (credit.bridgeProtocol == 'TOUCAN') credit = updateToucanCall(tokenAddress, credit, registry)
-  // TODO: This seems to be never called
   else if (credit.bridgeProtocol == 'C3') credit = updateC3Call(tokenAddress, credit)
   else if (credit.bridgeProtocol == 'CMARK') credit = updateCMARKCall(tokenAddress, credit)
 
@@ -228,7 +227,6 @@ export function updateICRCredit(tokenAddress: Address, tokenId: BigInt, timestam
   credit.save()
 }
 
-// TODO: This seems to be never called
 export function updateCarbonCreditCrossChain(creditAddress: Address, amount: BigInt): void {
   let credit = loadCarbonCredit(creditAddress)
   credit.crossChainSupply = credit.crossChainSupply.plus(amount)

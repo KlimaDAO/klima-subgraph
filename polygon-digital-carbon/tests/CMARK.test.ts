@@ -140,7 +140,7 @@ export function setup(): void {
 
 }
 
-describe('handleNewCarbonmarkCredit Tests', () => {
+describe('CMARK tests', () => {
   beforeEach(() => {
     clearStore()
     
@@ -158,7 +158,7 @@ describe('handleNewCarbonmarkCredit Tests', () => {
     clearStore()
   })
 
-  test('Issuance of a carbonmark Token entity', () => {
+  test('Issuance of a Carbonmark Token entity', () => {
     // Issuance event
     const event = newIssuedEvent()
     let id = issuedTokenAddress.toHexString()
@@ -227,7 +227,7 @@ describe('handleNewCarbonmarkCredit Tests', () => {
     let provenanceId = issuedTokenAddress.concat(ZERO_ADDRESS).concat(Bytes.fromI32(1)).toHexString()
     assert.fieldEquals('ProvenanceRecord', provenanceId, 'transactionType', 'TRANSFER')
 
-    // Retire with the token's retire function
+    // Retire with the CMARK Token contract event
     const retirementEvent = createNewTokenRetiredEvent()
     handleCarbonmarkCreditRetirement(retirementEvent)
 

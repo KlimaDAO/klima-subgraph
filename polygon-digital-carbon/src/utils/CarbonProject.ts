@@ -1,4 +1,3 @@
-import { log } from 'matchstick-as'
 import { CMARK_PROJECT_INFO } from '../../../lib/utils/CMARKProjectInfo'
 import { ECO_REGISTRY_PROJECT_INFO } from '../../../lib/utils/EcoRegistryProjectInfo'
 import { PURO_PROJECT_INFO } from '../../../lib/utils/PuroProjectInfo'

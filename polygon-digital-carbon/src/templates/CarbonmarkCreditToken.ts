@@ -6,7 +6,6 @@ import { loadCarbonCredit } from '../utils/CarbonCredit'
 import { incrementAccountRetirements, loadOrCreateAccount } from '../utils/Account'
 import { saveRetire } from '../utils/Retire'
 import { ZERO_ADDRESS } from '../../../lib/utils/Constants'
-import { log } from 'matchstick-as'
 
 
 export function handleCarbonmarkCreditTransfer(event: Transfer): void {

@@ -1,7 +1,4 @@
 import { CarbonmarkCreditToken } from '../../generated/templates'
-import {
-  NewTokenProject
-} from '../../generated/C3ProjectTokenFactory/C3ProjectTokenFactory'
 import { loadOrCreateCarbonCredit, updateCarbonCreditWithCall } from '../utils/CarbonCredit'
 import { createTokenWithCall } from '../utils/Token'
 import { Issued } from '../../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditTokenFactory'

@@ -36,6 +36,7 @@ import { C3RetirementMetadata as C3RetirementMetadataTemplate } from '../generat
 import { extractIpfsHash } from '../utils/ipfs'
 import { returnedPoccID } from '../generated/Coorest/Coorest'
 
+
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
   if (event.params.tokenId == ZERO_BI) {
@@ -247,6 +248,7 @@ export function handleMossRetirement(event: CarbonOffset): void {
   )
 
   incrementAccountRetirements(senderAddress)
+
 }
 
 export function saveCCO2Retirement(event: burnedCO2Token): void {
@@ -400,6 +402,7 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
   let retireId: Bytes = asyncRetireRequest.retire
   let retire = loadRetire(retireId)
 
+
   if (c3RetireRequestDetails == null) {
     log.error('No C3RetireRequest found for retireId: {} hash: {}', [event.transaction.hash.toHexString()])
     return
@@ -445,6 +448,7 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
     }
   }
 
+
   c3RetireRequestDetails.save()
   asyncRetireRequest.save()
   retire.save()
@@ -452,12 +456,14 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
   let credit = loadCarbonCredit(retire.credit)
   if (credit === null) {
     return
-  } else {
+  }
+  else {
     if (credit.tokenId !== null) {
       CarbonMetricUtils.updateCarbonTokenRetirements(new C3T(), event.block.timestamp, credit.tokenId as BigInt)
     }
   }
 }
+
 
 export function handleVCUOMetaDataUpdated(event: VCUOMetaDataUpdated): void {
   let safeguard = TokenURISafeguard.load('safeguard')

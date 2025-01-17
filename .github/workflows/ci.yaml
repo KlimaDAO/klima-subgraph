@@ -29,7 +29,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '16'
+          node-version: '18'
       - name: Install dependencies
         run: yarn --immutable
         working-directory: '${{ matrix.value }}'
@@ -39,22 +39,22 @@ jobs:
       # https://github.com/marketplace/actions/check-uncommitted-changes
       - name: Prepare Manifest
         if: matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark'
-        run: npm run prepare-matic
+        run: yarn prepare-matic
         working-directory: '${{ matrix.value }}'
       - name: Generate Subgraph Code
-        run: npm run codegen
+        run: yarn codegen
         working-directory: '${{ matrix.value }}'
       - name: Check for uncommitted changes
         id: check-changes
         uses: mskri/check-uncommitted-changes-action@v1.0.1
       - name: Evaluate if there are changes
         if: steps.check-changes.outputs.outcome == failure()
-        run: echo "There are uncommitted changes - execute 'npm run codegen' locally and commit the generated files!"
+        run: echo "There are uncommitted changes - execute 'yarn codegen' locally and commit the generated files!"
         
       - name: Build Subgraph
-        run: npm run build
+        run: yarn build
         working-directory: '${{ matrix.value }}'
       - name: Run Tests
         if: matrix.value == 'polygon-digital-carbon'
-        run: npm run test -d
+        run: yarn test -d
         working-directory: '${{ matrix.value }}'

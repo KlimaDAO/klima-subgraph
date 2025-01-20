@@ -12,7 +12,7 @@ import { fetchCMSProjects } from './CMSQueries';
     p => { return [
       p.id,
       p.name ?? '',
-      p.methodologies[0].id.current ?? '',
+      p.methodologies[0].rid.current ?? '',
       p.methodologies[0].category ?? '',
       p.country ?? '',
       p.region ?? '',

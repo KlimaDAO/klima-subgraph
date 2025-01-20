@@ -10,7 +10,8 @@ const HQLCMSProjectFragment  = `{
       alt
     }
     methodologies {
-      id {
+      id: _id
+      rid: id {
         current
       }
       category

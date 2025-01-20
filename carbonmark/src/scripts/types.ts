@@ -16,7 +16,8 @@ export type CMSProjectInfo {
   id: String,
   name: String,
   methodologies: [{
-    id: {
+    id: String,
+    rid: {
       current: String
     },
     category: String,

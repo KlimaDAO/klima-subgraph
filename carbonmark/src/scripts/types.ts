@@ -13,15 +13,15 @@ export class ProjectInfo {
   }
 
 export type CMSProjectInfo = {
-  id: String,
-  name: String,
+  id: string,
+  name: string,
   methodologies: [{
-    id: String,
+    id: string,
     rid: {
-      current: String
+      current: string
     },
-    category: String,
+    category: string,
   }],
-  country: String,
-  region: String,
+  country: string,
+  region: string,
 }

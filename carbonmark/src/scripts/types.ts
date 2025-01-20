@@ -11,3 +11,16 @@ export class ProjectInfo {
       public isExAnte: boolean
     ) {}
   }
+
+export type CMSProjectInfo {
+  id: String,
+  name: String,
+  methodologies: [{
+    id: {
+      current: String
+    },
+    category: String,
+  }],
+  country: String,
+  region: String,
+}

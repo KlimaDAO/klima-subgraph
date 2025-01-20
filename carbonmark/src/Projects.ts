@@ -11552,4 +11552,16 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '0',
     false
   ),
+  new ProjectInfo(
+    // TODO: Add token address here
+    '',
+    'CMARK-1',
+    '2022',
+    'LIMENET',
+    'ACM0022',
+    'Other',
+    'United States of America',
+    '0',
+    false
+  ),
 ]

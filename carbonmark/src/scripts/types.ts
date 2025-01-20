@@ -12,7 +12,7 @@ export class ProjectInfo {
     ) {}
   }
 
-export type CMSProjectInfo {
+export type CMSProjectInfo = {
   id: String,
   name: String,
   methodologies: [{

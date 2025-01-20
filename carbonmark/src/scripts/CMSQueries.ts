@@ -24,6 +24,20 @@ const HQLCMSProjectFragment  = `{
     registryProjectId
   }`
 
+  export type CMSProjectInfo = {
+    id: string;
+    name: string;
+    methodologies: [{
+      id: string;
+      rid: {
+        current: string
+      },
+      category: string;
+    }];
+    country: string;
+    region: string;
+  }
+  
 export async function fetchCMSProject(registry: string, registryProjectId: string) {
     const { data } = await axios.post('https://l6of5nwi.apicdn.sanity.io/v1/graphql/production/default', {
       query: `

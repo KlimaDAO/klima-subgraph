@@ -1,11 +1,11 @@
 import fs from 'fs'
 import 'dotenv/config';
-import { CMSProjectInfo } from './types';
+import { CMSProjectInfo } from './CMSQueries';
 import { fetchCMSProjects } from './CMSQueries';
 
 
 (async function updateMainnetCMARKProjects() {
-  // Fetch projects
+  // Fetch and format projects
   const projects: CMSProjectInfo[] = (await fetchCMSProjects('CMARK'))
   
   const mappedProjects = projects.map(
@@ -19,8 +19,8 @@ import { fetchCMSProjects } from './CMSQueries';
     ]}
   )
   
+  // Write file
   const newFileContents = `export const CMARK_PROJECT_INFO = ${JSON.stringify(mappedProjects, null, 2)};`
-
   fs.writeFileSync('../lib/utils/CMARKProjectInfo.ts', newFileContents, 'utf8')
   
 })();

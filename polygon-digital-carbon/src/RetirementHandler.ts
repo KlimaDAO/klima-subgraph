@@ -36,7 +36,6 @@ import { C3RetirementMetadata as C3RetirementMetadataTemplate } from '../generat
 import { extractIpfsHash } from '../utils/ipfs'
 import { returnedPoccID } from '../generated/Coorest/Coorest'
 
-
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount
   if (event.params.tokenId == ZERO_BI) {
@@ -163,7 +162,6 @@ export function saveToucanPuroRetirementRequest(event: RetirementRequested): voi
   incrementAccountRetirements(senderAddress)
 
   // TODO: determine how to handle carbon metrics once request is finalized
-
 }
 
 export function handleVCUOMinted(event: VCUOMinted): void {
@@ -249,7 +247,6 @@ export function handleMossRetirement(event: CarbonOffset): void {
   )
 
   incrementAccountRetirements(senderAddress)
-
 }
 
 export function saveCCO2Retirement(event: burnedCO2Token): void {
@@ -260,12 +257,8 @@ export function saveCCO2Retirement(event: burnedCO2Token): void {
 
   // Set up project/default info for Coorest "project"
 
-  if (credit.vintage == 1970) {
-    credit.project = 'CCO2'
-    credit.save()
-
-    loadOrCreateCarbonProject('CCS', 'CCO2')
-  }
+  let project = loadOrCreateCarbonProject('CCS', 'CCO2')
+  credit.project = project.id
 
   credit.retired = credit.retired.plus(event.params.amount)
   credit.save()
@@ -316,7 +309,6 @@ export function saveICRRetirement(event: RetiredVintage): void {
   credit.save()
 
   CarbonMetricUtils.updateCarbonTokenRetirements(new ICR(), event.block.timestamp, amount)
-
 
   // Ensure account entities are created for all addresses
   loadOrCreateAccount(event.params.account)
@@ -408,7 +400,6 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
   let retireId: Bytes = asyncRetireRequest.retire
   let retire = loadRetire(retireId)
 
-
   if (c3RetireRequestDetails == null) {
     log.error('No C3RetireRequest found for retireId: {} hash: {}', [event.transaction.hash.toHexString()])
     return
@@ -454,7 +445,6 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
     }
   }
 
-
   c3RetireRequestDetails.save()
   asyncRetireRequest.save()
   retire.save()
@@ -462,15 +452,12 @@ export function completeC3RetireRequest(event: EndAsyncToken): void {
   let credit = loadCarbonCredit(retire.credit)
   if (credit === null) {
     return
-  }
-  else {
+  } else {
     if (credit.tokenId !== null) {
       CarbonMetricUtils.updateCarbonTokenRetirements(new C3T(), event.block.timestamp, credit.tokenId as BigInt)
     }
   }
-
 }
-
 
 export function handleVCUOMetaDataUpdated(event: VCUOMetaDataUpdated): void {
   let safeguard = TokenURISafeguard.load('safeguard')

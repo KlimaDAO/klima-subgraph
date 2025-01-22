@@ -680,7 +680,7 @@ templates:
           file: ../lib/abis/CarbonmarkCreditToken.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleCarbonmarkCreditTransfer
+          handler: handleCreditTransfer
         - event: Retired(uint256,indexed address,string,string,indexed string,indexed address,string)
           handler: handleCarbonmarkCreditRetirement
       file: ./src/TransferHandler.ts

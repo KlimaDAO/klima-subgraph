@@ -358,6 +358,7 @@ dataSources:
       eventHandlers:
         - event: Issued(indexed string,uint256,indexed address,indexed address)
           handler: handleNewCarbonmarkCredit
+        # TODO: determine if we need a handler for cancellation event
   - kind: ethereum/contract
     name: UBO
     network: {{network}}

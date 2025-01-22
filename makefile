@@ -26,6 +26,12 @@ TCO2_HOLDER = 0x34798dd650DD478a801Fc1b0125cD6848F52F693
 
 MARKETPLACE = 0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821
 
+CMARK_TOKEN_FACTORY = 0xEeE3abDD638E219261e061c06C0798Fd5C05B5D3 
+
+CMARK_TOKEN_FACTORY_OWNER = 0xc51Cc27d3BB611DB27f26F617E1c15483A8790Cf 
+
+BENEFICIARY = 0xdc1DfA8C0b6C4a8BB22400608468aCfF21016Fad
+
 export RPC_URL = http://localhost:8545
 
 local-fork:
@@ -60,6 +66,11 @@ impersonate:
 	cast rpc anvil_impersonateAccount 0xfb079f82cdd18313f3566fb8ddd6414b3507bda2 --rpc-url ${RPC_URL}
 
 	cast rpc anvil_impersonateAccount 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 --rpc-url ${RPC_URL}
+
+	# Impersonate CarbonmarkCreditTokenFactory owner
+	cast rpc anvil_impersonateAccount ${CMARK_TOKEN_FACTORY_OWNER} --rpc-url ${RPC_URL}
+
+
 
 tco2:
 
@@ -133,6 +144,8 @@ balances:
 
 	cast call ${TCO2} "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET}
 
+	cast call ${TCO2} "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET}
+
 approvals:
 
 	# cast call ${USDC} "allowance(address,address)(uint256)" ${DUMMY_SERVER_WALLET} ${DIAMOND}
@@ -141,8 +154,24 @@ approvals:
 
 	# cast call ${USDC} "allowance(address,address)(uint256)" 0xfb079f82cdd18313f3566fb8ddd6414b3507bda2 ${DIAMOND}
 
-	# cast call ${USDC} "allowance(address,address)(uint256)" 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 ${DIAMOND}
+	# cast call ${USDC} "allowance(address,address)(uint256)" 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 ${DIAMOND}	
 
 
+cmark-issue:
+	cast send ${CMARK_TOKEN_FACTORY} --unlocked --from ${CMARK_TOKEN_FACTORY_OWNER} "issueCredits(string,uint256,address)()" CMARK-1000-2025 1000000000000 ${ANVIL_PUBLIC_WALLET} --rpc-url ${RPC_URL}
 
-	
+cmark-cancel:
+	cast send ${CMARK_TOKEN_FACTORY} --unlocked --from ${CMARK_TOKEN_FACTORY_OWNER} "cancelCredits(string,uint256,string,address)()" CMARK-1000-2025 500000000000 bad ${ANVIL_PUBLIC_WALLET} --rpc-url ${RPC_URL}
+
+cmark-get-addr:
+	$(eval CMARK_TOKEN = $(shell cast call ${CMARK_TOKEN_FACTORY} "creditIdToAddress(string)(address)" CMARK-1000-2025 --rpc-url ${RPC_URL}))
+
+cmark-balance: cmark-get-addr
+	cast call ${CMARK_TOKEN} "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET} --rpc-url ${RPC_URL}
+
+cmark-retire: cmark-get-addr
+	cast call ${CMARK_TOKEN} "approve(address,address)(uint256)" ${DUMMY_SERVER_WALLET} 1000000000000000000000000 --rpc-url ${RPC_URL}
+	cast send ${CMARK_TOKEN} --unlocked --from ${DUMMY_SERVER_WALLET} "retireFrom(address)(uint256)" 250000000000 ${BENEFICIARY} "beneficiary" "message" "US" ${CMARK_TOKEN_FACTORY_OWNER} --rpc-url ${RPC_URL}
+
+
+cmark: cmark-issue

@@ -338,7 +338,7 @@ dataSources:
           handler: handleEndAsyncToken
   - kind: ethereum/contract
     name: CarbonmarkCreditTokenFactory
-    network: matic
+    network: {{network}}
     source:
       address: '{{CMARK.address}}'
       abi: CarbonmarkCreditTokenFactory
@@ -666,7 +666,7 @@ templates:
       file: ./src/TransferHandler.ts
   - name: CarbonmarkCreditToken
     kind: ethereum/contract
-    network: matic
+    network: {{network}}
     source:
       abi: CarbonmarkCreditToken
     mapping:

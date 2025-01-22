@@ -1,5 +1,5 @@
 {
-  "network": "mainnet",
+  "network": "matic",
   "ToucanCarbonOffsetsFactory": {
     "address": "0x2359677E513Bc83106268514c5B2De3C29C849ea",
     "startBlock": "67003669"

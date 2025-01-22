@@ -204,8 +204,8 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
 function updateCMARKCall(tokenAddress: Address, carbonCredit: CarbonCredit): CarbonCredit {
   let token = loadOrCreateToken(tokenAddress)
   let splittedSymbol = token.symbol.split("-")
-  let projectId = splittedSymbol.slice(1,3).join("-")
-  let vintage = splittedSymbol[3]
+  let projectId = splittedSymbol.slice(0,2).join("-")
+  let vintage = splittedSymbol[2]
 
   let project = loadOrCreateCarbonProject('CMARK', projectId)
   project.save()

@@ -8,6 +8,7 @@ enum Registry {
   J_CREDIT
   ECO_REGISTRY
   CCS
+  CMARK
 }
 
 enum RetireSource {
@@ -21,6 +22,7 @@ enum BridgeProtocol {
   MOSS
   ICR
   COOREST
+  CMARK
 }
 
 enum CrossChainBridgeDirection {

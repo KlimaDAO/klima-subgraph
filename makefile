@@ -170,8 +170,8 @@ cmark-balance: cmark-get-addr
 	cast call ${CMARK_TOKEN} "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET} --rpc-url ${RPC_URL}
 
 cmark-retire: cmark-get-addr
-	cast call ${CMARK_TOKEN} "approve(address,address)(uint256)" ${DUMMY_SERVER_WALLET} 1000000000000000000000000 --rpc-url ${RPC_URL}
-	cast send ${CMARK_TOKEN} --unlocked --from ${DUMMY_SERVER_WALLET} "retireFrom(address)(uint256)" 250000000000 ${BENEFICIARY} "beneficiary" "message" "US" ${CMARK_TOKEN_FACTORY_OWNER} --rpc-url ${RPC_URL}
+	cast send ${CMARK_TOKEN} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(uint256)" ${DUMMY_SERVER_WALLET} 10000000000000000000000 --rpc-url ${RPC_URL}
+	cast send ${CMARK_TOKEN} --unlocked --from ${DUMMY_SERVER_WALLET} "retireFrom(uint256,address,string,string,string,address)()" 2500000000 ${BENEFICIARY} "beneficiary" "message" "US" ${ANVIL_PUBLIC_WALLET} --rpc-url ${RPC_URL}
 
 
 cmark: cmark-issue

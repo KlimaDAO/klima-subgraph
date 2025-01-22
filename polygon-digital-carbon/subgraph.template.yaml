@@ -355,6 +355,8 @@ dataSources:
           file: ../lib/abis/CarbonmarkCreditTokenFactory.json
         - name: CarbonmarkCreditToken
           file: ../lib/abis/CarbonmarkCreditToken.json
+        - name: ERC20
++         file: ../lib/abis/ERC20.json
       eventHandlers:
         - event: Issued(indexed string,uint256,indexed address,indexed address)
           handler: handleNewCarbonmarkCredit

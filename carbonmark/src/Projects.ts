@@ -11557,7 +11557,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '',
     'CMARK-1',
     '2022',
-    'LIMENET',
+    'Black Earth 2022 OWC',
     'ACM0022',
     'Other',
     'United States of America',

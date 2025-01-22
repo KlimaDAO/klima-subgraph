@@ -15,8 +15,7 @@ import { CMARK_PROJECT_INFO } from '../../lib/utils/CMARKProjectInfo'
 import { Transfer } from '../generated/BCT/ERC20'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Retired } from '../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditToken'
-import { handleCarbonmarkCreditRetirement } from '../src/templates/CarbonmarkCreditToken'
-import {handleCreditTransfer } from '../src/TransferHandler'
+import { handleCarbonmarkCreditRetirement, handleCarbonmarkCreditTransfer } from '../src/templates/CarbonmarkCreditToken'
 
 
 const ISSUED_TOKEN_ADDRESS = '0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9'
@@ -136,7 +135,7 @@ export function setup(): void {
 
   // Initial transfer to beneficiary
   const createInitialTransferEvent = createNewTransferEvent(ZERO_ADDRESS, issuedTokenOwner, ISSUED_TOKEN_AMOUNT)
-  handleCreditTransfer(createInitialTransferEvent)
+  handleCarbonmarkCreditTransfer(createInitialTransferEvent)
 
 }
 
@@ -191,7 +190,7 @@ describe('CMARK tests', () => {
 
     // Initial transfer to owner event
     const createInitialTransferEvent = createNewTransferEvent(ZERO_ADDRESS, issuedTokenOwner, ISSUED_TOKEN_AMOUNT)
-    handleCreditTransfer(createInitialTransferEvent)
+    handleCarbonmarkCreditTransfer(createInitialTransferEvent)
 
     let creditId = issuedTokenAddress.toHexString()
     assert.fieldEquals('CarbonCredit', creditId, 'currentSupply', ISSUED_TOKEN_AMOUNT.toString())
@@ -207,7 +206,7 @@ describe('CMARK tests', () => {
     let creditId = issuedTokenAddress.toHexString()
 
     const transferEvent = createNewTransferEvent(issuedTokenOwner, issuedTokenTransferTo, ISSUED_TOKEN_TRANSFER_VALUE)
-    handleCreditTransfer(transferEvent)
+    handleCarbonmarkCreditTransfer(transferEvent)
     assert.fieldEquals('CarbonCredit', creditId, 'currentSupply', ISSUED_TOKEN_AMOUNT.toString())
 
     let provenanceId = issuedTokenAddress.concat(issuedTokenTransferTo).concat(Bytes.fromI32(1)).toHexString()
@@ -221,7 +220,7 @@ describe('CMARK tests', () => {
     // Transfer to Zero address event
     let creditId = issuedTokenAddress.toHexString()
     const zeroTransferEvent = createNewTransferEvent(issuedTokenTransferTo, ZERO_ADDRESS, ISSUED_TOKEN_TRANSFER_VALUE)
-    handleCreditTransfer(zeroTransferEvent)
+    handleCarbonmarkCreditTransfer(zeroTransferEvent)
     assert.fieldEquals('CarbonCredit', creditId, 'currentSupply', (ISSUED_TOKEN_AMOUNT - ISSUED_TOKEN_TRANSFER_VALUE).toString())
 
     let provenanceId = issuedTokenAddress.concat(ZERO_ADDRESS).concat(Bytes.fromI32(1)).toHexString()

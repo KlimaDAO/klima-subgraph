@@ -1,9 +1,17 @@
+import { Transfer } from '../../generated/BCT/ERC20'
+import { handleCreditTransfer } from '../TransferHandler'
 import { Retired } from '../../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditToken'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 import { loadCarbonCredit } from '../utils/CarbonCredit'
 import { incrementAccountRetirements, loadOrCreateAccount } from '../utils/Account'
 import { saveRetire } from '../utils/Retire'
 import { ZERO_ADDRESS } from '../../../lib/utils/Constants'
+
+
+export function handleCarbonmarkCreditTransfer(event: Transfer): void {
+  return handleCreditTransfer(event)  
+}
+
 
 export function handleCarbonmarkCreditRetirement(event: Retired): void {
   // Don't process zero amount events

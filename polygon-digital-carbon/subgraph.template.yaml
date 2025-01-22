@@ -356,7 +356,7 @@ dataSources:
         - name: CarbonmarkCreditToken
           file: ../lib/abis/CarbonmarkCreditToken.json
         - name: ERC20
-+         file: ../lib/abis/ERC20.json
+          file: ../lib/abis/ERC20.json
       eventHandlers:
         - event: Issued(indexed string,uint256,indexed address,indexed address)
           handler: handleNewCarbonmarkCredit
@@ -682,10 +682,10 @@ templates:
           file: ../lib/abis/CarbonmarkCreditToken.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleCreditTransfer
+          handler: handleCarbonmarkCreditTransfer
         - event: Retired(uint256,indexed address,string,string,indexed string,indexed address,string)
           handler: handleCarbonmarkCreditRetirement
-      file: ./src/TransferHandler.ts
+      file: ./src/templates/CarbonmarkCreditToken.ts
   - name: ICRProjectToken
     kind: ethereum/contract
     network: {{network}}

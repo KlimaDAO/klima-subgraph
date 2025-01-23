@@ -17,8 +17,8 @@ export function handleCarbonmarkCreditRetirement(event: Retired): void {
   // Don't process zero amount events
   if (event.params.amount == ZERO_BI) return
 
-  let credit = loadCarbonCredit(event.params.creditId)
-
+  let credit = loadCarbonCredit(event.address)
+   
   credit.retired = credit.retired.plus(event.params.amount)
   credit.save()
 

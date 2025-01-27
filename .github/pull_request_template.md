@@ -36,6 +36,8 @@ ex: - refactor(carbonProjects)!: removed very important field from entity
 - [ ] Matchstick test included (if applicable).
 - [ ] Version incremented in package.json of the applicable subgraph(s)
 - [ ] All changes are reflected in the changelog of this PR for the applicable subgraph(s)
+- [ ] If modifying `polygon-digital-carbon` or `carbonmark` subgraphs, MAKE SURE TO MODIFY `subgraph.template.yaml` (NOT `subgraph.yaml` DIRECTLY!)
+  - If modifying `subgraph.template.yaml`, also make sure to run `npm run prepare-matic` locally and commit the resulting rendered `subgraph.yaml`
 
 ## ℹ️ Additional Information
 

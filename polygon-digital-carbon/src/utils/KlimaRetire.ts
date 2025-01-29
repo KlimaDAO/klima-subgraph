@@ -1,4 +1,5 @@
 import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
+import { toDecimal } from '../../../lib/utils/Decimals'
 import { KlimaRetire } from '../../generated/schema'
 
 export function saveKlimaRetire(
@@ -15,8 +16,13 @@ export function saveKlimaRetire(
     klimaRetire.retire = retire
     klimaRetire.index = index
     klimaRetire.feeAmount = feeAmount
+    klimaRetire.feeAmountTonnes = toDecimal(feeAmount)
     klimaRetire.specific = specific
     klimaRetire.save()
   }
   return klimaRetire as KlimaRetire
+}
+
+export function loadKlimaRetire(id: String): KlimaRetire | null {
+  return KlimaRetire.load(Bytes.fromUTF8(id))
 }

@@ -8,6 +8,7 @@ enum Registry {
   J_CREDIT
   ECO_REGISTRY
   CCS
+  CMARK
 }
 
 enum RetireSource {
@@ -337,10 +338,10 @@ type Retire @entity {
   "Source of the retirement"
   source: RetireSource!
 
-  "Amount of carbon retired"
+  "Amount of carbon retired in native units"
   amount: BigInt!
 
-  "Amount of carbon Retired in Tonnes"
+  "Amount of carbon Retired in tonnes"
   amountTonnes: BigDecimal!
 
   "Beneficiary address"
@@ -406,8 +407,52 @@ type KlimaRetire @entity {
   "Fee charged for retirement in native units"
   feeAmount: BigInt!
 
+  "Fee charged for retirement in tonnes"
+  feeAmountTonnes: BigDecimal!
+
   "Selective retirement"
   specific: Boolean!
+}
+
+type DailyKlimaRetireSnapshot @entity {
+  id: ID!
+  timestamp: BigInt!
+  pool: Bytes!
+  credit: CarbonCredit!
+  amount: BigDecimal!
+  feeAmount: BigDecimal!
+}
+
+type CarbonMetric @entity {
+  id: ID!
+  timestamp: BigInt!
+  bctSupply: BigDecimal!
+  nctSupply: BigDecimal!
+  mco2Supply: BigDecimal!
+  cco2Supply: BigDecimal!
+  uboSupply: BigDecimal!
+  nboSupply: BigDecimal!
+  bctRedeemed: BigDecimal!
+  nctRedeemed: BigDecimal!
+  uboRedeemed: BigDecimal!
+  nboRedeemed: BigDecimal!
+  totalCarbonSupply: BigDecimal!
+  bctCrosschainSupply: BigDecimal!
+  nctCrosschainSupply: BigDecimal!
+  totalCrosschainSupply: BigDecimal!
+  tco2Retired: BigDecimal!
+  mco2Retired: BigDecimal!
+  cco2Retired: BigDecimal!
+  c3tRetired: BigDecimal!
+  icrRetired: BigDecimal!
+  totalRetirements: BigDecimal!
+  bctKlimaRetired: BigDecimal!
+  nctKlimaRetired: BigDecimal!
+  mco2KlimaRetired: BigDecimal!
+  cco2KlimaRetired: BigDecimal!
+  uboKlimaRetired: BigDecimal!
+  nboKlimaRetired: BigDecimal!
+  totalKlimaRetirements: BigDecimal!
 }
 
 ##############################

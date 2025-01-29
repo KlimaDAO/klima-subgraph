@@ -16,6 +16,8 @@ import { KLIMA_CARBON_RETIREMENTS_CONTRACT } from '../../lib/utils/Constants'
 import { handleCCO2Retired } from '../src/TransferHandler'
 import { loadOrCreateAccount } from '../src/utils/Account'
 import { convertToAmountTonnes } from '../utils/helpers'
+import { DailyKlimaRetireSnapshot } from '../generated/schema'
+import { dayTimestamp } from '../../lib/utils/Dates'
 
 const cco2 = Address.fromString('0x82b37070e43c1ba0ea9e2283285b674ef7f1d4e2')
 
@@ -102,6 +104,10 @@ describe('Carbon Retired Tests', () => {
       ethereum.Value.fromString('CCO2 Project'),
     ])
 
+    createMockedFunction(cco2, 'totalSupply', 'totalSupply():(uint256)').returns([
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))
+    ])
+
     createMockedFunction(
       KLIMA_CARBON_RETIREMENTS_CONTRACT,
       'retirements',
@@ -134,12 +140,16 @@ describe('Carbon Retired Tests', () => {
   test('handleCarbonRetired: CCO2', () => {
     let sender = loadOrCreateAccount(senderAddress)
 
+    let timestamp = BigInt.fromI32(0)
+
     let burnedCO2TokenEvent = newBurnedCO2TokenEvent(retiredAmount)
     burnedCO2TokenEvent.transaction.from = senderAddress
+    burnedCO2TokenEvent.address = cco2
 
     handleCCO2Retired(burnedCO2TokenEvent)
 
     let carbonRetiredEvent = createNewCarbonRetiredEvent(retiredAmount)
+    carbonRetiredEvent.block.timestamp = timestamp
     carbonRetiredEvent.transaction.from = senderAddress
 
     handleCarbonRetired(carbonRetiredEvent)
@@ -157,7 +167,10 @@ describe('Carbon Retired Tests', () => {
     const beneficiary = loadOrCreateAccount(beneficiaryAddress)
     const retireId = sender.id.concatI32(sender.totalRetirements - 1).toHexString()
     const klimaRetireId = beneficiaryAddress.concatI32(beneficiary.totalRetirements).toHexString()
+    let snapshotId = dayTimestamp(timestamp).toString() + carbonToken.toHexString()
+    const snapshot = DailyKlimaRetireSnapshot.load(snapshotId)
 
+    assert.assertNotNull(snapshot)
     assert.fieldEquals('KlimaRetire', klimaRetireId, 'retire', retireId)
     assert.fieldEquals('KlimaRetire', klimaRetireId, 'index', '0')
     assert.fieldEquals('KlimaRetire', klimaRetireId, 'feeAmount', '10000000000000000')

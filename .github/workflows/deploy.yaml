@@ -87,7 +87,7 @@ jobs:
         working-directory: '${{ matrix.value }}'
       - name: Compare schema versions and determine new version
         id: compare_versions
-        if: ${{ env.IS_MAIN == 'true' }}
+        if: ${{ env.IS_MAIN == 'true' || env.IS_STAGING == 'true' }}
         run: |
           SHOULD_DEPLOY=false
           LAST_PUBLISHED_VERSION_TAG=${{ steps.get_last_tag.outputs.last_tag }}
@@ -95,8 +95,10 @@ jobs:
 
           # If the branch is staging, always deploy
           if [[ "${{ env.IS_STAGING }}" == "true" ]]; then
+            short_sha=$(git rev-parse --short "$GITHUB_SHA")
+            echo "short_sha=$short_sha" >> $GITHUB_OUTPUT
             echo "should_deploy=true" >> $GITHUB_OUTPUT
-            echo "NEW_PUBLISHED_VERSION=0.0.0" >> $GITHUB_OUTPUT
+            echo "NEW_PUBLISHED_VERSION=$short_sha" >> $GITHUB_OUTPUT
             exit 0
           fi
 
@@ -250,7 +252,7 @@ jobs:
           ../node_modules/.bin/graph deploy --studio --deploy-key ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY }} "${{ steps.staging_or_not.outputs.subgraph }}" --version-label "$VERSION_LABEL"
         working-directory: '${{ matrix.value }}'
       - name: Deploy Subgraph to Alchemy Hosted Service
-        if: ${{ (matrix.value == 'carbonmark' || matrix.value == 'polygon-digital-carbon' || matrix.value == 'pairs' || matrix.value == 'ethereum-bridged-carbon') && (!contains(fromJson(env.VERSIONED_SUBGRAPHS), matrix.value) || (contains(fromJson(env.VERSIONED_SUBGRAPHS), matrix.value) && steps.compare_versions.outputs.should_deploy == 'true')) }}
+        if: ${{ (matrix.value == 'carbonmark' || matrix.value == 'polygon-digital-carbon' || matrix.value == 'pairs' || matrix.value == 'ethereum-bridged-carbon') && env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
           VERSION_LABEL="${{ steps.compare_versions.outputs.new_published_version }}"
 

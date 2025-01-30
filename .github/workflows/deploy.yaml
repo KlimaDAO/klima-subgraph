@@ -164,12 +164,14 @@ jobs:
           git config user.email "deploy-action@carbonmark.com"
           git config user.name "deploy-action"
 
-          git add version.json src/utils/version.ts
+          git add version.json src/utils/version.ts subgraph.yaml
 
           # Use git diff --cached --quiet to check for staged changes
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
+            echo "🔍 **Unstaged Changes:**"
+            git diff
             git commit -m "action: update to publishedVersion: $NEW_PUBLISHED_VERSION for ${{ matrix.value }}"
             
             if [[ "${GITHUB_REF}" == "refs/heads/"* ]]; then

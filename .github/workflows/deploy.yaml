@@ -64,8 +64,8 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
         working-directory: '${{ matrix.value }}'
-      - name: Install octokit at root
-        run: yarn add octokit
+      # - name: Install octokit at root
+      #   run: yarn add octokit
       - name: Get last release tag
         if: ${{ env.IS_MAIN == 'true' }}
         id: get_last_tag

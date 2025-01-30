@@ -26,9 +26,8 @@ name: Deployment
 on:
   push:
     branches:
-      - main
-      - staging
-
+      - main-deployment-test
+      - staging-deployment-test
 jobs:
   compile:
     runs-on: ubuntu-latest

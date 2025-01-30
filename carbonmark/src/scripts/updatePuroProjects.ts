@@ -3,47 +3,10 @@ import fs from 'fs'
 import { PROJECT_INFO } from '../Projects'
 import { ProjectInfo } from './types'
 import dotenv from 'dotenv'
+import { fetchCMSProject, fetchCMSProjects } from './CMSQueries'
 dotenv.config()
 
 const PURO_EARTH_SUBGRAPH_ID = 'FU5APMSSCqcRy9jy56aXJiGV3PQmFQHg2tzukvSJBgwW'
-
-async function fetchCMSProject(registry: string) {
-  const { data } = await axios.post('https://l6of5nwi.apicdn.sanity.io/v1/graphql/production/default', {
-    query: `
-        query getCMSProject($registry: String!) {
-          allProject(
-            where: {
-              registry: { eq: $registry }
-            }
-          ) {
-            country
-            description
-            id: _id
-            geolocation {
-              lat
-              lng
-              alt
-            }
-            methodologies {
-              id: _id
-              category
-              name
-            }
-            name
-            region
-            registry
-            url
-            registryProjectId
-          }
-        }
-      `,
-    variables: {
-      registry,
-    },
-  })
-
-  return data.data.allProject
-}
 
 async function fetchSubgraphProjectVintages() {
   const { data } = await axios.post(
@@ -74,7 +37,7 @@ async function updatePuroProjects() {
   const updatedProjects: ProjectInfo[] = []
   const registry = 'PUR'
 
-  const cmsInfo = await fetchCMSProject(registry)
+  const cmsInfo = await fetchCMSProjects(registry)
 
   const subgraphVintageData = await fetchSubgraphProjectVintages()
   const libSet = new Set<string>()

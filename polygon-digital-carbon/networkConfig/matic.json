@@ -91,5 +91,9 @@
   "Coorest": {
     "address": "0x363ae9B7Dbf55c0956A74C3be4ed0996d277A8BE",
     "startBlock": "34084214"
+  },
+  "CMARK": {
+    "address": "0xeee3abdd638e219261e061c06c0798fd5c05b5d3",
+    "startBlock": "65350000"
   }
 }

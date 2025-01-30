@@ -22,6 +22,7 @@ enum BridgeProtocol {
   MOSS
   ICR
   COOREST
+  CMARK
 }
 
 enum CrossChainBridgeDirection {

@@ -1,3 +1,7 @@
+#!make
+include .env
+export $(shell sed 's/=.*//' .env)
+
 .PHONY: local-fork
 
 PURO_TOKEN = 0x6960cE1d21f63C4971324B5b611c4De29aCF980C
@@ -26,19 +30,22 @@ TCO2_HOLDER = 0x34798dd650DD478a801Fc1b0125cD6848F52F693
 
 MARKETPLACE = 0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821
 
+CMARK_TOKEN_FACTORY = 0xEeE3abDD638E219261e061c06C0798Fd5C05B5D3 
+
+CMARK_TOKEN_FACTORY_OWNER = 0xc51Cc27d3BB611DB27f26F617E1c15483A8790Cf 
+
+BENEFICIARY = 0xdc1DfA8C0b6C4a8BB22400608468aCfF21016Fad
+
 export RPC_URL = http://localhost:8545
 
 local-fork:
-	$(eval POLYGON_URL := $(shell grep '^POLYGON_URL' .env | cut -d '=' -f2))
 	anvil --fork-url $(POLYGON_URL) --host 0.0.0.0 --no-storage-caching
 
 local-fork-block:
-	$(eval POLYGON_URL := $(shell grep '^POLYGON_URL' .env | cut -d '=' -f2))
-	anvil --fork-url $(POLYGON_URL) --fork-block-number 55637900 --host 0.0.0.0 --no-storage-caching
+	anvil --fork-url $(POLYGON_URL) --fork-block-number ${FORK_BLOCK} --host 0.0.0.0 --no-storage-caching
 
 
 impersonate:
-	$(eval RPC_URL := $(shell grep '^RPC_URL' .env | cut -d '=' -f2))
 	cast rpc anvil_impersonateAccount ${PURO_TOKEN_HOLDER} --rpc-url ${RPC_URL}
 
 	cast rpc anvil_impersonateAccount ${OTHER_HOLDER} --rpc-url ${RPC_URL}
@@ -61,6 +68,11 @@ impersonate:
 
 	cast rpc anvil_impersonateAccount 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 --rpc-url ${RPC_URL}
 
+	# Impersonate CarbonmarkCreditTokenFactory owner
+	cast rpc anvil_impersonateAccount ${CMARK_TOKEN_FACTORY_OWNER} --rpc-url ${RPC_URL}
+
+
+
 tco2:
 
 	# fund with TCO2 for other erc20 testing
@@ -72,7 +84,6 @@ tco2:
 
 
 transfer:
-	$(eval RPC_URL := $(shell grep '^RPC_URL' .env | cut -d '=' -f2))
 	cast send 0x6960cE1d21f63C4971324B5b611c4De29aCF980C --unlocked --from ${PURO_TOKEN_HOLDER} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 3000000000000000000 --rpc-url ${RPC_URL}
 
 	cast send 0x6960cE1d21f63C4971324B5b611c4De29aCF980C --unlocked --from ${OTHER_HOLDER} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 2000000000000000000 --rpc-url ${RPC_URL}
@@ -133,6 +144,8 @@ balances:
 
 	cast call ${TCO2} "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET}
 
+	cast call ${TCO2} "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET}
+
 approvals:
 
 	# cast call ${USDC} "allowance(address,address)(uint256)" ${DUMMY_SERVER_WALLET} ${DIAMOND}
@@ -141,8 +154,24 @@ approvals:
 
 	# cast call ${USDC} "allowance(address,address)(uint256)" 0xfb079f82cdd18313f3566fb8ddd6414b3507bda2 ${DIAMOND}
 
-	# cast call ${USDC} "allowance(address,address)(uint256)" 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 ${DIAMOND}
+	# cast call ${USDC} "allowance(address,address)(uint256)" 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 ${DIAMOND}	
 
 
+cmark-issue:
+	cast send ${CMARK_TOKEN_FACTORY} --unlocked --from ${CMARK_TOKEN_FACTORY_OWNER} "issueCredits(string,uint256,address)()" CMARK-1000-2025 1000000000000 ${ANVIL_PUBLIC_WALLET} --rpc-url ${RPC_URL}
 
-	
+cmark-cancel:
+	cast send ${CMARK_TOKEN_FACTORY} --unlocked --from ${CMARK_TOKEN_FACTORY_OWNER} "cancelCredits(string,uint256,string,address)()" CMARK-1000-2025 500000000000 bad ${ANVIL_PUBLIC_WALLET} --rpc-url ${RPC_URL}
+
+cmark-get-addr:
+	$(eval CMARK_TOKEN = $(shell cast call ${CMARK_TOKEN_FACTORY} "creditIdToAddress(string)(address)" CMARK-1000-2025 --rpc-url ${RPC_URL}))
+
+cmark-balance: cmark-get-addr
+	cast call ${CMARK_TOKEN} "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET} --rpc-url ${RPC_URL}
+
+cmark-retire: cmark-get-addr
+	cast send ${CMARK_TOKEN} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(uint256)" ${DUMMY_SERVER_WALLET} 10000000000000000000000 --rpc-url ${RPC_URL}
+	cast send ${CMARK_TOKEN} --unlocked --from ${DUMMY_SERVER_WALLET} "retireFrom(uint256,address,string,string,string,address)()" 2500000000 ${BENEFICIARY} "beneficiary" "message" "US" ${ANVIL_PUBLIC_WALLET} --rpc-url ${RPC_URL}
+
+
+cmark: cmark-issue

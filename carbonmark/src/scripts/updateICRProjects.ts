@@ -1,49 +1,10 @@
 import axios from 'axios'
 import fs from 'fs'
 import { PROJECT_INFO } from '../Projects'
+import { fetchCMSProject } from './CMSQueries'
 
 require('dotenv').config()
 
-
-async function fetchCMSProject(registry: string, registryProjectId: string) {
-  const { data } = await axios.post('https://l6of5nwi.apicdn.sanity.io/v1/graphql/production/default', {
-    query: `
-        query getCMSProject($registry: String!, $registryProjectId: String!) {
-          allProject(
-            where: {
-              registry: { eq: $registry }
-              registryProjectId: { eq: $registryProjectId }
-            }
-          ) {
-            country
-            description
-            id: _id
-            geolocation {
-              lat
-              lng
-              alt
-            }
-            methodologies {
-              id: _id
-              category
-              name
-            }
-            name
-            region
-            registry
-            url
-            registryProjectId
-          }
-        }
-      `,
-    variables: {
-      registry,
-      registryProjectId,
-    },
-  })
-
-  return data.data.allProject[0]
-}
 
 async function updateMainnetICRProjects() {
   const updated_PROJECT_INFO = [...PROJECT_INFO] 

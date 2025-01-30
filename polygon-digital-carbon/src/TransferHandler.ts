@@ -214,10 +214,6 @@ function recordTransfer(
   timestamp: BigInt,
   blockNumber: BigInt
 ): void {
-  let tokenVar = ''
-  if (tokenId !== null) {
-    tokenVar = tokenId.toString()
-  }
   // Ignore transfers of zero value
   if (amount == ZERO_BI) return
 

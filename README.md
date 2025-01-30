@@ -46,3 +46,8 @@ After the subgraph is deployed, navigate to http://127.0.01:8000/subgraphs/name/
 ### Deprecated Subgraph Deployments
 
 - Polygon Bridged Carbon: [Staging](https://thegraph.com/hosted-service/subgraph/klimadao/staging-polygon-bridged-carbon) | [Production](https://thegraph.com/hosted-service/subgraph/klimadao/polygon-bridged-carbon)
+
+### Note for non Ubuntu linux developers
+
+A bug in Matchstick prevents the `npm run test` copmmand to run correctly.
+You can use the workaround described here: https://github.com/graphprotocol/graph-tooling/issues/1546#issuecomment-2182244898

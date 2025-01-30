@@ -34,8 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy
     env:
-      IS_MAIN: ${{ github.ref == 'refs/heads/main' }}
-      IS_STAGING: ${{ github.ref == 'refs/heads/staging' }}
+      IS_MAIN: ${{ github.ref == 'refs/heads/main-deployment-test' }}
+      IS_STAGING: ${{ github.ref == 'refs/heads/staging-deployment-test' }}
     strategy:
       max-parallel: 1
       matrix:

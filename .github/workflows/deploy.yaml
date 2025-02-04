@@ -43,7 +43,6 @@ jobs:
             'bonds',
             'polygon-digital-carbon',
             'carbonmark',
-            'polygon-bridged-carbon',
             'protocol-metrics',
             'vesting',
             'user-carbon',
@@ -168,7 +167,7 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "action: update to publishedVersion: $NEW_PUBLISHED_VERSION for ${{ matrix.value }}"
-            
+
             if [[ "${GITHUB_REF}" == "refs/heads/"* ]]; then
               BRANCH_NAME=${GITHUB_REF#refs/heads/}
             elif [[ "${GITHUB_REF}" == "refs/pull/"* ]]; then

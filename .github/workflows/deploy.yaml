@@ -2,24 +2,23 @@
 # 1. Checkout the source repository: Retrieve the latest code from the repository.
 # 2. Setup Node: Install and configure the required Node.js version (16 for initial setup, later 18 for changelog generation).
 # 3. Install dependencies: Install all project dependencies using yarn --frozen-lockfile.
-# 4. Install octokit at root: Add octokit package to the project root.
-# 5. Get last release tag: Fetch the most recent version tag from Git and use 0.0.0 as a fallback if no tag exists.
-# 6. Get schema version from package.json: Extract the schema version from the package.json file.
-# 7. Compare schema versions and determine new version: Compare the schema version with the last published version, and calculate a new version tag if the schema version is higher.
-# 8. Set version in version.json: Update the version.json file with the new schema and published version if a new deployment is needed.
-# 9. Set version in version.ts: Update version.ts for the subgraph to reflect the new version if a deployment is necessary.
-# 10. Prepare manifest: Run a specific manifest preparation step (npm run prepare-matic) for the polygon-digital-carbon and carbonmark subgraphs if a new version is being deployed.
-# 11. Commit all changes: Stage, commit, and push any updated files (like version.json and version.ts) to the repository.
-# 12. Tag the commit with the new version: Create and push a Git tag for the new version, appending the subgraph name.
-# 13. Generate Subgraph Code: Run the npm run codegen command to generate code for the subgraph if changes are detected.
-# 14. Check for uncommitted changes: Ensure there are no uncommitted changes in the subgraph after code generation.
-# 15. Evaluate if there are changes: Print a message indicating if there are uncommitted changes and advise executing code generation locally if necessary.
-# 16. Build Subgraph: Run the build process for the subgraph (npm run build).
-# 17. Determine if branch is staging or not: Identify if the branch is staging or another branch, and set a prefix for the subgraph name.
-# 18. Create issue for deployment tracking: Automatically create a GitHub issue to track the deployment process.
-# 19. Check Node.js version (debugging): Verify the Node.js version in use (node -v).
-# 20. Generate Changelog: Run a custom script (.github/actions-scripts/generateChangelog.mjs) to generate a changelog between the last tag and the new version.
-# 21. Create GitHub Release: Draft a new GitHub release with the generated changelog for the new version.
+# 4. Get last release tag: Fetch the most recent version tag from Git and use 0.0.0 as a fallback if no tag exists.
+# 5. Get schema version from package.json: Extract the schema version from the package.json file.
+# 6. Compare schema versions and determine new version: Compare the schema version with the last published version, and calculate a new version tag if the schema version is higher.
+# 7. Set version in version.json: Update the version.json file with the new schema and published version if a new deployment is needed.
+# 8. Set version in version.ts: Update version.ts for the subgraph to reflect the new version if a deployment is necessary.
+# 9. Prepare manifest: Run a specific manifest preparation step (npm run prepare-matic) for the polygon-digital-carbon and carbonmark subgraphs if a new version is being deployed.
+# 10. Commit all changes: Stage, commit, and push any updated files (like version.json and version.ts) to the repository.
+# 11. Tag the commit with the new version: Create and push a Git tag for the new version, appending the subgraph name.
+# 12. Generate Subgraph Code: Run the npm run codegen command to generate code for the subgraph if changes are detected.
+# 13. Check for uncommitted changes: Ensure there are no uncommitted changes in the subgraph after code generation.
+# 14. Evaluate if there are changes: Print a message indicating if there are uncommitted changes and advise executing code generation locally if necessary.
+# 15. Build Subgraph: Run the build process for the subgraph (npm run build).
+# 16. Determine if branch is staging or not: Identify if the branch is staging or another branch, and set a prefix for the subgraph name.
+# 17. Create issue for deployment tracking: Automatically create a GitHub issue to track the deployment process.
+# 18. Check Node.js version (debugging): Verify the Node.js version in use (node -v).
+# 19. Generate Changelog: Run a custom script (.github/actions-scripts/generateChangelog.mjs) to generate a changelog between the last tag and the new version.
+# 20. Create GitHub Release: Draft a new GitHub release with the generated changelog for the new version.
 
 name: Deployment
 
@@ -64,8 +63,6 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
         working-directory: '${{ matrix.value }}'
-      - name: Install octokit at root
-        run: yarn add octokit
       - name: Get last release tag
         if: ${{ env.IS_MAIN == 'true' }}
         id: get_last_tag
@@ -164,7 +161,7 @@ jobs:
           git config user.email "deploy-action@carbonmark.com"
           git config user.name "deploy-action"
 
-          git add version.json src/utils/version.ts
+          git add version.json src/utils/version.ts subgraph.yaml
 
           # Use git diff --cached --quiet to check for staged changes
           if git diff --cached --quiet; then

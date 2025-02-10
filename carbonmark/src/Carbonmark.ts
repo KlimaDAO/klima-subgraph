@@ -1,6 +1,5 @@
 import { ListingCancelled, ListingCreated, ListingFilled, ListingUpdated } from '../generated/Carbonmark/Carbonmark'
 import {
-  loadListing,
   loadOrCreateActivity,
   loadOrCreateListing,
   loadOrCreateProject,
@@ -73,9 +72,8 @@ export function handleListingUpdated(event: ListingUpdated): void {
   let blockNumber = event.block.number
   // User should already exist from creating the listing.
 
-  // let listing = loadOrCreateListing(event.params.id.toHexString())
-  let listing = loadListing(event.params.id.toHexString())
-  console.warn('here-handleListingUpdated', listing, listing.project)
+  let listing = loadOrCreateListing(event.params.id.toHexString())
+
   let activity = loadOrCreateActivity(event.transaction.hash.toHexString().concat('ListingUpdated'))
 
   let project = loadProject(listing.project)
@@ -168,7 +166,6 @@ export function handleListingUpdated(event: ListingUpdated): void {
     activity.seller = listing.seller
     activity.save()
   }
-
 }
 
 export function handleListingFilled(event: ListingFilled): void {
@@ -176,9 +173,8 @@ export function handleListingFilled(event: ListingFilled): void {
   // Ensure the buyer user entity exists
   loadOrCreateUser(event.transaction.from)
 
-  // let listing = loadOrCreateListing(event.params.id.toHexString())
-  let listing = loadListing(event.params.id.toHexString())
-  console.warn('here-handleListingFilled', listing.project)
+  let listing = loadOrCreateListing(event.params.id.toHexString())
+
   let buyerActivty = loadOrCreateActivity(event.transaction.hash.toHexString().concat('Purchase'))
   let sellerActivity = loadOrCreateActivity(event.transaction.hash.toHexString().concat('Sold'))
 
@@ -223,11 +219,7 @@ export function handleListingFilled(event: ListingFilled): void {
 }
 
 export function handleListingCancelled(event: ListingCancelled): void {
-  // let listing = loadOrCreateListing(event.params.id.toHexString())
-
-  let listing = loadListing(event.params.id.toHexString())
-
-  console.warn('here-handleListingCancelled', listing.project)
+  let listing = loadOrCreateListing(event.params.id.toHexString())
 
   listing.active = false
   listing.deleted = true

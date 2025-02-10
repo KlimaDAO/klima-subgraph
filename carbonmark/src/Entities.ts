@@ -76,7 +76,15 @@ export function loadOrCreateListing(id: string): Listing {
   return listing
 }
 
-export function loadOrCreateActivity(id: string): Activity {
+export function loadListing(id: string): Listing {
+  let listing = Listing.load(id)
+  if (listing == null) {
+    throw new Error('Listing does not exist')
+  }
+  return listing
+}
+
+export function loadOrCreateActivity(id: string,): Activity {
   let activity = Activity.load(id)
   if (activity == null) {
     activity = new Activity(id)

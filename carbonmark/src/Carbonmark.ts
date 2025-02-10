@@ -90,6 +90,7 @@ export function handleListingUpdated(event: ListingUpdated): void {
     listing.expiration = event.params.newDeadline
 
     activity.activityType = 'UpdatedQuantity'
+    activity.listing = listing.id
     activity.project = listing.project
     activity.user = event.transaction.from
     activity.previousAmount = handleMigrationDecimals(project.registry, blockNumber, event.params.oldAmount)
@@ -109,6 +110,7 @@ export function handleListingUpdated(event: ListingUpdated): void {
     listing.expiration = event.params.newDeadline
 
     activity.activityType = 'UpdatedPrice'
+    activity.listing = listing.id
     activity.project = listing.project
     activity.user = event.transaction.from
     activity.price = event.params.newUnitPrice
@@ -131,6 +133,7 @@ export function handleListingUpdated(event: ListingUpdated): void {
     listing.expiration = event.params.newDeadline
 
     activity.activityType = 'UpdatedExpiration'
+    activity.listing = listing.id
     activity.project = listing.project
     activity.user = event.transaction.from
     activity.price = event.params.newUnitPrice

@@ -91,7 +91,7 @@ export function handleListingUpdated(event: ListingUpdated): void {
 
     activity.activityType = 'UpdatedQuantity'
     activity.listing = listing.id
-    activity.project = listing.project
+    activity.project = project.id
     activity.user = event.transaction.from
     activity.previousAmount = handleMigrationDecimals(project.registry, blockNumber, event.params.oldAmount)
     activity.amount = event.params.newAmount
@@ -111,7 +111,7 @@ export function handleListingUpdated(event: ListingUpdated): void {
 
     activity.activityType = 'UpdatedPrice'
     activity.listing = listing.id
-    activity.project = listing.project
+    activity.project = project.id
     activity.user = event.transaction.from
     activity.price = event.params.newUnitPrice
     activity.previousPrice = event.params.oldUnitPrice
@@ -134,7 +134,7 @@ export function handleListingUpdated(event: ListingUpdated): void {
 
     activity.activityType = 'UpdatedExpiration'
     activity.listing = listing.id
-    activity.project = listing.project
+    activity.project = project.id
     activity.user = event.transaction.from
     activity.price = event.params.newUnitPrice
     activity.previousPrice = event.params.oldUnitPrice
@@ -145,7 +145,27 @@ export function handleListingUpdated(event: ListingUpdated): void {
     activity.save()
   }
 
-  listing.save()
+  if (event.params.oldMinFillAmount != event.params.newMinFillAmount) {
+    if (activity.seller != ZERO_ADDRESS) {
+      activity = loadOrCreateActivity(event.transaction.hash.toHexString().concat('ListingUpdated2'))
+    }
+    listing.minFillAmount = event.params.newMinFillAmount
+    listing.updatedAt = event.block.timestamp
+    listing.save()
+
+    activity.activityType = 'UpdatedMinFillAmount'
+    activity.listing = listing.id
+    activity.project = project.id
+    activity.user = event.transaction.from
+    activity.price = event.params.newUnitPrice
+    activity.previousPrice = event.params.oldUnitPrice
+    activity.previousAmount = event.params.oldAmount
+    activity.amount = event.params.newAmount
+    activity.timeStamp = event.block.timestamp
+    activity.seller = listing.seller
+    activity.save()
+  }
+
 }
 
 export function handleListingFilled(event: ListingFilled): void {

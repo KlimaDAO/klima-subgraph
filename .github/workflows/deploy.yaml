@@ -182,7 +182,7 @@ jobs:
             git pull --rebase origin $BRANCH_NAME
 
             echo "Setting remote URL with all permissions token"
-            git remote set-url origin https://${{ secrets.ALL_PERMISSIONS_TOKEN }}@github.com/${{ github.repository }}.git
+            git remote set-url origin https://${{ secrets.GH_ACCE }}@github.com/${{ github.repository }}.git
 
             echo "Pushing to branch: $BRANCH_NAME"
             git push origin $BRANCH_NAME
@@ -210,7 +210,7 @@ jobs:
           fi
 
           echo "Setting remote URL with all permissions token"
-          git remote set-url origin https://${{ secrets.ALL_PERMISSIONS_TOKEN }}@github.com/${{ github.repository }}.git
+          git remote set-url origin https://${{ secrets.GH_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
 
           git push origin $BRANCH_NAME --tags
         working-directory: '${{ matrix.value }}'

@@ -181,6 +181,9 @@ jobs:
             echo "Pulling latest changes for branch: $BRANCH_NAME"
             git pull --rebase origin $BRANCH_NAME
 
+            echo "Setting remote URL with all permissions token"
+            git remote set-url origin https://${{ secrets.ALL_PERMISSIONS_TOKEN }}@github.com/${{ github.repository }}.git
+
             echo "Pushing to branch: $BRANCH_NAME"
             git push origin $BRANCH_NAME
           fi
@@ -196,6 +199,18 @@ jobs:
           echo "Tags after creation:"
           git fetch --tags
           git tag --list | grep "${{ matrix.value }}-v"
+
+          if [[ "${GITHUB_REF}" == "refs/heads/"* ]]; then
+            BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          elif [[ "${GITHUB_REF}" == "refs/pull/"* ]]; then
+            BRANCH_NAME=${GITHUB_HEAD_REF}
+          else
+            echo "Unsupported GITHUB_REF format: ${GITHUB_REF}"
+            exit 1
+          fi
+
+          echo "Setting remote URL with all permissions token"
+          git remote set-url origin https://${{ secrets.ALL_PERMISSIONS_TOKEN }}@github.com/${{ github.repository }}.git
 
           git push origin $BRANCH_NAME --tags
         working-directory: '${{ matrix.value }}'

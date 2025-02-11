@@ -2,6 +2,7 @@ enum ActivityType {
   UpdatedQuantity
   UpdatedPrice
   UpdatedExpiration
+  UpdatedMinFillAmount
   Purchase
   Sold
   CreatedListing

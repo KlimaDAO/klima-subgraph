@@ -80,7 +80,7 @@ export function loadOrCreateActivity(id: string): Activity {
   let activity = Activity.load(id)
   if (activity == null) {
     activity = new Activity(id)
-    activity.activityType = 'CreatedListing'
+    activity.activityType = ''
     activity.user = ZERO_ADDRESS
     activity.project = ''
     activity.seller = ZERO_ADDRESS

@@ -331,7 +331,7 @@ export function handleSwap(event: SwapEvent): void {
 }
 
 export function handleSetSubgraphVersion(block: ethereum.Block): void {
-  let version = new SubgraphVersion('polygon-digital-carbon')
+  let version = new SubgraphVersion('pairs')
   version.schemaVersion = SCHEMA_VERSION
   version.publishedVersion = PUBLISHED_VERSION
   version.save()

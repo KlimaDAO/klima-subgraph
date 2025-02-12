@@ -59,13 +59,18 @@ jobs:
           if [[ "${{ env.is_pr }}" == "true" ]]; then
             # For PRs: Compare the base branch (main) with the PR's head branch
             CHANGED=$(git diff --name-only origin/main ${{ github.event.pull_request.head.sha }} -- "${{ matrix.value }}/" || true)
+            DIFF=$(git diff origin/main ${{ github.event.pull_request.head.sha }} -- "${{ matrix.value }}/")
           else
             # For pushes: Compare the main branch with the latest commit in the push
             CHANGED=$(git diff --name-only origin/main ${{ github.sha }} -- "${{ matrix.value }}/" || true)
+            DIFF=$(git diff origin/main ${{ github.sha }} -- "${{ matrix.value }}/")
           fi
 
           if [ -n "$CHANGED" ]; then
             echo "changes=true" >> $GITHUB_ENV
+
+            echo "Changed files: $CHANGED"
+            echo "Diff: $DIFF"
           else
             echo "changes=false" >> $GITHUB_ENV
           fi

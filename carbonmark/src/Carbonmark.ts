@@ -238,7 +238,7 @@ export function handleListingCancelled(event: ListingCancelled): void {
 
 
 export function handleSetSubgraphVersion(block: ethereum.Block): void {
-  let version = new SubgraphVersion('polygon-digital-carbon')
+  let version = new SubgraphVersion('carbonmark')
   version.schemaVersion = SCHEMA_VERSION
   version.publishedVersion = PUBLISHED_VERSION
   version.save()

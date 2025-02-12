@@ -2,12 +2,13 @@ import { Address, BigInt, Bytes, dataSource } from '@graphprotocol/graph-ts'
 import { stdYearFromTimestampNew as stdYearFromTimestamp } from '../../../lib/utils/Dates'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 import { C3ProjectToken } from '../../generated/templates/C3ProjectToken/C3ProjectToken'
-import { CarbonCredit, CarbonProject } from '../../generated/schema'
+import { CarbonCredit, CarbonProject, Token } from '../../generated/schema'
 import { ToucanCarbonOffsets } from '../../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
 import { loadOrCreateCarbonProject } from './CarbonProject'
 import { MethodologyCategories } from './MethodologyCategories'
 import { ToucanCarbonOffsetBatches } from '../../generated/ToucanCarbonOffsetBatch/ToucanCarbonOffsetBatches'
 import { ToucanContractRegistry } from '../../generated/ToucanPuroFactory/ToucanContractRegistry'
+import { loadOrCreateToken } from './Token'
 
 export function loadOrCreateCarbonCredit(tokenAddress: Address, bridge: string, tokenId: BigInt | null): CarbonCredit {
   let id = Bytes.fromHexString(tokenAddress.toHexString())
@@ -48,6 +49,7 @@ export function updateCarbonCreditWithCall(tokenAddress: Address, registry: stri
   let credit = loadCarbonCredit(tokenAddress)
   if (credit.bridgeProtocol == 'TOUCAN') credit = updateToucanCall(tokenAddress, credit, registry)
   else if (credit.bridgeProtocol == 'C3') credit = updateC3Call(tokenAddress, credit)
+  else if (credit.bridgeProtocol == 'CMARK') credit = updateCMARKCall(tokenAddress, credit)
 
   return credit
 }
@@ -195,6 +197,22 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
   project.category = project.category != '' ? project.category : MethodologyCategories.getMethodologyCategory(project.methodologies)
   project.region = attributes.region
   project.save()
+
+  return carbonCredit
+}
+
+function updateCMARKCall(tokenAddress: Address, carbonCredit: CarbonCredit): CarbonCredit {
+  let token = loadOrCreateToken(tokenAddress)
+  let splittedSymbol = token.symbol.split("-")
+  let projectId = splittedSymbol.slice(0,2).join("-")
+  let vintage = splittedSymbol[2]
+
+  let project = loadOrCreateCarbonProject('CMARK', projectId)
+  project.save()
+
+  carbonCredit.project = project.id
+  carbonCredit.vintage = BigInt.fromString(vintage).toI32()
+  carbonCredit.save()
 
   return carbonCredit
 }

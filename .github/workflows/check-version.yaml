@@ -66,6 +66,8 @@ jobs:
 
           if [ -n "$CHANGED" ]; then
             echo "changes=true" >> $GITHUB_ENV
+
+            echo "Changed files: $CHANGED"
           else
             echo "changes=false" >> $GITHUB_ENV
           fi

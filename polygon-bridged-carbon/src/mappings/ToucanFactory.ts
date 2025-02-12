@@ -11,7 +11,7 @@ export function handleNewTCO2(event: TokenCreated): void {
 }
 
 export function handleSetSubgraphVersion(block: ethereum.Block): void {
-  let version = new SubgraphVersion('ethereum-bridged-carbon')
+  let version = new SubgraphVersion('polygon-bridged-carbon')
   version.schemaVersion = SCHEMA_VERSION
   version.publishedVersion = PUBLISHED_VERSION
   version.save()

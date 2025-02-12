@@ -339,6 +339,31 @@ dataSources:
         - event: EndAsyncToken(address,address,address,uint256,string,string,uint256,uint256,bool,uint256)
           handler: handleEndAsyncToken
   - kind: ethereum/contract
+    name: CarbonmarkCreditTokenFactory
+    network: matic
+    source:
+      address: '0xeee3abdd638e219261e061c06c0798fd5c05b5d3'
+      abi: CarbonmarkCreditTokenFactory
+      startBlock: 65350000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/templates/CarbonmarkCreditTokenFactory.ts
+      entities:
+        - CarbonmarkCreditTokenFactory
+      abis:
+        - name: CarbonmarkCreditTokenFactory
+          file: ../lib/abis/CarbonmarkCreditTokenFactory.json
+        - name: CarbonmarkCreditToken
+          file: ../lib/abis/CarbonmarkCreditToken.json
+        - name: ERC20
+          file: ../lib/abis/ERC20.json
+      eventHandlers:
+        - event: Issued(indexed string,uint256,indexed address,indexed address)
+          handler: handleNewCarbonmarkCredit
+        # TODO: determine if we need a handler for cancellation event
+  - kind: ethereum/contract
     name: UBO
     network: matic
     source:
@@ -643,6 +668,26 @@ templates:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleCreditTransfer
       file: ./src/TransferHandler.ts
+  - name: CarbonmarkCreditToken
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: CarbonmarkCreditToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CarbonmarkCreditToken
+      abis:
+        - name: CarbonmarkCreditToken
+          file: ../lib/abis/CarbonmarkCreditToken.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleCarbonmarkCreditTransfer
+        - event: Retired(uint256,indexed address,string,string,indexed string,indexed address,string)
+          handler: handleCarbonmarkCreditRetirement
+      file: ./src/templates/CarbonmarkCreditToken.ts
   - name: ICRProjectToken
     kind: ethereum/contract
     network: matic

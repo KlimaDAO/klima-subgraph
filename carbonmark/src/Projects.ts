@@ -11553,6 +11553,17 @@ export const PROJECT_INFO: ProjectInfo[] = [
     false
   ),
   new ProjectInfo(
+    '0xfd47cfa69af9eaf5446cdc5f3e879618a0e87613',
+    'CMARK-0',
+    '9999',
+    'This Project is for Testing Purposes Only',
+    'C05000000',
+    'Other',
+    'Canada',
+    '0',
+    false
+  ),
+  new ProjectInfo(
     // TODO: Add token address here
     '',
     'CMARK-1',
@@ -11560,7 +11571,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     'Black Earth 2022 OWC',
     'ACM0022',
     'Other',
-    'United States of America',
+    'United States',
     '0',
     false
   ),

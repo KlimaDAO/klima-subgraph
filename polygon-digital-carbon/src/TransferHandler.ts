@@ -44,7 +44,7 @@ import { convertToAmountTonnes, createAsyncRetireRequestId } from '../utils/help
 import { burnedCO2Token } from '../generated/CCO2/CCO2'
 
 // @todo remove this
-// test#3
+// test #5
 
 export function handleCreditTransfer(event: Transfer): void {
   recordTransfer(

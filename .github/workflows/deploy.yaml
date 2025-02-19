@@ -32,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy
     env:
+      # @todo revert to main before merge
       IS_MAIN: ${{ github.ref == 'refs/heads/protected-main-test' }}
       IS_STAGING: ${{ github.ref == 'refs/heads/staging' }}
     strategy:
@@ -182,12 +183,12 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GH_ACCESS_TOKEN }}
-          base: main
+          # @todo revert to main before merge
+          base: protected-main-test 
           branch: 'auto-deploy-${{ matrix.value }}-${{ github.run_id }}'
           title: 'Auto deploy: update ${{ matrix.value }} to ${{ steps.compare_versions.outputs.new_published_version }}'
           body: 'Auto generated PR for deployment changes.'
           commit-message: 'action: update to publishedVersion: ${{ steps.compare_versions.outputs.new_published_version }} for ${{ matrix.value }}'
-        working-directory: '${{ matrix.value }}'
 
       - name: Approve and Merge PR
         if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}

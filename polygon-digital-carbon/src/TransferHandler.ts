@@ -43,6 +43,9 @@ import { AsyncRetireRequestStatus } from '../utils/enums'
 import { convertToAmountTonnes, createAsyncRetireRequestId } from '../utils/helpers'
 import { burnedCO2Token } from '../generated/CCO2/CCO2'
 
+// @todo remove this
+// test#3
+
 export function handleCreditTransfer(event: Transfer): void {
   recordTransfer(
     event.address,

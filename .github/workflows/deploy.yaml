@@ -211,7 +211,7 @@ jobs:
 
       # For non‑protected branches (e.g. staging), commit and push directly.
       - name: Commit all changes (staging)
-        if: ${{ github.ref != 'refs/heads/main' && steps.compare_versions.outputs.should_deploy == 'true' }}
+        if: ${{ env.IS_MAIN != 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
           set -x
           NEW_PUBLISHED_VERSION=${{ steps.compare_versions.outputs.new_published_version }}

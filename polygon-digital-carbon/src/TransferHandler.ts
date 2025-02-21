@@ -46,6 +46,7 @@ import { burnedCO2Token } from '../generated/CCO2/CCO2'
 // @todo remove this
 // test #6
 
+
 export function handleCreditTransfer(event: Transfer): void {
   recordTransfer(
     event.address,

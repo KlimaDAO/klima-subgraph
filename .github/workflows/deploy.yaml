@@ -175,6 +175,8 @@ jobs:
           fi
           echo "Setting remote URL with all permissions token"
           git remote set-url origin https://${{ secrets.GH_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
+          echo "git branch: $(git branch)"
+          echo "pushing to $NEW_BRANCH"
           git push origin $NEW_BRANCH
         working-directory: '${{ matrix.value }}'
 

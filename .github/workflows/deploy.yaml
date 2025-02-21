@@ -160,6 +160,7 @@ jobs:
         working-directory: '${{ matrix.value }}'
 
       - name: Commit changes and create PR for main branch
+        id: commit_step
         if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
           NEW_PUBLISHED_VERSION=${{ steps.compare_versions.outputs.new_published_version }}
@@ -173,12 +174,11 @@ jobs:
           else
             git commit -m "action: update to publishedVersion: $NEW_PUBLISHED_VERSION for ${{ matrix.value }}"
           fi
-          echo "Setting remote URL with all permissions token"
+          echo "::set-output name=branch::$NEW_BRANCH"
           git remote set-url origin https://${{ secrets.GH_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
-          echo "git branch: $(git branch)"
-          echo "pushing to $NEW_BRANCH"
           git push origin $NEW_BRANCH
         working-directory: '${{ matrix.value }}'
+
 
       - name: Create Pull Request
         if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
@@ -187,10 +187,11 @@ jobs:
           token: ${{ secrets.GH_ACCESS_TOKEN }}
           # @todo revert to main before merge
           base: protected-main-test 
-          branch: 'auto-deploy-${{ matrix.value }}-${{ github.run_id }}'
+          branch: ${{ steps.commit_step.outputs.branch }}
           title: 'Auto deploy: update ${{ matrix.value }} to ${{ steps.compare_versions.outputs.new_published_version }}'
           body: 'Auto generated PR for deployment changes.'
           commit-message: 'action: update to publishedVersion: ${{ steps.compare_versions.outputs.new_published_version }} for ${{ matrix.value }}'
+
 
       - name: Approve and Merge PR
         if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}

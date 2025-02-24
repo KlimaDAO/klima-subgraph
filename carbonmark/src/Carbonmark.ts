@@ -151,7 +151,6 @@ export function handleListingUpdated(event: ListingUpdated): void {
     }
     listing.minFillAmount = event.params.newMinFillAmount
     listing.updatedAt = event.block.timestamp
-    listing.save()
 
     activity.activityType = 'UpdatedMinFillAmount'
     activity.listing = listing.id
@@ -165,6 +164,7 @@ export function handleListingUpdated(event: ListingUpdated): void {
     activity.seller = listing.seller
     activity.save()
   }
+  listing.save()
 
 }
 

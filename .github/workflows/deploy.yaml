@@ -77,24 +77,12 @@ jobs:
       - name: Build Subgraph
         run: npm run build
         working-directory: '${{ matrix.value }}'
-      - name: Staging or not
+      - name: Set subgraph name
         if: ${{ steps.compare_versions.outputs.should_deploy == 'true'}}
-        id: staging_or_not
+        id: set_subgraph_name
         run: |
-          echo "short_sha=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
-
-          if [[ "${{ env.IS_STAGING }}" == "true" ]]
-          then
-              PREFIX="staging-"
-          fi;
-
-          if [[ "${{ matrix.value }}" =~ .*"-".*"-carbon".* ]]
-          then
-              echo "subgraph=${PREFIX}${{ matrix.value }}" >> $GITHUB_OUTPUT
-          else
-              echo "subgraph=${PREFIX}klimadao-${{ matrix.value }}" >> $GITHUB_OUTPUT
-          fi
+          echo "subgraph=${{ matrix.value }}" >> $GITHUB_OUTPUT
       - name: Deploy Subgraph to Studio
         run: |
-          ../node_modules/.bin/graph deploy --studio --deploy-key ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY_ALTERNATE_EOA }} "${{ steps.staging_or_not.outputs.subgraph }}" --version-label "$steps.get_last_tag.outputs.last_tag"
+          ../node_modules/.bin/graph deploy --studio --deploy-key ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY_ALTERNATE_EOA }} "${{ steps.set_subgraph_name.outputs.subgraph }}" --version-label "$steps.get_last_tag.outputs.last_tag"
         working-directory: '${{ matrix.value }}'

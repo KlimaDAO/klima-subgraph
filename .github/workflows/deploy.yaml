@@ -78,8 +78,15 @@ jobs:
         run: npm run build
         working-directory: '${{ matrix.value }}'
       - name: Staging or not
+        if: ${{ steps.compare_versions.outputs.should_deploy == 'true'}}
         id: staging_or_not
         run: |
+          echo "short_sha=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
+
+          if [[ "${{ env.IS_STAGING }}" == "true" ]]
+          then
+              PREFIX="staging-"
+          fi;
 
           if [[ "${{ matrix.value }}" =~ .*"-".*"-carbon".* ]]
           then
@@ -87,8 +94,6 @@ jobs:
           else
               echo "subgraph=${PREFIX}klimadao-${{ matrix.value }}" >> $GITHUB_OUTPUT
           fi
-        env:
-          REF: ${{ github.ref }}
       - name: Deploy Subgraph to Studio
         run: |
           ../node_modules/.bin/graph deploy --studio --deploy-key ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY_ALTERNATE_EOA }} "${{ steps.staging_or_not.outputs.subgraph }}" --version-label "$steps.get_last_tag.outputs.last_tag"

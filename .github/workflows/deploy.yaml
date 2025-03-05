@@ -38,16 +38,16 @@ jobs:
       matrix:
         value:
           [
-            'bonds',
-            'polygon-digital-carbon',
+            # 'bonds',
+            # 'polygon-digital-carbon',
             'carbonmark',
-            'polygon-bridged-carbon',
-            'protocol-metrics',
-            'vesting',
-            'user-carbon',
-            'pairs',
-            'celo-bridged-carbon',
-            'ethereum-bridged-carbon',
+            # 'polygon-bridged-carbon',
+            # 'protocol-metrics',
+            # 'vesting',
+            # 'user-carbon',
+            # 'pairs',
+            # 'celo-bridged-carbon',
+            # 'ethereum-bridged-carbon',
           ]
     steps:
       - name: Check out source repository
@@ -80,7 +80,14 @@ jobs:
       - name: Set subgraph name
         id: set_subgraph_name
         run: |
-          echo "subgraph=${{ matrix.value }}" >> $GITHUB_OUTPUT
+          if [[ "${{ matrix.value }}" =~ .*"-".*"-carbon".* ]]
+          then
+              echo "subgraph=${PREFIX}${{ matrix.value }}" >> $GITHUB_OUTPUT
+          else
+              echo "subgraph=${PREFIX}klimadao-${{ matrix.value }}" >> $GITHUB_OUTPUT
+          fi
+        env:
+          REF: ${{ github.ref }}
       - name: Deploy Subgraph to Studio
         run: |
           ../node_modules/.bin/graph deploy --studio --deploy-key ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY_ALTERNATE_EOA }} "${{ steps.set_subgraph_name.outputs.subgraph }}" --version-label "$steps.get_last_tag.outputs.last_tag"

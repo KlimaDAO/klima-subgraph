@@ -78,7 +78,6 @@ jobs:
         run: npm run build
         working-directory: '${{ matrix.value }}'
       - name: Set subgraph name
-        if: ${{ steps.compare_versions.outputs.should_deploy == 'true'}}
         id: set_subgraph_name
         run: |
           echo "subgraph=${{ matrix.value }}" >> $GITHUB_OUTPUT

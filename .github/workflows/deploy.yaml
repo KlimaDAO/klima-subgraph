@@ -36,8 +36,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        value:
-          [
+        value: [
             # 'bonds',
             # 'polygon-digital-carbon',
             'carbonmark',
@@ -61,15 +60,12 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
         working-directory: '${{ matrix.value }}'
-      - name: Get last release tag
-        id: get_last_tag
+      - name: Get published version from version.json
+        id: get_published_version
         run: |
-          LAST_TAG=$(git tag --list "${{ matrix.value }}-v*" | sort -V | tail -n 1)
-          if [ -z "$LAST_TAG" ]; then
-            LAST_TAG="0.0.0"  # Fallback for no existing tags
-          fi
-          echo "last_tag=$LAST_TAG" >> $GITHUB_OUTPUT
-          echo "Fetched LAST_TAG: $LAST_TAG"
+          PUBLISHED_VERSION=$(jq -r '.publishedVersion' version.json)
+          echo "published_version=$PUBLISHED_VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted published version: $PUBLISHED_VERSION"
         working-directory: '${{ matrix.value }}'
       - name: Generate Subgraph Code
         run: npm run codegen
@@ -90,5 +86,5 @@ jobs:
           REF: ${{ github.ref }}
       - name: Deploy Subgraph to Studio
         run: |
-          ../node_modules/.bin/graph deploy --studio --deploy-key ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY_ALTERNATE_EOA }} "${{ steps.set_subgraph_name.outputs.subgraph }}" --version-label "$steps.get_last_tag.outputs.last_tag"
+          ../node_modules/.bin/graph deploy --studio --deploy-key ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY_ALTERNATE_EOA }} "${{ steps.set_subgraph_name.outputs.subgraph }}" --version-label "$steps.get_published_version.outputs.published_version"
         working-directory: '${{ matrix.value }}'

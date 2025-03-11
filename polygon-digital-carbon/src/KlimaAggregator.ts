@@ -135,15 +135,17 @@ export function handleCarbonRetired(event: CarbonRetired): void {
   loadOrCreateAccount(event.params.retiringAddress)
   loadOrCreateAccount(event.params.beneficiaryAddress)
 
-  if (index != BigInt.fromI32(sender.totalRetirements)) {
-    log.error('Index is not equal to total retirements. Out of sync: {} {}', [
-      index.toString(),
-      sender.totalRetirements.toString(),
-    ])
-  }
+
 
   let adjustedTotalRetirements = sender.totalRetirements - 1
   let currentRetirementIndex = sender.retirementIndexBalancer
+
+  if (index != BigInt.fromI32(adjustedTotalRetirements)) {
+    log.error('Index is not equal to total retirements. Out of sync: {} {}', [
+      index.toString(),
+      adjustedTotalRetirements.toString(),
+    ])
+  }
 
   if (currentRetirementIndex < adjustedTotalRetirements) {
     for (let i = currentRetirementIndex; i < adjustedTotalRetirements; i++) {

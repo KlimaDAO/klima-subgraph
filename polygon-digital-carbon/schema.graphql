@@ -741,7 +741,7 @@ type Account @entity {
 
   totalRetirements: Int!
   # index of the retirement in the retirement batch
-  retirementIndexBalancer: Int!
+  previousTotalRetirements: Int!
 
   ## Carbon Credit Activity ##
   bridges: [Bridge!]! @derivedFrom(field: "account")

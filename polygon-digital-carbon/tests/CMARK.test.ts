@@ -176,11 +176,11 @@ describe('CMARK tests', () => {
     assert.fieldEquals('CarbonCredit', id, 'isExAnte', 'false')
 
     assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'registry', 'CMARK')
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'name', CMARK_PROJECT_INFO[0][1])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'methodologies', CMARK_PROJECT_INFO[0][2])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'category', CMARK_PROJECT_INFO[0][3])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'country', CMARK_PROJECT_INFO[0][4])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'region', CMARK_PROJECT_INFO[0][5])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'name', CMARK_PROJECT_INFO[1][1])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'methodologies', CMARK_PROJECT_INFO[1][2])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'category', CMARK_PROJECT_INFO[1][3])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'country', CMARK_PROJECT_INFO[1][4])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'region', CMARK_PROJECT_INFO[1][5])
 
     assert.fieldEquals('Token', id, 'tokenAddress', ISSUED_TOKEN_ADDRESS)
     assert.fieldEquals('Token', id, 'name', ISSUED_TOKEN_NAME)

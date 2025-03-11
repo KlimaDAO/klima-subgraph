@@ -129,16 +129,17 @@ export function handleCarbonRetired(event: CarbonRetired): void {
   let retirementsContractAddress = getRetirementsContractAddress(network)
 
   let klimaRetirements = KlimaCarbonRetirements.bind(retirementsContractAddress)
-  let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
+  let rawIndex = klimaRetirements.retirements(event.params.beneficiaryAddress).value0
+  let index = rawIndex.minus(BigInt.fromI32(1))
 
   let sender = loadOrCreateAccount(event.transaction.from)
   loadOrCreateAccount(event.params.retiringAddress)
   loadOrCreateAccount(event.params.beneficiaryAddress)
 
+  let rawTotalRetirements = sender.totalRetirements
+  let adjustedTotalRetirements = rawTotalRetirements - 1
 
-
-  let adjustedTotalRetirements = sender.totalRetirements - 1
-  let currentRetirementIndex = sender.retirementIndexBalancer
+  let previousTotalRetirements = sender.previousTotalRetirements
 
   if (index != BigInt.fromI32(adjustedTotalRetirements)) {
     log.error('Index is not equal to total retirements. Out of sync: {} {}', [
@@ -147,40 +148,38 @@ export function handleCarbonRetired(event: CarbonRetired): void {
     ])
   }
 
-  if (currentRetirementIndex < adjustedTotalRetirements) {
-    for (let i = currentRetirementIndex; i < adjustedTotalRetirements; i++) {
-      let retire = loadRetire(sender.id.concatI32(i))
-      if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
+  for (let i = previousTotalRetirements; i < rawTotalRetirements; i++) {
+    let retire = loadRetire(sender.id.concatI32(i))
+    if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
 
-      retire.source = 'KLIMA'
-      retire.beneficiaryAddress = event.params.beneficiaryAddress
-      retire.beneficiaryName = event.params.beneficiaryString
-      retire.retiringAddress = event.params.retiringAddress
-      retire.retirementMessage = event.params.retirementMessage
-      retire.save()
+    retire.source = 'KLIMA'
+    retire.beneficiaryAddress = event.params.beneficiaryAddress
+    retire.beneficiaryName = event.params.beneficiaryString
+    retire.retiringAddress = event.params.retiringAddress
+    retire.retirementMessage = event.params.retirementMessage
+    retire.save()
 
-      const klimaRetire = saveKlimaRetire(
-        event.params.beneficiaryAddress,
-        retire.id,
-        BigInt.fromI32(i),
-        event.params.retiredAmount.div(BigInt.fromI32(100)), // hard-coded 1% fee
-        false
-      )
+    const klimaRetire = saveKlimaRetire(
+      event.params.beneficiaryAddress,
+      retire.id,
+      BigInt.fromI32(i),
+      event.params.retiredAmount.div(BigInt.fromI32(100)), // hard-coded 1% fee
+      false
+    )
 
-      if (klimaRetire !== null) {
-        const dailyRetirement = generateDailyKlimaRetirement(klimaRetire)
-        if (dailyRetirement !== null) {
-          dailyRetirement.save()
-        }
+    if (klimaRetire !== null) {
+      const dailyRetirement = generateDailyKlimaRetirement(klimaRetire)
+      if (dailyRetirement !== null) {
+        dailyRetirement.save()
       }
+    }
 
-      if (retire.pool !== null && Address.fromBytes(retire.pool as Bytes) != ZERO_ADDRESS) {
-        updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
-      }
+    if (retire.pool !== null && Address.fromBytes(retire.pool as Bytes) != ZERO_ADDRESS) {
+      updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
     }
   }
 
-  sender.retirementIndexBalancer = adjustedTotalRetirements
+  sender.previousTotalRetirements = adjustedTotalRetirements
   sender.save()
 }
 

@@ -53,7 +53,6 @@ export function saveToucanRetirement(event: Retired): void {
   let sender = loadOrCreateAccount(event.transaction.from)
   let senderAddress = event.transaction.from
   loadOrCreateAccount(event.params.sender) // Beneficiary address
-
   saveRetire(
     sender.id.concatI32(sender.totalRetirements),
     credit.id,
@@ -68,6 +67,8 @@ export function saveToucanRetirement(event: Retired): void {
     event.block.timestamp,
     event.transaction.hash
   )
+
+  log.info('underlying retire id: {}', [sender.id.concatI32(sender.totalRetirements).toHexString()])
 
   incrementAccountRetirements(senderAddress)
 }

@@ -7,6 +7,7 @@ export function loadOrCreateAccount(accountAddress: Address): Account {
 
   account = new Account(accountAddress)
   account.totalRetirements = 0
+  account.retirementIndexBalancer = 0
   account.save()
   return account as Account
 }

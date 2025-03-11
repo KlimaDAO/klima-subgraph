@@ -4,7 +4,7 @@ import { ToucanRetired } from '../generated/RetireToucanCarbon/RetireToucanCarbo
 import { C3Retired } from '../generated/RetireC3Carbon/RetireC3Carbon'
 import { CarbonRetired, CarbonRetired1 as CarbonRetiredTokenId } from '../generated/KlimaInfinity/KlimaInfinity'
 import { KlimaCarbonRetirements } from '../generated/RetireC3Carbon/KlimaCarbonRetirements'
-import { Address, BigInt, Bytes, dataSource, ethereum } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, dataSource, ethereum, log } from '@graphprotocol/graph-ts'
 import { CarbonMetricUtils } from './utils/CarbonMetrics'
 import { PoolTokenFactory } from './utils/pool_token/PoolTokenFactory'
 import { loadOrCreateAccount } from './utils/Account'
@@ -135,36 +135,51 @@ export function handleCarbonRetired(event: CarbonRetired): void {
   loadOrCreateAccount(event.params.retiringAddress)
   loadOrCreateAccount(event.params.beneficiaryAddress)
 
-  let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
+  if (index != BigInt.fromI32(sender.totalRetirements)) {
+    log.error('Index is not equal to total retirements. Out of sync: {} {}', [
+      index.toString(),
+      sender.totalRetirements.toString(),
+    ])
+  }
 
-  if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
+  let adjustedTotalRetirements = sender.totalRetirements - 1
+  let currentRetirementIndex = sender.retirementIndexBalancer
 
-  retire.source = 'KLIMA'
-  retire.beneficiaryAddress = event.params.beneficiaryAddress
-  retire.beneficiaryName = event.params.beneficiaryString
-  retire.retiringAddress = event.params.retiringAddress
-  retire.retirementMessage = event.params.retirementMessage
-  retire.save()
+  if (currentRetirementIndex < adjustedTotalRetirements) {
+    for (let i = currentRetirementIndex; i < adjustedTotalRetirements; i++) {
+      let retire = loadRetire(sender.id.concatI32(i))
+      if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
 
-  const klimaRetire = saveKlimaRetire(
-    event.params.beneficiaryAddress,
-    retire.id,
-    index,
-    event.params.retiredAmount.div(BigInt.fromI32(100)), // hard-coded 1% fee
-    false
-  )
+      retire.source = 'KLIMA'
+      retire.beneficiaryAddress = event.params.beneficiaryAddress
+      retire.beneficiaryName = event.params.beneficiaryString
+      retire.retiringAddress = event.params.retiringAddress
+      retire.retirementMessage = event.params.retirementMessage
+      retire.save()
 
-  if (klimaRetire !== null ){
-    const dailyRetirement = generateDailyKlimaRetirement(klimaRetire)
-    if (dailyRetirement !== null) {
-      dailyRetirement.save()
+      const klimaRetire = saveKlimaRetire(
+        event.params.beneficiaryAddress,
+        retire.id,
+        BigInt.fromI32(i),
+        event.params.retiredAmount.div(BigInt.fromI32(100)), // hard-coded 1% fee
+        false
+      )
+
+      if (klimaRetire !== null) {
+        const dailyRetirement = generateDailyKlimaRetirement(klimaRetire)
+        if (dailyRetirement !== null) {
+          dailyRetirement.save()
+        }
+      }
+
+      if (retire.pool !== null && Address.fromBytes(retire.pool as Bytes) != ZERO_ADDRESS) {
+        updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
+      }
     }
   }
 
-  if (retire.pool !== null && Address.fromBytes(retire.pool as Bytes) != ZERO_ADDRESS) {
-    updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
-  }
-
+  sender.retirementIndexBalancer = adjustedTotalRetirements
+  sender.save()
 }
 
 export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): void {
@@ -199,7 +214,7 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
     false
   )
 
-  if (klimaRetire !== null ){
+  if (klimaRetire !== null) {
     const dailyRetirement = generateDailyKlimaRetirement(klimaRetire)
     if (dailyRetirement !== null) {
       dailyRetirement.save()
@@ -209,7 +224,6 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
   if (retire.pool !== null && Address.fromBytes(retire.pool as Bytes) != ZERO_ADDRESS) {
     updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
   }
-
 }
 
 function generateDailyKlimaRetirement(klimaRetire: KlimaRetire): DailyKlimaRetireSnapshot | null {
@@ -229,7 +243,6 @@ function generateDailyKlimaRetirement(klimaRetire: KlimaRetire): DailyKlimaRetir
   }
 
   return null
-
 }
 
 function updateKlimaRetirementProtocolMetrics(pool: Bytes, timestamp: BigInt, retiredAmount: BigInt): void {

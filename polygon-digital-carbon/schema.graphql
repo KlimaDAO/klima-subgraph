@@ -9,6 +9,7 @@ enum Registry {
   ECO_REGISTRY
   CCS
   CMARK
+  TVER
 }
 
 enum RetireSource {

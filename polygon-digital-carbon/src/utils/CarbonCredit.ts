@@ -49,8 +49,7 @@ export function updateCarbonCreditWithCall(tokenAddress: Address, registry: stri
   let credit = loadCarbonCredit(tokenAddress)
   if (credit.bridgeProtocol == 'TOUCAN') credit = updateToucanCall(tokenAddress, credit, registry)
   else if (credit.bridgeProtocol == 'C3') credit = updateC3Call(tokenAddress, credit)
-  else if (credit.bridgeProtocol == 'CMARK') credit = updateCMARKCall(tokenAddress, credit)
-
+  else if (credit.bridgeProtocol == 'CMARK')  credit = updateCMARKCall(tokenAddress, credit, registry)
   return credit
 }
 
@@ -201,13 +200,13 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
   return carbonCredit
 }
 
-function updateCMARKCall(tokenAddress: Address, carbonCredit: CarbonCredit): CarbonCredit {
+function updateCMARKCall(tokenAddress: Address, carbonCredit: CarbonCredit, prefix: string): CarbonCredit {
   let token = loadOrCreateToken(tokenAddress)
   let splittedSymbol = token.symbol.split("-")
   let projectId = splittedSymbol.slice(0,2).join("-")
   let vintage = splittedSymbol[2]
 
-  let project = loadOrCreateCarbonProject('CMARK', projectId)
+  let project = loadOrCreateCarbonProject(prefix, projectId)
   project.save()
 
   carbonCredit.project = project.id

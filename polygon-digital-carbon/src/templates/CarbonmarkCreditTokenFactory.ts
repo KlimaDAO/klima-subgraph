@@ -8,7 +8,8 @@ export function handleNewCarbonmarkCredit(event: Issued): void {
   // Start indexing the Carbonmak tokens; `event.params.tokenAddress` is the
   // address of the new token contract
   CarbonmarkCreditToken.create(event.params.creditTokenAddress)
-  loadOrCreateCarbonCredit(event.params.creditTokenAddress, 'CMARK', null)
+  const prefix = event.params.creditId.toString().split('-')[0]
+  loadOrCreateCarbonCredit(event.params.creditTokenAddress, prefix, null)
   createTokenWithCall(event.params.creditTokenAddress, event.block)
   updateCarbonCreditWithCall(event.params.creditTokenAddress, '')
 }

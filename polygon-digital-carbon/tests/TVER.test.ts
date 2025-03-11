@@ -11,7 +11,7 @@ import {
 import { Address, Bytes, ethereum } from '@graphprotocol/graph-ts'
 import { Issued } from '../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditTokenFactory'
 import { handleNewCarbonmarkCredit } from '../src/templates/CarbonmarkCreditTokenFactory'
-import { CMARK_PROJECT_INFO } from '../../lib/utils/CMARKProjectInfo'
+import { TVER_PROJECT_INFO } from '../../lib/utils/TVERProjectInfo'
 import { Transfer } from '../generated/BCT/ERC20'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Retired } from '../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditToken'
@@ -20,11 +20,11 @@ import { handleCarbonmarkCreditRetirement, handleCarbonmarkCreditTransfer } from
 
 const ISSUED_TOKEN_ADDRESS = '0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9'
 const ISSUED_TOKEN_BENEFICIARY = '0x3Da300661Eb0f04a4044A4fB01d79E66C8c81ED9'
-const ISSUED_TOKEN_PROJECT_ID = 'CMARK-1'
+const ISSUED_TOKEN_PROJECT_ID = 'TVER-1'
 const ISSUED_TOKEN_VINTAGE = '2025'
 const ISSUED_TOKEN_CREDIT_ID = `${ISSUED_TOKEN_PROJECT_ID}-${ISSUED_TOKEN_VINTAGE}`
 const ISSUED_TOKEN_SYMBOL = ISSUED_TOKEN_CREDIT_ID
-const ISSUED_TOKEN_NAME = `CMARK: ${ISSUED_TOKEN_CREDIT_ID}`
+const ISSUED_TOKEN_NAME = `TVER: ${ISSUED_TOKEN_CREDIT_ID}`
 const ISSUED_TOKEN_DECIMALS = 18
 const ISSUED_TOKEN_AMOUNT = 115221
 
@@ -139,7 +139,7 @@ export function setup(): void {
 
 }
 
-describe('CMARK tests', () => {
+describe('TVER tests', () => {
   beforeEach(() => {
     clearStore()
 
@@ -157,7 +157,7 @@ describe('CMARK tests', () => {
     clearStore()
   })
 
-  test('Issuance of a Carbonmark Token entity', () => {
+  test('Issuance of a Carbonmark TVER Token entity', () => {
     // Issuance event
     const event = newIssuedEvent()
     let id = issuedTokenAddress.toHexString()
@@ -175,12 +175,12 @@ describe('CMARK tests', () => {
     assert.fieldEquals('CarbonCredit', id, 'lastBatchId', '0')
     assert.fieldEquals('CarbonCredit', id, 'isExAnte', 'false')
 
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'registry', 'CMARK')
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'name', CMARK_PROJECT_INFO[1][1])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'methodologies', CMARK_PROJECT_INFO[1][2])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'category', CMARK_PROJECT_INFO[1][3])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'country', CMARK_PROJECT_INFO[1][4])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'region', CMARK_PROJECT_INFO[1][5])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'registry', 'TVER')
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'name', TVER_PROJECT_INFO[0][1])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'methodologies', TVER_PROJECT_INFO[0][2])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'category', TVER_PROJECT_INFO[0][3])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'country', TVER_PROJECT_INFO[0][4])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'region', TVER_PROJECT_INFO[0][5])
 
     assert.fieldEquals('Token', id, 'tokenAddress', ISSUED_TOKEN_ADDRESS)
     assert.fieldEquals('Token', id, 'name', ISSUED_TOKEN_NAME)
@@ -214,7 +214,7 @@ describe('CMARK tests', () => {
 
   })
 
-  test('Token owner retires with the CMARK Token contract', () => {
+  test('Token owner retires with the TVER Token contract', () => {
     setup();
 
     // Transfer to Zero address event
@@ -226,7 +226,7 @@ describe('CMARK tests', () => {
     let provenanceId = issuedTokenAddress.concat(ZERO_ADDRESS).concat(Bytes.fromI32(1)).toHexString()
     assert.fieldEquals('ProvenanceRecord', provenanceId, 'transactionType', 'TRANSFER')
 
-    // Retire with the CMARK Token contract event
+    // Retire with the TVER Token contract event
     const retirementEvent = createNewTokenRetiredEvent()
     handleCarbonmarkCreditRetirement(retirementEvent)
 

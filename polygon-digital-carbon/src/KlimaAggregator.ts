@@ -18,33 +18,18 @@ import { getRetirementsContractAddress } from '../utils/helpers'
 import { SubgraphVersion } from '../generated/schema'
 import { PUBLISHED_VERSION, SCHEMA_VERSION } from '../utils/version'
 
-class ChunkParams {
-  start: i32
-  end: i32
-  CHUNK_SIZE: i32
-}
-
-function getChunkParams(sender: Account, diff: i32): ChunkParams {
-  let params = new ChunkParams()
-  params.CHUNK_SIZE = 100
-  params.start = sender.totalRetirements - diff
-  params.end = sender.totalRetirements
-  return params
-}
-
 function getOnchainRetirementIndex(beneficiaryAddress: Address): BigInt {
   let network = dataSource.network()
   let retirementsContractAddress = getRetirementsContractAddress(network)
   let klimaRetirements = KlimaCarbonRetirements.bind(retirementsContractAddress)
-  let index = klimaRetirements.retirements(beneficiaryAddress).value0.minus(BigInt.fromI32(1))
+  let index = klimaRetirements.retirements(beneficiaryAddress).value0
   return index
 }
 
 function processRetirement(
   sender: Account,
-  iterationCount: BigInt,
   diff: i32,
-  retirementIndex: i32,
+  onchainIndex: BigInt,
   beneficiaryAddress: Address,
   beneficiaryName: string,
   retiringAddress: Address,
@@ -53,7 +38,8 @@ function processRetirement(
   retiredAmount: BigInt,
   timestamp: BigInt
 ): void {
-  let retireId = sender.id.concatI32((sender.totalRetirements - diff) + iterationCount.toI32())
+  let retireId = sender.id.concatI32(sender.totalRetirements - 1)
+
   let retire = loadRetire(retireId)
 
   // Update the retire entity
@@ -65,10 +51,12 @@ function processRetirement(
   retire.retirementMessage = retirementMessage
   retire.save()
 
+  let adjustedIndex = onchainIndex.minus(BigInt.fromI32(diff))
+
   const klimaRetire = saveKlimaRetire(
     beneficiaryAddress,
     retire.id,
-    BigInt.fromI32(retirementIndex),
+    adjustedIndex,
     retiredAmount.div(BigInt.fromI32(100)), // hard-coded 1% fee
     false
   )
@@ -84,47 +72,6 @@ function processRetirement(
   // Update protocol metrics if needed
   if (retire.pool !== null && Address.fromBytes(retire.pool as Bytes) != ZERO_ADDRESS) {
     updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, timestamp, retiredAmount)
-  }
-}
-
-function processRetirementChunk(
-  sender: Account,
-  onchainIndex: BigInt,
-  retirementStartIndex: i32,
-  retirementEndIndex: i32,
-  diff: i32,
-  beneficiaryAddress: Address,
-  beneficiaryName: string,
-  retiringAddress: Address,
-  retirementMessage: string,
-  carbonPool: Address,
-  retiredAmount: BigInt,
-  timestamp: BigInt
-): void {
-  let baseIndex : BigInt = onchainIndex.minus(BigInt.fromI32(diff - 1))
-  let iterationCount : BigInt = BigInt.fromI32(0)
-
-  for (let i = retirementStartIndex; i < retirementEndIndex; i++) {
-    /** subtract diff amount from onchain index for the correct start index. However need to account for the increment so we subtract diff - 1 
-     *  and then add the iteration count to set the correct index
-    */
-    const retirementIndex = baseIndex.plus(iterationCount).toI32()
-    log.info('retirementIndex: {}', [retirementIndex.toString()])
-    processRetirement(
-      sender,
-      iterationCount,
-      diff,
-      retirementIndex,
-      beneficiaryAddress,
-      beneficiaryName,
-      retiringAddress,
-      retirementMessage,
-      carbonPool,
-      retiredAmount,
-      timestamp
-    )
-
-    iterationCount = iterationCount.plus(BigInt.fromI32(1))
   }
 }
 
@@ -242,36 +189,37 @@ export function handleCarbonRetired(event: CarbonRetired): void {
   // need to include the index here as we need to get the diff between the stored local retirement index  and onchain
   //  and go back that from the total retirements to get the correct index to start from
   let index = getOnchainRetirementIndex(Address.fromBytes(beneficiary.id))
-  let diff = sender.totalRetirements - sender.previousTotalRetirements
+  // this should never jump by more than 1 in the current RA implementation
+  let diff: i32 = index.minus(BigInt.fromI32(sender.previousRetirementIndex)).toI32()
+  // 80 previous
+  //  6 3rd party
+  // previous total 86
+  // 4 more RA
+  // current total 90
 
   log.info('sender.totalRetirements: {}', [sender.totalRetirements.toString()])
   log.info('index: {}', [index.toString()])
   log.info('diff: {}', [diff.toString()])
 
-  const params = getChunkParams(sender, diff)
+  // const params = getChunkParams(sender, diff)
 
-  log.info('params.start: {}', [params.start.toString()])
-  log.info('params.end: {}', [params.end.toString()])
+  // log.info('params.start: {}', [params.start.toString()])
+  // log.info('params.end: {}', [params.end.toString()])
 
-  for (let chunkStart: i32 = params.start; chunkStart < params.end; chunkStart += params.CHUNK_SIZE) {
-    let chunkEnd: i32 = Math.min(chunkStart + params.CHUNK_SIZE, params.end) as i32
-    processRetirementChunk(
-      sender,
-      index,
-      chunkStart,
-      chunkEnd,
-      diff,
-      event.params.beneficiaryAddress,
-      event.params.beneficiaryString,
-      event.params.retiringAddress,
-      event.params.retirementMessage,
-      event.params.carbonPool,
-      event.params.retiredAmount,
-      event.block.timestamp
-    )
-  }
+  processRetirement(
+    sender,
+    diff,
+    index,
+    event.params.beneficiaryAddress,
+    event.params.beneficiaryString,
+    event.params.retiringAddress,
+    event.params.retirementMessage,
+    event.params.carbonPool,
+    event.params.retiredAmount,
+    event.block.timestamp
+  )
 
-  sender.previousTotalRetirements = sender.totalRetirements
+  sender.previousRetirementIndex = sender.previousRetirementIndex + 1
   sender.save()
 }
 

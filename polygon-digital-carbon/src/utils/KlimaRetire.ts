@@ -23,6 +23,6 @@ export function saveKlimaRetire(
   return klimaRetire as KlimaRetire
 }
 
-export function loadKlimaRetire(id: String): KlimaRetire | null {
+export function loadKlimaRetire(id: string): KlimaRetire | null {
   return KlimaRetire.load(Bytes.fromUTF8(id))
 }

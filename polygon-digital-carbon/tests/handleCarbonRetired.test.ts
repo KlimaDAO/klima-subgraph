@@ -15,10 +15,13 @@ import { CarbonRetired } from '../generated/KlimaInfinity/KlimaInfinity'
 import { handleCarbonRetired } from '../src/KlimaAggregator'
 import { KLIMA_CARBON_RETIREMENTS_CONTRACT } from '../../lib/utils/Constants'
 import { handleCCO2Retired } from '../src/TransferHandler'
-import { loadOrCreateAccount } from '../src/utils/Account'
+import { incrementAccountRetirements, loadOrCreateAccount } from '../src/utils/Account'
 import { convertToAmountTonnes } from '../utils/helpers'
 import { Account, DailyKlimaRetireSnapshot, Retire } from '../generated/schema'
 import { dayTimestamp } from '../../lib/utils/Dates'
+import { Retired } from '../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
+import { saveToucanRetirement } from '../src/RetirementHandler'
+import { loadOrCreateCarbonCredit } from '../src/utils/CarbonCredit'
 
 const cco2 = Address.fromString('0x82b37070e43c1ba0ea9e2283285b674ef7f1d4e2')
 
@@ -28,31 +31,41 @@ const globalBeneficiaryAddress = Address.fromString('0x0987654321098765432109876
 
 const retiredAmount = BigInt.fromString('1000000000000000000')
 
+const tco2 = Address.fromString('0xb139C4cC9D20A3618E9a2268D73Eff18C496B991')
+
 // testing variables
 const randomToken = Address.fromString('0x1234567890123456789012345678901234567890')
 const randomToken2 = Address.fromString('0x0987654321098765432109876543210987654321')
 const randomToken3 = Address.fromString('0x3456789012345678901234567890123456789012')
 const randomTxnHash = Bytes.fromHexString('0xa1b2c3d4e5f6078c9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7089a0b1c2d3')
 
-function createRetire(sender: Account, credit: Address, index: i32): Retire {
-  let retire = new Retire(sender.id.concatI32(index))
-  retire.source = 'KLIMA'
-  retire.amount = BigInt.fromString('1000000000000000000')
-  retire.amountTonnes = convertToAmountTonnes(cco2, BigInt.fromString('1000000000000000000'))
-  retire.beneficiaryAddress = globalBeneficiaryAddress
-  retire.beneficiaryName = 'Beneficiary'
-  retire.beneficiaryLocation = 'Canada'
-  retire.retirementMessage = 'Retirement Message'
-  retire.retiringAddress = senderAddress
-  retire.retiringName = 'Sender'
-  retire.consumptionCountryCode = 'CA'
-  retire.consumptionPeriodStart = BigInt.fromI32(1715328000)
-  retire.consumptionPeriodEnd = BigInt.fromI32(2715328000)
-  retire.timestamp = BigInt.fromI32(1715328000)
-  retire.credit = credit
-  retire.hash = randomTxnHash
-  retire.save()
-  return retire
+function newRetiredEvent(amount: BigInt): Retired {
+  let mockEvent = newMockEvent()
+
+  let newRetiredEvent = new Retired(
+    mockEvent.address,
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    mockEvent.block,
+    mockEvent.transaction,
+    mockEvent.parameters,
+    mockEvent.receipt
+  )
+
+  newRetiredEvent.address = tco2
+  newRetiredEvent.transaction.from = senderAddress
+  newRetiredEvent.transaction.hash = randomTxnHash
+
+  newRetiredEvent.parameters = new Array()
+
+  let senderParam = new ethereum.EventParam('sender', ethereum.Value.fromAddress(senderAddress))
+  newRetiredEvent.parameters.push(senderParam)
+
+  let tokenIdParam = new ethereum.EventParam('tokenId', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1)))
+  newRetiredEvent.parameters.push(tokenIdParam)
+
+  return newRetiredEvent
 }
 
 function newBurnedCO2TokenEvent(amount: BigInt): burnedCO2Token {
@@ -135,6 +148,11 @@ describe('Carbon Retired Tests', () => {
     createMockedFunction(cco2, 'totalSupply', 'totalSupply():(uint256)').returns([
       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000)),
     ])
+
+    // create necessary credits
+    let credit = loadOrCreateCarbonCredit(tco2, 'TOUCAN', null)
+    credit.tokenAddress = tco2
+    credit.save()
   })
 
   afterAll(() => {
@@ -165,8 +183,6 @@ describe('Carbon Retired Tests', () => {
         ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
         ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
       ])
-
-      
     let sender = loadOrCreateAccount(senderAddress)
     let timestamp = BigInt.fromI32(0)
 
@@ -220,7 +236,7 @@ describe('Carbon Retired Tests', () => {
   })
 
   test('handleCarbonRetired: multiple retirements in one txn. no third party retirements', () => {
-    // testing multiple retirements in one txn
+    // testing multiple retirements in one txn. Set retirement index to 6 to simulate four retirements in one txn
     createMockedFunction(
       KLIMA_CARBON_RETIREMENTS_CONTRACT,
       'retirements',
@@ -232,22 +248,44 @@ describe('Carbon Retired Tests', () => {
         ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
         ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
       ])
-    let sender = loadOrCreateAccount(senderAddress)
-    sender.totalRetirements = 6
 
-    sender.previousTotalRetirements = 2
+    let sender = loadOrCreateAccount(senderAddress)
+    sender.totalRetirements = 2
+    sender.previousRetirementIndex = 2
     sender.save()
 
-    createRetire(sender, cco2, 2)
-    createRetire(sender, randomToken, 3)
-    createRetire(sender, randomToken2, 4)
-    createRetire(sender, randomToken3, 5)
+    // all retirements process underlying retirement than handle CarbonRetired event for that retirement
+    let retiredEvent = newRetiredEvent(retiredAmount)
+    retiredEvent.transaction.from = senderAddress
+    saveToucanRetirement(retiredEvent)
 
-    let event = createNewCarbonRetiredEvent(retiredAmount)
-    event.transaction.index = BigInt.fromI32(1000)
-    event.transaction.from = senderAddress
+    let newCarbonRetiredEvent = createNewCarbonRetiredEvent(retiredAmount)
+    newCarbonRetiredEvent.transaction.from = senderAddress
+    handleCarbonRetired(newCarbonRetiredEvent)
 
-    handleCarbonRetired(event)
+    let retiredEvent2 = newRetiredEvent(retiredAmount)
+    retiredEvent2.transaction.from = senderAddress
+    saveToucanRetirement(retiredEvent2)
+
+    let newCarbonRetiredEvent2 = createNewCarbonRetiredEvent(retiredAmount)
+    newCarbonRetiredEvent2.transaction.from = senderAddress
+    handleCarbonRetired(newCarbonRetiredEvent2)
+
+    let retiredEvent3 = newRetiredEvent(retiredAmount)
+    retiredEvent3.transaction.from = senderAddress
+    saveToucanRetirement(retiredEvent3)
+
+    let newCarbonRetiredEvent3 = createNewCarbonRetiredEvent(retiredAmount)
+    newCarbonRetiredEvent3.transaction.from = senderAddress
+    handleCarbonRetired(newCarbonRetiredEvent3)
+
+    let retiredEvent4 = newRetiredEvent(retiredAmount)
+    retiredEvent4.transaction.from = senderAddress
+    saveToucanRetirement(retiredEvent4)
+
+    let newCarbonRetiredEvent4 = createNewCarbonRetiredEvent(retiredAmount)
+    newCarbonRetiredEvent4.transaction.from = senderAddress
+    handleCarbonRetired(newCarbonRetiredEvent4)
 
     sender = loadOrCreateAccount(senderAddress)
 

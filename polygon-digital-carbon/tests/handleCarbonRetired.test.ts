@@ -24,7 +24,7 @@ const cco2 = Address.fromString('0x82b37070e43c1ba0ea9e2283285b674ef7f1d4e2')
 
 const senderAddress = Address.fromString('0x1234567890123456789012345678901234567890')
 
-const beneficiaryAddress = Address.fromString('0x0987654321098765432109876543210987654321')
+const globalBeneficiaryAddress = Address.fromString('0x0987654321098765432109876543210987654321')
 
 const retiredAmount = BigInt.fromString('1000000000000000000')
 
@@ -39,7 +39,7 @@ function createRetire(sender: Account, credit: Address, index: i32): Retire {
   retire.source = 'KLIMA'
   retire.amount = BigInt.fromString('1000000000000000000')
   retire.amountTonnes = convertToAmountTonnes(cco2, BigInt.fromString('1000000000000000000'))
-  retire.beneficiaryAddress = beneficiaryAddress
+  retire.beneficiaryAddress = globalBeneficiaryAddress
   retire.beneficiaryName = 'Beneficiary'
   retire.beneficiaryLocation = 'Canada'
   retire.retirementMessage = 'Retirement Message'
@@ -100,7 +100,7 @@ function createNewCarbonRetiredEvent(amount: BigInt): CarbonRetired {
   let retiringEntityStringParam = new ethereum.EventParam('retiringEntityString', ethereum.Value.fromString(''))
   let beneficiaryAddressParam = new ethereum.EventParam(
     'beneficiaryAddress',
-    ethereum.Value.fromAddress(beneficiaryAddress)
+    ethereum.Value.fromAddress(globalBeneficiaryAddress)
   )
   let beneficiaryStringParam = new ethereum.EventParam('beneficiaryString', ethereum.Value.fromString('Beneficiary'))
   let retirementMessageParam = new ethereum.EventParam(
@@ -135,7 +135,13 @@ describe('Carbon Retired Tests', () => {
     createMockedFunction(cco2, 'totalSupply', 'totalSupply():(uint256)').returns([
       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000)),
     ])
+  })
 
+  afterAll(() => {
+    clearStore()
+  })
+
+  test('handleCarbonRetired: CCO2', () => {
     createMockedFunction(
       KLIMA_CARBON_RETIREMENTS_CONTRACT,
       'retirements',
@@ -143,7 +149,7 @@ describe('Carbon Retired Tests', () => {
     )
       .withArgs([ethereum.Value.fromAddress(senderAddress)])
       .returns([
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1)),
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(100)),
         ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(100)),
         ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1234567890)),
       ])
@@ -153,34 +159,15 @@ describe('Carbon Retired Tests', () => {
       'retirements',
       'retirements(address):(uint256,uint256,uint256)'
     )
-      .withArgs([ethereum.Value.fromAddress(beneficiaryAddress)])
+      .withArgs([ethereum.Value.fromAddress(globalBeneficiaryAddress)])
       .returns([
         ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1)),
         ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
         ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
       ])
 
-    // testing multiple retirements in one txn
-    createMockedFunction(
-      KLIMA_CARBON_RETIREMENTS_CONTRACT,
-      'retirements',
-      'retirements(address):(uint256,uint256,uint256)'
-    )
-      .withArgs([ethereum.Value.fromAddress(beneficiaryAddress)])
-      .returns([
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(6)),
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
-      ])
-  })
-
-  afterAll(() => {
-    clearStore()
-  })
-
-  test('handleCarbonRetired: CCO2', () => {
+      
     let sender = loadOrCreateAccount(senderAddress)
-
     let timestamp = BigInt.fromI32(0)
 
     let burnedCO2TokenEvent = newBurnedCO2TokenEvent(retiredAmount)
@@ -207,6 +194,7 @@ describe('Carbon Retired Tests', () => {
     sender = loadOrCreateAccount(senderAddress)
     const beneficiary = loadOrCreateAccount(beneficiaryAddress)
     const retireId = sender.id.concatI32(sender.totalRetirements - 1).toHexString()
+    log.info('retireId: {}', [retireId])
     const klimaRetireId = beneficiaryAddress.concatI32(beneficiary.totalRetirements).toHexString()
     let snapshotId = dayTimestamp(timestamp).toString() + carbonToken.toHexString()
     const snapshot = DailyKlimaRetireSnapshot.load(snapshotId)
@@ -231,7 +219,19 @@ describe('Carbon Retired Tests', () => {
     clearStore()
   })
 
-  test('handleCarbonRetired: multiple retirements in one txn', () => {
+  test('handleCarbonRetired: multiple retirements in one txn. no third party retirements', () => {
+    // testing multiple retirements in one txn
+    createMockedFunction(
+      KLIMA_CARBON_RETIREMENTS_CONTRACT,
+      'retirements',
+      'retirements(address):(uint256,uint256,uint256)'
+    )
+      .withArgs([ethereum.Value.fromAddress(globalBeneficiaryAddress)])
+      .returns([
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(6)),
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
+      ])
     let sender = loadOrCreateAccount(senderAddress)
     sender.totalRetirements = 6
 
@@ -257,8 +257,39 @@ describe('Carbon Retired Tests', () => {
     }
 
     for (let i = 2; i < 6; i++) {
-      let klimaRetireId = beneficiaryAddress.concatI32(i).toHexString()
+      let klimaRetireId = globalBeneficiaryAddress.concatI32(i).toHexString()
       assert.fieldEquals('KlimaRetire', klimaRetireId, 'index', i.toString())
     }
   })
+
+  // test('handleCarbonRetired: multiple retirements in one txn. includes intermediate third party retirements', () => {
+  //   let sender = loadOrCreateAccount(senderAddress)
+  //   sender.totalRetirements = 8
+
+  //   sender.previousTotalRetirements = 2
+  //   sender.save()
+
+  //   createRetire(sender, cco2, 2)
+  //   createRetire(sender, randomToken, 3)
+  //   createRetire(sender, randomToken2, 4)
+  //   createRetire(sender, randomToken3, 5)
+
+  //   let event = createNewCarbonRetiredEvent(retiredAmount)
+  //   event.transaction.index = BigInt.fromI32(1000)
+  //   event.transaction.from = senderAddress
+
+  //   handleCarbonRetired(event)
+
+  //   sender = loadOrCreateAccount(senderAddress)
+
+  //   for (let i = 2; i < 6; i++) {
+  //     let retireId = sender.id.concatI32(i).toHexString()
+  //     assert.fieldEquals('Retire', retireId, 'source', 'KLIMA')
+  //   }
+
+  //   for (let i = 2; i < 6; i++) {
+  //     let klimaRetireId = beneficiaryAddress.concatI32(i).toHexString()
+  //     assert.fieldEquals('KlimaRetire', klimaRetireId, 'index', i.toString())
+  //   }
+  // })
 })

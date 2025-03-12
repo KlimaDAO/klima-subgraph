@@ -270,6 +270,8 @@ export function saveCCO2Retirement(event: burnedCO2Token): void {
   let sender = loadOrCreateAccount(event.transaction.from)
   let senderAddress = event.transaction.from
 
+  log.info('saving retire for {}', [sender.id.concatI32(sender.totalRetirements).toHexString()])
+
   saveRetire(
     sender.id.concatI32(sender.totalRetirements),
     CCO2_ERC20_CONTRACT,

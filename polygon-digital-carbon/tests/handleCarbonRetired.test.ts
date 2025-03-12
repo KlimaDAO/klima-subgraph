@@ -262,9 +262,21 @@ describe('Carbon Retired Tests', () => {
     }
   })
 
-  // test('handleCarbonRetired: multiple retirements in one txn. includes intermediate third party retirements', () => {
+  // test('handleCarbonRetired: multiple retirements in one txn. no third party retirements', () => {
+  //   // testing multiple retirements in one txn
+  //   createMockedFunction(
+  //     KLIMA_CARBON_RETIREMENTS_CONTRACT,
+  //     'retirements',
+  //     'retirements(address):(uint256,uint256,uint256)'
+  //   )
+  //     .withArgs([ethereum.Value.fromAddress(globalBeneficiaryAddress)])
+  //     .returns([
+  //       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(50)),
+  //       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
+  //       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
+  //     ])
   //   let sender = loadOrCreateAccount(senderAddress)
-  //   sender.totalRetirements = 8
+  //   sender.totalRetirements = 100
 
   //   sender.previousTotalRetirements = 2
   //   sender.save()
@@ -288,7 +300,7 @@ describe('Carbon Retired Tests', () => {
   //   }
 
   //   for (let i = 2; i < 6; i++) {
-  //     let klimaRetireId = beneficiaryAddress.concatI32(i).toHexString()
+  //     let klimaRetireId = globalBeneficiaryAddress.concatI32(i).toHexString()
   //     assert.fieldEquals('KlimaRetire', klimaRetireId, 'index', i.toString())
   //   }
   // })

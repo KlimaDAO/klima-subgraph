@@ -53,11 +53,9 @@ function processRetirement(
   retiredAmount: BigInt,
   timestamp: BigInt
 ): void {
-  log.info('iterationCount: {}', [iterationCount.toString()])
-  log.info('processing retirement for {}', [sender.id.concatI32((sender.totalRetirements - diff) + iterationCount).toHexString()])
   let retireId = sender.id.concatI32((sender.totalRetirements - diff) + iterationCount)
   let retire = loadRetire(retireId)
-  log.info('retire found {}', [retire.id.toHexString()])
+
   // Update the retire entity
   if (carbonPool != ZERO_ADDRESS) retire.pool = carbonPool
   retire.source = 'KLIMA'
@@ -106,15 +104,16 @@ function processRetirementChunk(
   let iterationCount = 0
 
   for (let i = retirementStartIndex; i < retirementEndIndex; i++) {
-    log.info('retirementStartIndex: {}', [i.toString()])
-    const retirementIndex = onchainIndex.plus(BigInt.fromI32(iterationCount)).toI32()
-    log.info('onchainIndex: {}', [onchainIndex.toString()])
+    /** subtract diff amount from onchain index. However need to account for the increment so we subtract diff - 1 
+     *  and then add the iteration count
+    */
+    const retirementIndex = onchainIndex.minus(BigInt.fromI32(diff - 1)).plus(BigInt.fromI32(iterationCount)).toI32()
     log.info('retirementIndex: {}', [retirementIndex.toString()])
     processRetirement(
       sender,
       iterationCount,
       diff,
-      retirementIndex, // adjust for zero indexed retirement count
+      retirementIndex,
       beneficiaryAddress,
       beneficiaryName,
       retiringAddress,

@@ -191,20 +191,6 @@ export function handleCarbonRetired(event: CarbonRetired): void {
   let index = getOnchainRetirementIndex(Address.fromBytes(beneficiary.id))
   // this should never jump by more than 1 in the current RA implementation
   let diff: i32 = index.minus(BigInt.fromI32(sender.previousRetirementIndex)).toI32()
-  // 80 previous
-  //  6 3rd party
-  // previous total 86
-  // 4 more RA
-  // current total 90
-
-  log.info('sender.totalRetirements: {}', [sender.totalRetirements.toString()])
-  log.info('index: {}', [index.toString()])
-  log.info('diff: {}', [diff.toString()])
-
-  // const params = getChunkParams(sender, diff)
-
-  // log.info('params.start: {}', [params.start.toString()])
-  // log.info('params.end: {}', [params.end.toString()])
 
   processRetirement(
     sender,

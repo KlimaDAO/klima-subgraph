@@ -68,8 +68,6 @@ export function saveToucanRetirement(event: Retired): void {
     event.transaction.hash
   )
 
-  log.info('underlying retire id: {}', [sender.id.concatI32(sender.totalRetirements).toHexString()])
-
   incrementAccountRetirements(senderAddress)
 }
 
@@ -269,8 +267,6 @@ export function saveCCO2Retirement(event: burnedCO2Token): void {
   // Ensure account entities are created for all addresses
   let sender = loadOrCreateAccount(event.transaction.from)
   let senderAddress = event.transaction.from
-
-  log.info('saving retire for {}', [sender.id.concatI32(sender.totalRetirements).toHexString()])
 
   saveRetire(
     sender.id.concatI32(sender.totalRetirements),

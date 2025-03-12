@@ -42,7 +42,7 @@ function getOnchainRetirementIndex(beneficiaryAddress: Address): BigInt {
 
 function processRetirement(
   sender: Account,
-  iterationCount: i32,
+  iterationCount: BigInt,
   diff: i32,
   retirementIndex: i32,
   beneficiaryAddress: Address,
@@ -53,7 +53,7 @@ function processRetirement(
   retiredAmount: BigInt,
   timestamp: BigInt
 ): void {
-  let retireId = sender.id.concatI32((sender.totalRetirements - diff) + iterationCount)
+  let retireId = sender.id.concatI32((sender.totalRetirements - diff) + iterationCount.toI32())
   let retire = loadRetire(retireId)
 
   // Update the retire entity
@@ -101,13 +101,14 @@ function processRetirementChunk(
   retiredAmount: BigInt,
   timestamp: BigInt
 ): void {
-  let iterationCount = 0
+  let baseIndex : BigInt = onchainIndex.minus(BigInt.fromI32(diff - 1))
+  let iterationCount : BigInt = BigInt.fromI32(0)
 
   for (let i = retirementStartIndex; i < retirementEndIndex; i++) {
-    /** subtract diff amount from onchain index. However need to account for the increment so we subtract diff - 1 
-     *  and then add the iteration count
+    /** subtract diff amount from onchain index for the correct start index. However need to account for the increment so we subtract diff - 1 
+     *  and then add the iteration count to set the correct index
     */
-    const retirementIndex = onchainIndex.minus(BigInt.fromI32(diff - 1)).plus(BigInt.fromI32(iterationCount)).toI32()
+    const retirementIndex = baseIndex.plus(iterationCount).toI32()
     log.info('retirementIndex: {}', [retirementIndex.toString()])
     processRetirement(
       sender,
@@ -123,7 +124,7 @@ function processRetirementChunk(
       timestamp
     )
 
-    iterationCount++
+    iterationCount = iterationCount.plus(BigInt.fromI32(1))
   }
 }
 

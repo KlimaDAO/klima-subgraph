@@ -28,8 +28,6 @@ function getOnchainRetirementIndex(beneficiaryAddress: Address): BigInt {
 
 function processRetirement(
   sender: Account,
-  diff: i32,
-  onchainIndex: BigInt,
   beneficiaryAddress: Address,
   beneficiaryName: string,
   retiringAddress: Address,
@@ -50,6 +48,13 @@ function processRetirement(
   retire.retiringAddress = retiringAddress
   retire.retirementMessage = retirementMessage
   retire.save()
+
+  let onchainIndex = getOnchainRetirementIndex(beneficiaryAddress)
+
+  let diff: i32 = onchainIndex.minus(BigInt.fromI32(sender.previousRetirementIndex)).toI32()
+  // @note we could technically just use the previousRetirementIndex here versus retrieve the onchain index
+  // this method retains a link to the onchain index for syncing purposes
+  // if there is no reason to keep that link to the onchain index we can just assign index as previousRetirementIndex and increment
 
   let adjustedIndex = onchainIndex.minus(BigInt.fromI32(diff))
 
@@ -78,104 +83,73 @@ function processRetirement(
 export function handleMossRetired(event: MossRetired): void {
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
-  let network = dataSource.network()
-
-  let retirementsContractAddress = getRetirementsContractAddress(network)
-
-  let klimaRetirements = KlimaCarbonRetirements.bind(retirementsContractAddress)
-  let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
 
   let sender = loadOrCreateAccount(event.transaction.from)
   loadOrCreateAccount(event.params.beneficiaryAddress)
   loadOrCreateAccount(event.params.retiringAddress)
 
-  let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
-
-  if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
-
-  retire.source = 'KLIMA'
-  retire.beneficiaryAddress = event.params.beneficiaryAddress
-  retire.beneficiaryName = event.params.beneficiaryString
-  retire.retiringAddress = event.params.retiringAddress
-  retire.retirementMessage = event.params.retirementMessage
-
-  retire.save()
-
-  saveKlimaRetire(
+  processRetirement(
+    sender,
     event.params.beneficiaryAddress,
-    retire.id,
-    index,
-    event.params.retiredAmount.div(BigInt.fromI32(100)),
-    false
+    event.params.beneficiaryString,
+    event.params.retiringAddress,
+    event.params.retirementMessage,
+    event.params.carbonPool,
+    event.params.retiredAmount,
+    event.block.timestamp
   )
+
+  sender.previousRetirementIndex = sender.previousRetirementIndex + 1
+  log.info('sender.previousRetirementIndex: {}', [sender.previousRetirementIndex.toString()])
+  sender.save()
 }
 
 export function handleToucanRetired(event: ToucanRetired): void {
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
-  let network = dataSource.network()
-
-  let retirementsContractAddress = getRetirementsContractAddress(network)
-  let klimaRetirements = KlimaCarbonRetirements.bind(retirementsContractAddress)
-
-  let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
 
   let sender = loadOrCreateAccount(event.transaction.from)
   loadOrCreateAccount(event.params.beneficiaryAddress)
   loadOrCreateAccount(event.params.retiringAddress)
 
-  let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
-
-  if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
-
-  retire.source = 'KLIMA'
-  retire.beneficiaryAddress = event.params.beneficiaryAddress
-  retire.beneficiaryName = event.params.beneficiaryString
-  retire.retiringAddress = event.params.retiringAddress
-  retire.retirementMessage = event.params.retirementMessage
-  retire.save()
-
-  saveKlimaRetire(
+  processRetirement(
+    sender,
     event.params.beneficiaryAddress,
-    retire.id,
-    index,
-    event.params.retiredAmount.div(BigInt.fromI32(100)),
-    false
+    event.params.beneficiaryString,
+    event.params.retiringAddress,
+    event.params.retirementMessage,
+    event.params.carbonPool,
+    event.params.retiredAmount,
+    event.block.timestamp
   )
+
+  sender.previousRetirementIndex = sender.previousRetirementIndex + 1
+  log.info('sender.previousRetirementIndex: {}', [sender.previousRetirementIndex.toString()])
+  sender.save()
 }
 
 export function handleC3Retired(event: C3Retired): void {
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
 
-  let network = dataSource.network()
-  let retirementsContractAddress = getRetirementsContractAddress(network)
-
-  let klimaRetirements = KlimaCarbonRetirements.bind(retirementsContractAddress)
-  let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
-
   let sender = loadOrCreateAccount(event.transaction.from)
   loadOrCreateAccount(event.params.retiringAddress)
   loadOrCreateAccount(event.params.beneficiaryAddress)
 
-  let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
-
-  if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
-
-  retire.source = 'KLIMA'
-  retire.beneficiaryAddress = event.params.beneficiaryAddress
-  retire.beneficiaryName = event.params.beneficiaryString
-  retire.retiringAddress = event.params.retiringAddress
-  retire.retirementMessage = event.params.retirementMessage
-  retire.save()
-
-  const klimaRetire = saveKlimaRetire(
+  processRetirement(
+    sender,
     event.params.beneficiaryAddress,
-    retire.id,
-    index,
-    event.params.retiredAmount.div(BigInt.fromI32(100)),
-    false
+    event.params.beneficiaryString,
+    event.params.retiringAddress,
+    event.params.retirementMessage,
+    event.params.carbonPool,
+    event.params.retiredAmount,
+    event.block.timestamp
   )
+
+  sender.previousRetirementIndex = sender.previousRetirementIndex + 1
+  log.info('sender.previousRetirementIndex: {}', [sender.previousRetirementIndex.toString()])
+  sender.save()
 }
 
 export function handleCarbonRetired(event: CarbonRetired): void {
@@ -184,18 +158,13 @@ export function handleCarbonRetired(event: CarbonRetired): void {
 
   let sender = loadOrCreateAccount(event.transaction.from)
   loadOrCreateAccount(event.params.retiringAddress)
-  let beneficiary = loadOrCreateAccount(event.params.beneficiaryAddress)
+  loadOrCreateAccount(event.params.beneficiaryAddress)
 
   // need to include the index here as we need to get the diff between the stored local retirement index  and onchain
   //  and go back that from the total retirements to get the correct index to start from
-  let index = getOnchainRetirementIndex(Address.fromBytes(beneficiary.id))
-
-  let diff: i32 = index.minus(BigInt.fromI32(sender.previousRetirementIndex)).toI32()
 
   processRetirement(
     sender,
-    diff,
-    index,
     event.params.beneficiaryAddress,
     event.params.beneficiaryString,
     event.params.retiringAddress,
@@ -213,45 +182,25 @@ export function handleCarbonRetired(event: CarbonRetired): void {
 export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): void {
   // Ignore zero value retirements
   if (event.params.retiredAmount == ZERO_BI) return
-  let network = dataSource.network()
-
-  let retirementsContractAddress = getRetirementsContractAddress(network)
-  let klimaRetirements = KlimaCarbonRetirements.bind(retirementsContractAddress)
-  let index = klimaRetirements.retirements(event.params.beneficiaryAddress).value0.minus(BigInt.fromI32(1))
 
   let sender = loadOrCreateAccount(event.transaction.from)
   loadOrCreateAccount(event.params.retiringAddress)
   loadOrCreateAccount(event.params.beneficiaryAddress)
 
-  let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
-
-  if (event.params.carbonPool != ZERO_ADDRESS) retire.pool = event.params.carbonPool
-
-  retire.source = 'KLIMA'
-  retire.beneficiaryAddress = event.params.beneficiaryAddress
-  retire.beneficiaryName = event.params.beneficiaryString
-  retire.retiringAddress = event.params.retiringAddress
-  retire.retirementMessage = event.params.retirementMessage
-  retire.save()
-
-  const klimaRetire = saveKlimaRetire(
+  processRetirement(
+    sender,
     event.params.beneficiaryAddress,
-    retire.id,
-    index,
-    event.params.retiredAmount.div(BigInt.fromI32(100)), // hard-coded 1% fee
-    false
+    event.params.beneficiaryString,
+    event.params.retiringAddress,
+    event.params.retirementMessage,
+    event.params.carbonPool,
+    event.params.retiredAmount,
+    event.block.timestamp
   )
 
-  if (klimaRetire !== null) {
-    const dailyRetirement = generateDailyKlimaRetirement(klimaRetire)
-    if (dailyRetirement !== null) {
-      dailyRetirement.save()
-    }
-  }
-
-  if (retire.pool !== null && Address.fromBytes(retire.pool as Bytes) != ZERO_ADDRESS) {
-    updateKlimaRetirementProtocolMetrics(retire.pool as Bytes, event.block.timestamp, event.params.retiredAmount)
-  }
+  sender.previousRetirementIndex = sender.previousRetirementIndex + 1
+  log.info('sender.previousRetirementIndex: {}', [sender.previousRetirementIndex.toString()])
+  sender.save()
 }
 
 function generateDailyKlimaRetirement(klimaRetire: KlimaRetire): DailyKlimaRetireSnapshot | null {

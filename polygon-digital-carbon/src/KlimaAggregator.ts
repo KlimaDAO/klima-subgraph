@@ -189,7 +189,7 @@ export function handleCarbonRetired(event: CarbonRetired): void {
   // need to include the index here as we need to get the diff between the stored local retirement index  and onchain
   //  and go back that from the total retirements to get the correct index to start from
   let index = getOnchainRetirementIndex(Address.fromBytes(beneficiary.id))
-  // this should never jump by more than 1 in the current RA implementation
+
   let diff: i32 = index.minus(BigInt.fromI32(sender.previousRetirementIndex)).toI32()
 
   processRetirement(
@@ -206,6 +206,7 @@ export function handleCarbonRetired(event: CarbonRetired): void {
   )
 
   sender.previousRetirementIndex = sender.previousRetirementIndex + 1
+  log.info('sender.previousRetirementIndex: {}', [sender.previousRetirementIndex.toString()])
   sender.save()
 }
 

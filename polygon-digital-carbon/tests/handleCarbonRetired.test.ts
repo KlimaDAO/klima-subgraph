@@ -13,11 +13,10 @@ import { Address, BigInt, Bytes, ethereum, store } from '@graphprotocol/graph-ts
 import { burnedCO2Token } from '../generated/CCO2/CCO2'
 import { CarbonRetired } from '../generated/KlimaInfinity/KlimaInfinity'
 import { handleCarbonRetired } from '../src/KlimaAggregator'
-import { KLIMA_CARBON_RETIREMENTS_CONTRACT } from '../../lib/utils/Constants'
 import { handleCCO2Retired } from '../src/TransferHandler'
-import { incrementAccountRetirements, loadOrCreateAccount } from '../src/utils/Account'
+import { loadOrCreateAccount } from '../src/utils/Account'
 import { convertToAmountTonnes } from '../utils/helpers'
-import { Account, DailyKlimaRetireSnapshot, Retire } from '../generated/schema'
+import { DailyKlimaRetireSnapshot } from '../generated/schema'
 import { dayTimestamp } from '../../lib/utils/Dates'
 import { Retired } from '../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
 import { saveToucanRetirement } from '../src/RetirementHandler'
@@ -34,9 +33,6 @@ const retiredAmount = BigInt.fromString('1000000000000000000')
 const tco2 = Address.fromString('0xb139C4cC9D20A3618E9a2268D73Eff18C496B991')
 
 // testing variables
-const randomToken = Address.fromString('0x1234567890123456789012345678901234567890')
-const randomToken2 = Address.fromString('0x0987654321098765432109876543210987654321')
-const randomToken3 = Address.fromString('0x3456789012345678901234567890123456789012')
 const randomTxnHash = Bytes.fromHexString('0xa1b2c3d4e5f6078c9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7089a0b1c2d3')
 
 function newRetiredEvent(amount: BigInt): Retired {
@@ -160,29 +156,6 @@ describe('Carbon Retired Tests', () => {
   })
 
   test('handleCarbonRetired: CCO2', () => {
-    createMockedFunction(
-      KLIMA_CARBON_RETIREMENTS_CONTRACT,
-      'retirements',
-      'retirements(address):(uint256,uint256,uint256)'
-    )
-      .withArgs([ethereum.Value.fromAddress(senderAddress)])
-      .returns([
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(100)),
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(100)),
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1234567890)),
-      ])
-
-    createMockedFunction(
-      KLIMA_CARBON_RETIREMENTS_CONTRACT,
-      'retirements',
-      'retirements(address):(uint256,uint256,uint256)'
-    )
-      .withArgs([ethereum.Value.fromAddress(globalBeneficiaryAddress)])
-      .returns([
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1)),
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
-      ])
     let sender = loadOrCreateAccount(senderAddress)
     let timestamp = BigInt.fromI32(0)
 
@@ -235,23 +208,13 @@ describe('Carbon Retired Tests', () => {
   })
 
   test('handleCarbonRetired: multiple retirements in one txn. no third party retirements', () => {
-    // testing multiple retirements in one txn. Set retirement index to 6 to simulate four retirements in one txn
-    createMockedFunction(
-      KLIMA_CARBON_RETIREMENTS_CONTRACT,
-      'retirements',
-      'retirements(address):(uint256,uint256,uint256)'
-    )
-      .withArgs([ethereum.Value.fromAddress(globalBeneficiaryAddress)])
-      .returns([
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(6)),
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
-      ])
-
     let sender = loadOrCreateAccount(senderAddress)
     sender.totalRetirements = 2
-    sender.previousRetirementIndex = 2
     sender.save()
+
+    let beneficiary = loadOrCreateAccount(globalBeneficiaryAddress)
+    beneficiary.klimaRetirementsIndex = BigInt.fromI32(2)
+    beneficiary.save()
 
     // all retirements process underlying retirement than handle CarbonRetired event for that retirement
     let retiredEvent = newRetiredEvent(retiredAmount)
@@ -291,33 +254,21 @@ describe('Carbon Retired Tests', () => {
     for (let i = 2; i < 6; i++) {
       let retireId = sender.id.concatI32(i).toHexString()
       assert.fieldEquals('Retire', retireId, 'source', 'KLIMA')
-    }
 
-    for (let i = 2; i < 6; i++) {
       let klimaRetireId = globalBeneficiaryAddress.concatI32(i).toHexString()
       assert.fieldEquals('KlimaRetire', klimaRetireId, 'index', i.toString())
     }
   })
 
   test('handleCarbonRetired: multiple retirements in one txn w/ third party retirements', () => {
-    // testing multiple retirements in one txn. Set retirement index to 6 to simulate four retirements in one txn
-    createMockedFunction(
-      KLIMA_CARBON_RETIREMENTS_CONTRACT,
-      'retirements',
-      'retirements(address):(uint256,uint256,uint256)'
-    )
-      .withArgs([ethereum.Value.fromAddress(globalBeneficiaryAddress)])
-      .returns([
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(8)),
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
-      ])
-
     let sender = loadOrCreateAccount(senderAddress)
     // simulate 4 previous retirements, two direct retirements (not through RA) and then the four more RA retirements (below)
     sender.totalRetirements = 6
-    sender.previousRetirementIndex = 4
     sender.save()
+
+    let beneficiary = loadOrCreateAccount(globalBeneficiaryAddress)
+    beneficiary.klimaRetirementsIndex = BigInt.fromI32(4)
+    beneficiary.save()
 
     // all retirements process underlying retirement than handle CarbonRetired event for that retirement
     let retiredEvent = newRetiredEvent(retiredAmount)

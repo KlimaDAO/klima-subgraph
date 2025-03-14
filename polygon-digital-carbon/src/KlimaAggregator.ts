@@ -18,16 +18,9 @@ import { getRetirementsContractAddress } from '../utils/helpers'
 import { SubgraphVersion } from '../generated/schema'
 import { PUBLISHED_VERSION, SCHEMA_VERSION } from '../utils/version'
 
-function getOnchainRetirementIndex(beneficiaryAddress: Address): BigInt {
-  let network = dataSource.network()
-  let retirementsContractAddress = getRetirementsContractAddress(network)
-  let klimaRetirements = KlimaCarbonRetirements.bind(retirementsContractAddress)
-  let index = klimaRetirements.retirements(beneficiaryAddress).value0
-  return index
-}
-
 function processRetirement(
   sender: Account,
+  beneficiary: Account,
   beneficiaryAddress: Address,
   beneficiaryName: string,
   retiringAddress: Address,
@@ -49,22 +42,17 @@ function processRetirement(
   retire.retirementMessage = retirementMessage
   retire.save()
 
-  let onchainIndex = getOnchainRetirementIndex(beneficiaryAddress)
-
-  let diff: i32 = onchainIndex.minus(BigInt.fromI32(sender.previousRetirementIndex)).toI32()
-  // @note we could technically just use the previousRetirementIndex here versus retrieve the onchain index
-  // this method retains a link to the onchain index for syncing purposes
-  // if there is no reason to keep that link to the onchain index we can just assign index as previousRetirementIndex and increment
-
-  let adjustedIndex = onchainIndex.minus(BigInt.fromI32(diff))
-
   const klimaRetire = saveKlimaRetire(
     beneficiaryAddress,
     retire.id,
-    adjustedIndex,
+    beneficiary.klimaRetirementsIndex,
     retiredAmount.div(BigInt.fromI32(100)), // hard-coded 1% fee
     false
   )
+
+  // increment the klima retirements index for beneficiary
+  beneficiary.klimaRetirementsIndex = beneficiary.klimaRetirementsIndex.plus(BigInt.fromI32(1))
+  beneficiary.save()
 
   // Generate daily retirement data if needed
   if (klimaRetire !== null) {
@@ -85,11 +73,12 @@ export function handleMossRetired(event: MossRetired): void {
   if (event.params.retiredAmount == ZERO_BI) return
 
   let sender = loadOrCreateAccount(event.transaction.from)
-  loadOrCreateAccount(event.params.beneficiaryAddress)
+  let beneficiary = loadOrCreateAccount(event.params.beneficiaryAddress)
   loadOrCreateAccount(event.params.retiringAddress)
 
   processRetirement(
     sender,
+    beneficiary,
     event.params.beneficiaryAddress,
     event.params.beneficiaryString,
     event.params.retiringAddress,
@@ -98,10 +87,6 @@ export function handleMossRetired(event: MossRetired): void {
     event.params.retiredAmount,
     event.block.timestamp
   )
-
-  sender.previousRetirementIndex = sender.previousRetirementIndex + 1
-  log.info('sender.previousRetirementIndex: {}', [sender.previousRetirementIndex.toString()])
-  sender.save()
 }
 
 export function handleToucanRetired(event: ToucanRetired): void {
@@ -109,11 +94,12 @@ export function handleToucanRetired(event: ToucanRetired): void {
   if (event.params.retiredAmount == ZERO_BI) return
 
   let sender = loadOrCreateAccount(event.transaction.from)
-  loadOrCreateAccount(event.params.beneficiaryAddress)
+  let beneficiary = loadOrCreateAccount(event.params.beneficiaryAddress)
   loadOrCreateAccount(event.params.retiringAddress)
 
   processRetirement(
     sender,
+    beneficiary,
     event.params.beneficiaryAddress,
     event.params.beneficiaryString,
     event.params.retiringAddress,
@@ -122,10 +108,6 @@ export function handleToucanRetired(event: ToucanRetired): void {
     event.params.retiredAmount,
     event.block.timestamp
   )
-
-  sender.previousRetirementIndex = sender.previousRetirementIndex + 1
-  log.info('sender.previousRetirementIndex: {}', [sender.previousRetirementIndex.toString()])
-  sender.save()
 }
 
 export function handleC3Retired(event: C3Retired): void {
@@ -133,11 +115,12 @@ export function handleC3Retired(event: C3Retired): void {
   if (event.params.retiredAmount == ZERO_BI) return
 
   let sender = loadOrCreateAccount(event.transaction.from)
+  let beneficiary = loadOrCreateAccount(event.params.beneficiaryAddress)
   loadOrCreateAccount(event.params.retiringAddress)
-  loadOrCreateAccount(event.params.beneficiaryAddress)
 
   processRetirement(
     sender,
+    beneficiary,
     event.params.beneficiaryAddress,
     event.params.beneficiaryString,
     event.params.retiringAddress,
@@ -146,10 +129,6 @@ export function handleC3Retired(event: C3Retired): void {
     event.params.retiredAmount,
     event.block.timestamp
   )
-
-  sender.previousRetirementIndex = sender.previousRetirementIndex + 1
-  log.info('sender.previousRetirementIndex: {}', [sender.previousRetirementIndex.toString()])
-  sender.save()
 }
 
 export function handleCarbonRetired(event: CarbonRetired): void {
@@ -157,14 +136,12 @@ export function handleCarbonRetired(event: CarbonRetired): void {
   if (event.params.retiredAmount == ZERO_BI) return
 
   let sender = loadOrCreateAccount(event.transaction.from)
+  let beneficiary = loadOrCreateAccount(event.params.beneficiaryAddress)
   loadOrCreateAccount(event.params.retiringAddress)
-  loadOrCreateAccount(event.params.beneficiaryAddress)
-
-  // need to include the index here as we need to get the diff between the stored local retirement index  and onchain
-  //  and go back that from the total retirements to get the correct index to start from
 
   processRetirement(
     sender,
+    beneficiary,
     event.params.beneficiaryAddress,
     event.params.beneficiaryString,
     event.params.retiringAddress,
@@ -173,10 +150,6 @@ export function handleCarbonRetired(event: CarbonRetired): void {
     event.params.retiredAmount,
     event.block.timestamp
   )
-
-  sender.previousRetirementIndex = sender.previousRetirementIndex + 1
-  log.info('sender.previousRetirementIndex: {}', [sender.previousRetirementIndex.toString()])
-  sender.save()
 }
 
 export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): void {
@@ -184,11 +157,12 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
   if (event.params.retiredAmount == ZERO_BI) return
 
   let sender = loadOrCreateAccount(event.transaction.from)
+  let beneficiary = loadOrCreateAccount(event.params.beneficiaryAddress)
   loadOrCreateAccount(event.params.retiringAddress)
-  loadOrCreateAccount(event.params.beneficiaryAddress)
 
   processRetirement(
     sender,
+    beneficiary,
     event.params.beneficiaryAddress,
     event.params.beneficiaryString,
     event.params.retiringAddress,
@@ -197,10 +171,6 @@ export function handleCarbonRetiredWithTokenId(event: CarbonRetiredTokenId): voi
     event.params.retiredAmount,
     event.block.timestamp
   )
-
-  sender.previousRetirementIndex = sender.previousRetirementIndex + 1
-  log.info('sender.previousRetirementIndex: {}', [sender.previousRetirementIndex.toString()])
-  sender.save()
 }
 
 function generateDailyKlimaRetirement(klimaRetire: KlimaRetire): DailyKlimaRetireSnapshot | null {

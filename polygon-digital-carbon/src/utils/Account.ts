@@ -1,4 +1,4 @@
-import { Address } from '@graphprotocol/graph-ts'
+import { Address, BigInt } from '@graphprotocol/graph-ts'
 import { Account } from '../../generated/schema'
 
 export function loadOrCreateAccount(accountAddress: Address): Account {
@@ -7,7 +7,7 @@ export function loadOrCreateAccount(accountAddress: Address): Account {
 
   account = new Account(accountAddress)
   account.totalRetirements = 0
-  account.previousRetirementIndex = 0
+  account.klimaRetirementsIndex = BigInt.fromI32(0)
   account.save()
   return account as Account
 }

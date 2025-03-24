@@ -740,6 +740,8 @@ type Account @entity {
   id: Bytes!
 
   totalRetirements: Int!
+  # index of the retirement in the retirement batch
+  klimaRetirementsIndex: BigInt!
 
   ## Carbon Credit Activity ##
   bridges: [Bridge!]! @derivedFrom(field: "account")

@@ -53,7 +53,6 @@ export function saveToucanRetirement(event: Retired): void {
   let sender = loadOrCreateAccount(event.transaction.from)
   let senderAddress = event.transaction.from
   loadOrCreateAccount(event.params.sender) // Beneficiary address
-
   saveRetire(
     sender.id.concatI32(sender.totalRetirements),
     credit.id,

@@ -49,7 +49,7 @@ export function updateCarbonCreditWithCall(tokenAddress: Address, registry: stri
   let credit = loadCarbonCredit(tokenAddress)
   if (credit.bridgeProtocol == 'TOUCAN') credit = updateToucanCall(tokenAddress, credit, registry)
   else if (credit.bridgeProtocol == 'C3') credit = updateC3Call(tokenAddress, credit)
-  else if (credit.bridgeProtocol == 'CMARK')  credit = updateCMARKCall(tokenAddress, credit, registry)
+  else if (credit.bridgeProtocol == 'CMARK' || credit.bridgeProtocol == 'TVER')  credit = updateCMARKCall(tokenAddress, credit, registry)
   return credit
 }
 

@@ -164,7 +164,7 @@ describe('TVER tests', () => {
 
     handleNewCarbonmarkCredit(event)
     assert.fieldEquals('CarbonCredit', id, 'tokenAddress', ISSUED_TOKEN_ADDRESS)
-    assert.fieldEquals('CarbonCredit', id, 'bridgeProtocol', 'CMARK')
+    assert.fieldEquals('CarbonCredit', id, 'bridgeProtocol', 'TVER')
     assert.fieldEquals('CarbonCredit', id, 'project', ISSUED_TOKEN_PROJECT_ID)
     assert.fieldEquals('CarbonCredit', id, 'vintage', ISSUED_TOKEN_VINTAGE)
     assert.fieldEquals('CarbonCredit', id, 'currentSupply', '0')

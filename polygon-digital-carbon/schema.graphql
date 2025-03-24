@@ -24,6 +24,7 @@ enum BridgeProtocol {
   ICR
   COOREST
   CMARK
+  TVER
 }
 
 enum CrossChainBridgeDirection {

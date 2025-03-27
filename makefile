@@ -30,9 +30,13 @@ TCO2_HOLDER = 0x34798dd650DD478a801Fc1b0125cD6848F52F693
 
 MARKETPLACE = 0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821
 
-CMARK_TOKEN_FACTORY = 0xEeE3abDD638E219261e061c06C0798Fd5C05B5D3 
+CMARK_TOKEN_FACTORY = 0xEeE3abDD638E219261e061c06C0798Fd5C05B5D3
 
-CMARK_TOKEN_FACTORY_OWNER = 0xc51Cc27d3BB611DB27f26F617E1c15483A8790Cf 
+CMARK_TOKEN_FACTORY_OWNER = 0xc51Cc27d3BB611DB27f26F617E1c15483A8790Cf
+
+TVER_TOKEN_FACTORY = 0xB95A8C12D0F49e7388De4CF9a17EEE28d734D7A1
+
+TVER_TOKEN_FACTORY_OWNER = 0xc51Cc27d3BB611DB27f26F617E1c15483A8790Cf
 
 BENEFICIARY = 0xdc1DfA8C0b6C4a8BB22400608468aCfF21016Fad
 
@@ -49,7 +53,7 @@ impersonate:
 	cast rpc anvil_impersonateAccount ${PURO_TOKEN_HOLDER} --rpc-url ${RPC_URL}
 
 	cast rpc anvil_impersonateAccount ${OTHER_HOLDER} --rpc-url ${RPC_URL}
-	
+
 	# impersonate kraken for USDC transfers
 	cast rpc anvil_impersonateAccount ${KRAKEN} --rpc-url ${RPC_URL}
 
@@ -114,7 +118,7 @@ create_listing:
 	cast send ${PURO_TOKEN} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${MARKETPLACE} 5000000000000000000 --rpc-url ${RPC_URL}
 
 	cast send ${MARKETPLACE} --unlocked --from ${ANVIL_PUBLIC_WALLET} "createListing(address,uint256,uint256,uint256,uint256)(bool)" ${PURO_TOKEN} 5000000000000000000 2500000 10000000000000000 1748548281 --rpc-url ${RPC_URL}
-		
+
 approve:
 
 	# cast send ${USDC} --unlocked --from ${ANVIL_PUBLIC_WALLET} "approve(address,uint256)(bool)" ${DIAMOND} 500000000000 --rpc-url ${RPC_URL}
@@ -125,7 +129,7 @@ approve:
 
 	# prod
 	cast send ${USDC} --unlocked --from 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 "approve(address,uint256)(bool)" ${DIAMOND} 500000000000 --rpc-url ${RPC_URL}
-	
+
 	# test
 	cast send ${USDC} --unlocked --from 0xfb079f82cdd18313f3566fb8ddd6414b3507bda2 "approve(address,uint256)(bool)" ${DIAMOND} 500000000000 --rpc-url ${RPC_URL}
 
@@ -133,9 +137,9 @@ approve:
 usdc_transfer:
 
 	cast send ${USDC} --unlocked --from ${KRAKEN} "transfer(address,uint256)(bool)" ${ANVIL_PUBLIC_WALLET} 500000000000
-	
+
 	cast send ${USDC} --unlocked --from ${KRAKEN} "transfer(address,uint256)(bool)" ${DUMMY_SERVER_WALLET} 500000000000
-	
+
 
 balances:
 	cast call 0x6960cE1d21f63C4971324B5b611c4De29aCF980C "balanceOf(address)(uint256)" ${ANVIL_PUBLIC_WALLET}
@@ -154,7 +158,7 @@ approvals:
 
 	# cast call ${USDC} "allowance(address,address)(uint256)" 0xfb079f82cdd18313f3566fb8ddd6414b3507bda2 ${DIAMOND}
 
-	# cast call ${USDC} "allowance(address,address)(uint256)" 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 ${DIAMOND}	
+	# cast call ${USDC} "allowance(address,address)(uint256)" 0x885d78bc6d5cab15e7ef10963846bd2f975c2b89 ${DIAMOND}
 
 
 cmark-issue:

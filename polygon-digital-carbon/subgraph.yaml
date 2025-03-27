@@ -364,6 +364,31 @@ dataSources:
           handler: handleNewCarbonmarkCredit
         # TODO: determine if we need a handler for cancellation event
   - kind: ethereum/contract
+    name: TVERCreditTokenFactory
+    network: matic
+    source:
+      address: '0xB95A8C12D0F49e7388De4CF9a17EEE28d734D7A1'
+      abi: CarbonmarkCreditTokenFactory
+      startBlock: 68650000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/templates/CarbonmarkCreditTokenFactory.ts
+      entities:
+        - CarbonmarkCreditTokenFactory
+      abis:
+        - name: CarbonmarkCreditTokenFactory
+          file: ../lib/abis/CarbonmarkCreditTokenFactory.json
+        - name: CarbonmarkCreditToken
+          file: ../lib/abis/CarbonmarkCreditToken.json
+        - name: ERC20
+          file: ../lib/abis/ERC20.json
+      eventHandlers:
+        - event: Issued(indexed string,uint256,indexed address,indexed address)
+          handler: handleNewCarbonmarkCredit
+        # TODO: determine if we need a handler for cancellation event
+  - kind: ethereum/contract
     name: UBO
     network: matic
     source:

@@ -9,6 +9,7 @@ enum Registry {
   ECO_REGISTRY
   CCS
   CMARK
+  TVER
 }
 
 enum RetireSource {
@@ -23,6 +24,7 @@ enum BridgeProtocol {
   ICR
   COOREST
   CMARK
+  TVER
 }
 
 enum CrossChainBridgeDirection {

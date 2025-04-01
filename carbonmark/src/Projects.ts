@@ -11575,4 +11575,26 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '0',
     false
   ),
+  new ProjectInfo(
+    '0x023eb0b4f9b4dbff04a7026c085e6da6b4e93d4f',
+    'TVER-0',
+    '9999',
+    'Testing Project 0',
+    'C05000000',
+    'Other',
+    'Canada',
+    '0',
+    false
+  ),
+  new ProjectInfo(
+    '', // @todo once deployed add address
+    'TVER-40',
+    '9999',
+    'Large Scale Sustainable Forestation Project in Khun Mae Kum Mee, Wung Chin, and Mae Yom-Mae Pang plantation, Phrae Province',
+    'C05000000',
+    'Other',
+    'Thailand',
+    '0',
+    false
+  ),
 ]

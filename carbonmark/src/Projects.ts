@@ -11576,6 +11576,18 @@ export const PROJECT_INFO: ProjectInfo[] = [
     false
   ),
   new ProjectInfo(
+    '0x928437e8d4d5affed566eee7e9b29ba591d7a2c1',
+    'CMARK-2',
+    '2024',
+    'CO2 storage following the application of Limenet technology in Augusta site',
+    'ACM0022',
+    'Blue Carbon',
+    'Italy',
+    '0',
+    false
+  ),
+
+  new ProjectInfo(
     '0x023eb0b4f9b4dbff04a7026c085e6da6b4e93d4f',
     'TVER-0',
     '9999',

@@ -18,7 +18,7 @@ export const CMARK_PROJECT_INFO = [
   [
     "CMARK-2",
     "CO2 storage following the application of Limenet technology in Augusta site",
-    "ACM0023",
+    "LM_V1_Storage",
     "Blue Carbon",
     "Italy",
     "Italy"

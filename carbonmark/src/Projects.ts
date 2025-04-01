@@ -11580,7 +11580,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     'CMARK-2',
     '2024',
     'CO2 storage following the application of Limenet technology in Augusta site',
-    'ACM0022',
+    'LM_V1_Storage',
     'Blue Carbon',
     'Italy',
     '0',

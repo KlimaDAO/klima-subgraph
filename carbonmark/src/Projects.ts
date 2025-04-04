@@ -11609,7 +11609,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     false
   ),
   new ProjectInfo(
-    '0xe71ffE27D210cc272C0b906623F959A77Ec3E4c7',
+    '0xe71ffe27d210cc272c0b906623f959a77ec3e4c7',
     'TVER-40',
     '2021', 
     'Large Scale Sustainable Forestation Project in Khun Mae Kum Mee, Wung Chin, and Mae Yom-Mae Pang plantation, Phrae Province',

@@ -11599,7 +11599,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     false
   ),
   new ProjectInfo(
-    '', // @TODO: Add token address here when deployed
+    '0xe71ffE27D210cc272C0b906623F959A77Ec3E4c7',
     'TVER-40',
     '9999',
     'Large Scale Sustainable Forestation Project in Khun Mae Kum Mee, Wung Chin, and Mae Yom-Mae Pang plantation, Phrae Province',

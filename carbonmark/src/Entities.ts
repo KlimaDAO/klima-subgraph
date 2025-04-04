@@ -11,7 +11,7 @@ export function loadOrCreateProject(token: Address, tokenId: BigInt): Project {
   let registry = ''
   let projectIndex = 0
   for (let i = 0; i < PROJECT_INFO.length; i++) {
-    if (tokenAddress.toLowerCase() == PROJECT_INFO[i].address && tokenId.toString() == PROJECT_INFO[i].tokenId) {
+    if (tokenAddress.toLowerCase() == PROJECT_INFO[i].address.toLowerCase() && tokenId.toString() == PROJECT_INFO[i].tokenId) {
       id = PROJECT_INFO[i].projectId + '-' + PROJECT_INFO[i].vintage
       registry = PROJECT_INFO[i].projectId.split('-')[0]
       projectIndex = i

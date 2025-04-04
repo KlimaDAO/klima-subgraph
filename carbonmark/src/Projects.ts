@@ -11564,10 +11564,20 @@ export const PROJECT_INFO: ProjectInfo[] = [
     false
   ),
   new ProjectInfo(
-    // TODO: Add token address here
-    '',
+    '0x678a3a1a507d351c0407c8c4ea46e65bed11657d',
     'CMARK-1',
     '2022',
+    'Black Earth 2022 OWC',
+    'ACM0022',
+    'Other',
+    'United States',
+    '0',
+    false
+  ),
+  new ProjectInfo(
+    '0x9cc632d5d7b0ac86a9d26af7d8d72f026d688d07',
+    'CMARK-1',
+    '2023',
     'Black Earth 2022 OWC',
     'ACM0022',
     'Other',
@@ -11599,12 +11609,12 @@ export const PROJECT_INFO: ProjectInfo[] = [
     false
   ),
   new ProjectInfo(
-    '', // @TODO: Add token address here when deployed
+    '0xe71ffE27D210cc272C0b906623F959A77Ec3E4c7',
     'TVER-40',
-    '9999',
+    '2021', 
     'Large Scale Sustainable Forestation Project in Khun Mae Kum Mee, Wung Chin, and Mae Yom-Mae Pang plantation, Phrae Province',
-    'C05000000',
-    'Other',
+    'T-VER-METH-FOR-03',
+    'Forestry',
     'Thailand',
     '0',
     false

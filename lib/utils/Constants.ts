@@ -97,7 +97,7 @@ export const MCO2_ERC20_CONTRACT = Address.fromString('0xaa7dbd1598251f856c12f63
 export const CCO2_ERC20_CONTRACT = Address.fromString('0x82B37070e43C1BA0EA9e2283285b674eF7f1D4E2')
 export const UBO_ERC20_CONTRACT = Address.fromString('0x2B3eCb0991AF0498ECE9135bcD04013d7993110c')
 export const NBO_ERC20_CONTRACT = Address.fromString('0x6BCa3B77C1909Ce1a4Ba1A20d1103bDe8d222E48')
-export const USDC_ERC20_CONTRACT = Address.fromString('0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174')
+export const USDC_ERC20_CONTRACT = Address.fromString('0x2791bca1f2de4661ed88a30c99a7a9449aa84174')
 
 // Protocol Functional Addresses
 export const DAO_MULTISIG = Address.fromString('0x65a5076c0ba74e5f3e069995dc3dab9d197d995c')
@@ -142,3 +142,6 @@ export const ICR_MIGRATION_HASHES = [
 
 // Global constants
 export const KGS_PER_TONNE = BigDecimal.fromString('1000')
+
+// Price guard constants
+export const MIN_PRICE_GUARD = BigInt.fromI32(1000)

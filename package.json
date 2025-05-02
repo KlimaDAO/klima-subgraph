@@ -22,7 +22,9 @@
     "local-fork": "make local-fork",
     "local-fork-block": "make local-fork-block",
     "fund": "make impersonate && make transfer && make tco2",
-    "usdc": "make impersonate && make transfer_USDC"
+    "usdc": "make impersonate && make transfer_USDC",
+    "addProjects-polygon": "bun lib/projects/addProjects.ts --polygon",
+    "removeProjects-polygon": "bun lib/projects/removeProjects.ts --polygon"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.56.0",

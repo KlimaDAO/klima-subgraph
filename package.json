@@ -23,8 +23,7 @@
     "local-fork-block": "make local-fork-block",
     "fund": "make impersonate && make transfer && make tco2",
     "usdc": "make impersonate && make transfer_USDC",
-    "addProjects-polygon": "bun lib/projects/addProjects.ts --polygon",
-    "removeProjects-polygon": "bun lib/projects/removeProjects.ts --polygon"
+    "addCredits-polygon": "bun lib/projects/addCredits.ts --network polygon"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.56.0",
@@ -34,7 +33,9 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
+    "arg": "^5.0.2",
     "conventional-changelog-cli": "5.0.0",
+    "ethers": "^6.14.0",
     "mustache": "4.2.0",
     "octokit": "4.0.2"
   }

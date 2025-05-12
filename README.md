@@ -51,3 +51,15 @@ After the subgraph is deployed, navigate to http://127.0.01:8000/subgraphs/name/
 
 A bug in Matchstick prevents the `npm run test` copmmand to run correctly.
 You can use the workaround described here: https://github.com/graphprotocol/graph-tooling/issues/1546#issuecomment-2182244898
+
+### Add project definitions on the fly
+
+Adding project definitions normally requires updating the `lib/projects/Projects.ts` file and recompiling and redeploying the Marketplace and Polygon Digital Carbon subgraph.
+This process is not optimal because the subgraphs deployment are tedious and long.
+
+Projects can be added on the fly (without redeployuing the contracts) by updating the ProjectManager contract.
+- update the `lib/projects/Projects.ts` file with the new project's definitions
+- set your `ALCHEMY_API_KEY` environment variable
+- set your `PRIVATE_KEY` environment variable
+- execute `npm run addProjects-polygon`
+

@@ -142,3 +142,6 @@ export const ICR_MIGRATION_HASHES = [
 
 // Global constants
 export const KGS_PER_TONNE = BigDecimal.fromString('1000')
+
+// Price guard constants
+export const MIN_PRICE_GUARD = BigInt.fromI32(1000)

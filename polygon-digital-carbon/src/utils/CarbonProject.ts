@@ -1,4 +1,3 @@
-import { Project } from '../../../carbonmark/generated/schema'
 import { PROJECT_INFO } from '../../../lib/projects/Projects'
 
 import { CarbonProject } from '../../generated/schema'
@@ -15,8 +14,6 @@ function loadOrCreateCarbonProjectHelper(registry: string, projectID: string, fo
   if (project == null || forceUpdate) {
     for (let i = 0; i < PROJECT_INFO.length; i++) {
       if (projectID.toLowerCase() == PROJECT_INFO[i].projectId) {
-        registry = PROJECT_INFO[i].projectId.split('-')[0]
-        project.registry = registry
         project.projectID = projectID
         project.name = PROJECT_INFO[i].name
         project.methodologies = PROJECT_INFO[i].methodology

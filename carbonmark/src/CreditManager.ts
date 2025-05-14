@@ -1,4 +1,4 @@
-import { log, Address, BigInt, store } from '@graphprotocol/graph-ts'
+import { log,  BigInt } from '@graphprotocol/graph-ts'
 import {
   CreditAdded as CreditAddedEvent,
 } from '../generated/CreditManager/CreditManager'
@@ -6,7 +6,7 @@ import { Project } from '../generated/schema'
 import { createCategory, createCountry } from './Entities'
 
 export function handleCreditAdded(event: CreditAddedEvent): void {
-  log.info('handleProjectAdded fired {}', [event.params.id.toHexString()])
+  log.info('handleProjectAdded fired {}-{}', [event.params.tokenAddress.toHexString(), event.params.tokenId.toString()])
 
   const registry = event.params.projectId.split('-')[0]
 
@@ -20,8 +20,9 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
   project.methodology = event.params.methodologies[0]
   project.vintage = BigInt.fromString(event.params.vintage)
   project.tokenId = BigInt.fromI32(0)
-  project.projectAddress = event.params.id
+  project.projectAddress = event.params.tokenAddress
   project.registry = registry
+  project.tokenId = event.params.tokenId
   project.category = event.params.category
   project.country = event.params.country
   project.save()

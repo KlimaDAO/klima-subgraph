@@ -1,8 +1,9 @@
+import { Project } from '../../../carbonmark/generated/schema'
 import { PROJECT_INFO } from '../../../lib/projects/Projects'
 
 import { CarbonProject } from '../../generated/schema'
 
-export function loadOrCreateCarbonProject(registry: string, projectID: string): CarbonProject {
+function loadOrCreateCarbonProjectHelper(registry: string, projectID: string, forceUpdate: boolean): CarbonProject {
   // Find the project + vintage ID from token address
   let project = CarbonProject.load(projectID)
 
@@ -10,7 +11,8 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
     project = new CarbonProject(projectID)
     project.registry = registry
     project.projectID = projectID
-
+  }
+  if (project == null || forceUpdate) {
     for (let i = 0; i < PROJECT_INFO.length; i++) {
       if (projectID.toLowerCase() == PROJECT_INFO[i].projectId) {
         registry = PROJECT_INFO[i].projectId.split('-')[0]
@@ -23,10 +25,16 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string): 
         break
       }
     }
-
     project.save()
-
-    
   }
   return project as CarbonProject
 }
+
+export function loadOrCreateCarbonProject(registry: string, projectID: string): CarbonProject {
+  return loadOrCreateCarbonProjectHelper(registry, projectID, false)
+}
+
+export function loadOrCreateOrUpdateCarbonProject(registry: string, projectID: string): CarbonProject {
+  return loadOrCreateCarbonProjectHelper(registry, projectID, true)
+}
+

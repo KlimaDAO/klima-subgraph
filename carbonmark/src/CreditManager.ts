@@ -14,17 +14,18 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
   let project = Project.load(id)
   if (project == null) {
     project = new Project(id)
-    project.key = event.params.projectId 
-    project.name = event.params.name
-    project.methodology = event.params.methodologies[0]
-    project.vintage = BigInt.fromString(event.params.vintage)
-    project.projectAddress = event.params.id
-    project.registry = registry
-    project.category = event.params.category
-    project.country = event.params.country
-    project.save()
-
-    createCountry(project.country)
-    createCategory(project.category)
   }
+  project.key = event.params.projectId 
+  project.name = event.params.name
+  project.methodology = event.params.methodologies[0]
+  project.vintage = BigInt.fromString(event.params.vintage)
+  project.tokenId = BigInt.fromI32(0)
+  project.projectAddress = event.params.id
+  project.registry = registry
+  project.category = event.params.category
+  project.country = event.params.country
+  project.save()
+
+  createCountry(project.country)
+  createCategory(project.category)
 }

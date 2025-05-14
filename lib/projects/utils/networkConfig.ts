@@ -10,20 +10,20 @@ export const networkConfig = {
         startBlock: 46541534,
       },
       creditManager: {
-        address: '0xa3b491CE0f67A03c0D8c1095F47d9ae9E98a2B92',
+        address: '0xeC78c8c2Df560e5598EeeaE388D20465D6e65f84',
         startBlock: 46541534,
       },
     },
   },
-  mumbai: {
-    rpcUrl: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+  amoy: {
+    rpcUrl: `https://rpc-amoy.polygon.technology`,
     addresses: {
       marketplace: {
         address: '0xD83aE95CC40B69a1053326D6b21C5731e616FD94',
         startBlock: 46541534,
       },
       creditManager: {
-        address: '',
+        address: '0x6E7070CA35df41A9f856d9530d3BA42C9a0E06Fa',
         startBlock: 46541534,
       },
     },

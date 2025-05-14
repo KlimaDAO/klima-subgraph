@@ -5,24 +5,31 @@ import { PROJECT_INFO } from './Projects';
 
 
 const getCreditInfo = (creditId: string) => {
-  const info = PROJECT_INFO.find(projectInfo => `${projectInfo[1]}-${projectInfo[2]}` === creditId)
+  const info = PROJECT_INFO.find(projectInfo => `${projectInfo.projectId}-${projectInfo.vintage}` === creditId)
   // The contract expects an array for the vintage
   if (!info) {
     throw(Error(`Credit id ${creditId} not found`))
   }
-  const res: (string | string[])[] = [...info]
-  // Add description
-  res.push("")
-  // Methodologies is an array
-  res[4] = [info[4]]
-  return res
+
+  return [
+    info.address,
+    info.tokenId,
+    info.isExAnte,
+    info.projectId,
+    info.vintage,
+    info.name,
+    [info.methodology],
+    info.category,
+    info.country,
+    "unknown", // region
+    "" // description
+  ]
 }
 
 const addCredits = async (network: string, creditIds: string[]) => {
   const { getContract, addresses } = getNetworkConfig(network as NetworkType)
 
-  const missingCredits = creditIds.map(creditId => getCreditInfo(creditId))
-  console.log(missingCredits)
+  const credits = creditIds.map(creditId => getCreditInfo(creditId))
 
   // Project Manager contract
   const creditManagerContractAddress = addresses.creditManager.address
@@ -35,7 +42,7 @@ const addCredits = async (network: string, creditIds: string[]) => {
   for (let i = 0; i < numberOfBatches; i++) {
     const start = i * batchSize
     const end = start + batchSize
-    const currentBatch = missingCredits.slice(start, end)
+    const currentBatch = credits.slice(start, end)
 
     try {
       const tx = await creditManagerContract.addCreditBatch(currentBatch)

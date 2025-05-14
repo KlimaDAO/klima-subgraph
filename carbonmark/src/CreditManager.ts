@@ -18,6 +18,7 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
   project.key = event.params.projectId 
   project.name = event.params.name
   project.methodology = event.params.methodologies[0]
+  project.isExAnte = event.params.isExAnte
   project.vintage = BigInt.fromString(event.params.vintage)
   project.tokenId = BigInt.fromI32(0)
   project.projectAddress = event.params.tokenAddress

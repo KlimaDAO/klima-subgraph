@@ -14,12 +14,14 @@
     "inputs": [
       { "indexed": false, "internalType": "address", "name": "tokenAddress", "type": "address" },
       { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "indexed": false, "internalType": "bool", "name": "isExAnte", "type": "bool" },
       { "indexed": false, "internalType": "string", "name": "projectId", "type": "string" },
       { "indexed": false, "internalType": "string", "name": "vintage", "type": "string" },
       { "indexed": false, "internalType": "string", "name": "name", "type": "string" },
       { "indexed": false, "internalType": "string[]", "name": "methodologies", "type": "string[]" },
       { "indexed": false, "internalType": "string", "name": "category", "type": "string" },
       { "indexed": false, "internalType": "string", "name": "country", "type": "string" },
+      { "indexed": false, "internalType": "string", "name": "region", "type": "string" },
       { "indexed": false, "internalType": "string", "name": "description", "type": "string" }
     ],
     "name": "CreditAdded",
@@ -91,12 +93,14 @@
         "components": [
           { "internalType": "address", "name": "tokenAddress", "type": "address" },
           { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+          { "internalType": "bool", "name": "isExAnte", "type": "bool" },
           { "internalType": "string", "name": "projectId", "type": "string" },
           { "internalType": "string", "name": "vintage", "type": "string" },
           { "internalType": "string", "name": "name", "type": "string" },
           { "internalType": "string[]", "name": "methodologies", "type": "string[]" },
           { "internalType": "string", "name": "category", "type": "string" },
           { "internalType": "string", "name": "country", "type": "string" },
+          { "internalType": "string", "name": "region", "type": "string" },
           { "internalType": "string", "name": "description", "type": "string" }
         ],
         "internalType": "struct CreditManager.Credit",
@@ -115,12 +119,14 @@
         "components": [
           { "internalType": "address", "name": "tokenAddress", "type": "address" },
           { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+          { "internalType": "bool", "name": "isExAnte", "type": "bool" },
           { "internalType": "string", "name": "projectId", "type": "string" },
           { "internalType": "string", "name": "vintage", "type": "string" },
           { "internalType": "string", "name": "name", "type": "string" },
           { "internalType": "string[]", "name": "methodologies", "type": "string[]" },
           { "internalType": "string", "name": "category", "type": "string" },
           { "internalType": "string", "name": "country", "type": "string" },
+          { "internalType": "string", "name": "region", "type": "string" },
           { "internalType": "string", "name": "description", "type": "string" }
         ],
         "internalType": "struct CreditManager.Credit[]",

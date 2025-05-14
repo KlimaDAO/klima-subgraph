@@ -4,7 +4,7 @@ import { networkConfig } from './networkConfig';
 export type NetworkType = keyof typeof networkConfig;
 
 export function getNetworkConfig(network: NetworkType) {
-  const config = networkConfig[network] || networkConfig['mumbai']; 
+  const config = networkConfig[network] || networkConfig['amoy']; 
   const provider = new JsonRpcProvider(config.rpcUrl);
   const wallet = new Wallet(process.env.PRIVATE_KEY!, provider);
   const signer = wallet.connect(provider);

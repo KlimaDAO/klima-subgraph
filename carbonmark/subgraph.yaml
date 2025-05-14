@@ -42,7 +42,7 @@ dataSources:
     name: CreditManager
     network: matic
     source:
-      address: '0xa3b491CE0f67A03c0D8c1095F47d9ae9E98a2B92'
+      address: '0xeC78c8c2Df560e5598EeeaE388D20465D6e65f84'
       abi: CreditManager
       startBlock: 71498964
     mapping:
@@ -56,7 +56,7 @@ dataSources:
         - name: CreditManager
           file: ../lib/abis/CreditManager.json
       eventHandlers:
-        - event: CreditAdded(address,uint256,string,string,string,string[],string,string,string)
+        - event: CreditAdded(address,uint256,bool,string,string,string,string[],string,string,string,string)
           handler: handleCreditAdded
 
 

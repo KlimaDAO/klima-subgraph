@@ -773,5 +773,5 @@ dataSources:
         - name: CreditManager
           file: ../lib/abis/CreditManager.json
       eventHandlers:
-        - event: CreditAdded(address,uint256,string,string,string,string[],string,string,string)
+        - event: CreditAdded(address,uint256,bool,string,string,string,string[],string,string,string,string)
           handler: handleCreditAdded

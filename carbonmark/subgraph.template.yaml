@@ -38,3 +38,25 @@ dataSources:
         - handler: handleSetSubgraphVersion
           filter:
             kind: once
+  - kind: ethereum/contract
+    name: CreditManager
+    network: {{network}}
+    source:
+      address: '{{CreditManager.address}}'
+      abi: CreditManager
+      startBlock: {{CreditManager.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/CreditManager.ts
+      entities:
+        - Project
+      abis:
+        - name: CreditManager
+          file: ../lib/abis/CreditManager.json
+      eventHandlers:
+        - event: CreditAdded(address,string,string,string,string[],string,string,string)
+          handler: handleListingCreated
+
+

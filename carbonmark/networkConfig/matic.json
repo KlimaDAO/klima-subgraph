@@ -2,6 +2,10 @@
     "network": "matic",
     "Carbonmark": {
       "address": "0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821",
-      "startBlock": "49503672"
+      "startBlock": "71498964"
+    },
+    "CreditManager": {
+      "address": "0xa3b491CE0f67A03c0D8c1095F47d9ae9E98a2B92",
+      "startBlock": "71498964"
     }
 }

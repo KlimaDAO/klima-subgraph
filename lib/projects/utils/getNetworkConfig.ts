@@ -10,6 +10,6 @@ export function getNetworkConfig(network: NetworkType) {
   const signer = wallet.connect(provider);
 
   const getContract = (address: string, abi: any[]) => new Contract(address, abi, wallet);
-
+0xa3b491CE0f67A03c0D8c1095F47d9ae9E98a2B92
   return { provider, wallet, signer, getContract, addresses: config.addresses};
 }

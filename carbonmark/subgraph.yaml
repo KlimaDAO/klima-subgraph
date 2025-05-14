@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Carbonmark
-    network: mumbai
+    network: matic
     source:
-      address: '0xD83aE95CC40B69a1053326D6b21C5731e616FD94'
+      address: '0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821'
       abi: Carbonmark
-      startBlock: 46814830
+      startBlock: 71498964
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -38,3 +38,25 @@ dataSources:
         - handler: handleSetSubgraphVersion
           filter:
             kind: once
+  - kind: ethereum/contract
+    name: CreditManager
+    network: matic
+    source:
+      address: '0xa3b491CE0f67A03c0D8c1095F47d9ae9E98a2B92'
+      abi: CreditManager
+      startBlock: 71498964
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/CreditManager.ts
+      entities:
+        - Project
+      abis:
+        - name: CreditManager
+          file: ../lib/abis/CreditManager.json
+      eventHandlers:
+        - event: CreditAdded(address,string,string,string,string[],string,string,string)
+          handler: handleListingCreated
+
+

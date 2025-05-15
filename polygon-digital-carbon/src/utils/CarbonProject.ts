@@ -10,6 +10,11 @@ function loadOrCreateCarbonProjectHelper(registry: string, projectID: string, fo
     project = new CarbonProject(projectID)
     project.registry = registry
     project.projectID = projectID
+    project.name = ''
+    project.methodologies = ''
+    project.category = ''
+    project.country = ''
+    project.region = ''
   }
   if (project == null || forceUpdate) {
     for (let i = 0; i < PROJECT_INFO.length; i++) {

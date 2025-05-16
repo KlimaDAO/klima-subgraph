@@ -1,6 +1,6 @@
 {
   "name": "klimadao-pairs",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "license": "MIT",
   "scripts": {
     "codegen": "graph codegen",

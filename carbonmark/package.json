@@ -9,6 +9,7 @@
     "update-puro": "bun src/scripts/updatePuroProjects.ts",
     "prepare-local": "npx mustache networkConfig/localhost.json subgraph.template.yaml > subgraph.yaml",
     "prepare-matic": "npx mustache networkConfig/matic.json subgraph.template.yaml > subgraph.yaml",
+    "prepare-matic-dynamic": "bun ../lib/projects/updateNetworkConfig.ts networkConfig/matic.json && npm run prepare-matic",
     "prepare-mumbai": "npx mustache networkConfig/mumbai.json subgraph.template.yaml > subgraph.yaml",
     "codegen": "rm -rf ./generated && graph codegen",
     "test": "graph test",

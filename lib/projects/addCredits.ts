@@ -10,7 +10,7 @@ if (!process.env.PRIVATE_KEY) {
 
 const getCreditInfo = (creditId: string) => {
   const info = PROJECT_INFO.find(projectInfo => `${projectInfo.projectId}-${projectInfo.vintage}` === creditId)
-  // The contract expects an array for the vintage
+  
   if (!info) {
     throw(Error(`Credit id ${creditId} not found`))
   }
@@ -32,10 +32,9 @@ const getCreditInfo = (creditId: string) => {
 
 const addCredits = async (network: string, creditIds: string[]) => {
   const { getContract, addresses } = getNetworkConfig(network as NetworkType)
-
+  
   const credits = creditIds.map(creditId => getCreditInfo(creditId))
 
-  // Project Manager contract
   const creditManagerContractAddress = addresses.creditManager.address
   
   const creditManagerContract = getContract(creditManagerContractAddress, CreditManagerAbi)

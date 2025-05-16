@@ -31,7 +31,7 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
   project.methodologies = event.params.methodologies[0] // CarbonProject supports only one methodology
   project.registry = registry
   project.category = event.params.category
-  project.region = '' // Should the credit manager support region?
+  project.region = event.params.region
   project.country = event.params.country
   project.save()
 }

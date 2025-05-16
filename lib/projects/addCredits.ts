@@ -3,6 +3,10 @@ import CreditManagerAbi from '../abis/CreditManager.json'
 import arg from 'arg';
 import { PROJECT_INFO } from './Projects';
 
+if (!process.env.PRIVATE_KEY) {
+  throw new Error('PRIVATE_KEY environment variable is not set');
+}
+
 
 const getCreditInfo = (creditId: string) => {
   const info = PROJECT_INFO.find(projectInfo => `${projectInfo.projectId}-${projectInfo.vintage}` === creditId)

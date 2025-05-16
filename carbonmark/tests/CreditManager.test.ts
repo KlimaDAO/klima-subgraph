@@ -18,7 +18,7 @@ const tokenAddress=Address.fromString(TOKEN_ADDRESS)
 const TOKEN_ID = 0
 const IS_EX_ANTE = false
 const PROJECT_ID = 'VCS-191'
-const REGISTRY = 'VERRA'
+const REGISTRY = 'VCS'
 const VINTAGE = '2009'
 const NAME = '4×50 MW Dayingjiang- 3 Hydropower Project Phases 1&2'
 const METHODOLOGIES = ['ACM0002']
@@ -79,15 +79,18 @@ describe('CreditManager tests', () => {
   test('CreditAdded event', () => {
     // Issuance event
     const event = newCreditAddedEvent()
-    const id = event.params.projectId
+    const id = event.params.projectId + '-' + event.params.vintage
 
     handleCreditAdded(event)
-    assert.fieldEquals('CarbonProject', id, 'projectID', PROJECT_ID)
-    assert.fieldEquals('CarbonProject', id, 'name', NAME)
-    assert.fieldEquals('CarbonProject', id, 'methodologies', METHODOLOGIES[0])
-    assert.fieldEquals('CarbonProject', id, 'category', CATEGORY)
-    assert.fieldEquals('CarbonProject', id, 'country', COUNTRY)
-    assert.fieldEquals('CarbonProject', id, 'region', REGION)
-    assert.fieldEquals('CarbonProject', id, 'registry', REGISTRY)
+    assert.fieldEquals('Project', id, 'key', PROJECT_ID)
+    assert.fieldEquals('Project', id, 'name', NAME)
+    assert.fieldEquals('Project', id, 'methodology', METHODOLOGIES[0])
+    assert.fieldEquals('Project', id, 'isExAnte', IS_EX_ANTE.toString())
+    assert.fieldEquals('Project', id, 'vintage', VINTAGE)
+    assert.fieldEquals('Project', id, 'projectAddress', TOKEN_ADDRESS.toLowerCase())
+    assert.fieldEquals('Project', id, 'registry', REGISTRY)
+    assert.fieldEquals('Project', id, 'tokenId', TOKEN_ID.toString())
+    assert.fieldEquals('Project', id, 'category', CATEGORY)
+    assert.fieldEquals('Project', id, 'country', COUNTRY)
   })
 })

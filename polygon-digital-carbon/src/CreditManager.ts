@@ -1,11 +1,13 @@
-import { log, Address, BigInt, store } from '@graphprotocol/graph-ts'
+import { log } from '@graphprotocol/graph-ts'
 import {
   CreditAdded as CreditAddedEvent,
 } from '../generated/CreditManager/CreditManager'
 import { CarbonProject } from '../generated/schema'
 
 export function handleCreditAdded(event: CreditAddedEvent): void {
+  log.info('fd', [])
   log.info('handleProjectAdded fired {}-{}', [event.params.tokenAddress.toHexString(), event.params.tokenId.toString()])
+  log.info('fds', [])
 
   const id = event.params.projectId
   let project = CarbonProject.load(id)

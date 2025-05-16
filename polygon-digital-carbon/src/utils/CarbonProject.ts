@@ -1,10 +1,12 @@
 import { PROJECT_INFO } from '../../../lib/projects/Projects'
 
 import { CarbonProject } from '../../generated/schema'
-
+import { log } from '@graphprotocol/graph-ts'
 function loadOrCreateCarbonProjectHelper(registry: string, projectID: string, forceUpdate: boolean): CarbonProject {
   // Find the project + vintage ID from token address
   let project = CarbonProject.load(projectID)
+
+  let newProject = project == null
 
   if (project == null) {
     project = new CarbonProject(projectID)
@@ -16,14 +18,16 @@ function loadOrCreateCarbonProjectHelper(registry: string, projectID: string, fo
     project.country = ''
     project.region = ''
   }
-  if (project == null || forceUpdate) {
+
+  if (newProject || forceUpdate) {
     for (let i = 0; i < PROJECT_INFO.length; i++) {
-      if (projectID.toLowerCase() == PROJECT_INFO[i].projectId) {
+      if (projectID.toLowerCase() == PROJECT_INFO[i].projectId.toLowerCase()) {
         project.projectID = projectID
         project.name = PROJECT_INFO[i].name
         project.methodologies = PROJECT_INFO[i].methodology
         project.category = PROJECT_INFO[i].category
         project.country = PROJECT_INFO[i].country
+        project.region = PROJECT_INFO[i].region
         break
       }
     }

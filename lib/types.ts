@@ -7,6 +7,7 @@ export class ProjectInfo {
       public methodology: string,
       public category: string,
       public country: string,
+      public region: string,
       public tokenId: string,
       public isExAnte: boolean
     ) {}

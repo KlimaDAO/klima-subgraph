@@ -8,9 +8,8 @@ import { ProjectIdUpdated } from '../../generated/CarbonProjectsAddress/CarbonPr
 import { USDC_ERC20_CONTRACT } from '../../../lib/utils/Constants'
 import { ZERO_BD, ZERO_BI } from '../../../lib/utils/Decimals'
 import { loadCarbonCredit } from './CarbonCredit'
-import { loadOrCreateCarbonProject } from './CarbonProject'
+import { loadOrCreateOrUpdateCarbonProject } from './CarbonProject'
 import { ToucanPuroCarbonOffsets } from '../../generated/templates/ToucanPuroCarbonOffsets/ToucanPuroCarbonOffsets'
-import { PURO_PROJECT_INFO } from '../../../lib/utils/PuroProjectInfo'
 
 export function createTokenWithCall(tokenAddress: Address, block: ethereum.Block): void {
   let token = Token.load(tokenAddress)
@@ -164,17 +163,7 @@ export function handlePuroIdMigration(event: ProjectIdUpdated): void {
     // retrieve new project attributes
     let attributes = carbonCreditContract.getAttributes()
     // create new project with updated Id
-    const updatedProject = loadOrCreateCarbonProject('PURO_EARTH', attributes.value0.projectId)
-
-    for (let i = 0; i < PURO_PROJECT_INFO.length; i++) {
-      if (updatedProject.id == PURO_PROJECT_INFO[i][0]) {
-        updatedProject.name = PURO_PROJECT_INFO[i][1]
-        updatedProject.country = PURO_PROJECT_INFO[i][2]
-        break
-      }
-    }
-
-    updatedProject.save()
+    const updatedProject = loadOrCreateOrUpdateCarbonProject('PURO_EARTH', attributes.value0.projectId)
 
     // update credit
     carbonCredit.project = updatedProject.id

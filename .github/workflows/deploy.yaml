@@ -13,12 +13,13 @@
 # 12. Generate Subgraph Code: Run the npm run codegen command to generate code for the subgraph if changes are detected.
 # 13. Check for uncommitted changes: Ensure there are no uncommitted changes in the subgraph after code generation.
 # 14. Evaluate if there are changes: Print a message indicating if there are uncommitted changes and advise executing code generation locally if necessary.
-# 15. Build Subgraph: Run the build process for the subgraph (npm run build).
-# 16. Determine if branch is staging or not: Identify if the branch is staging or another branch, and set a prefix for the subgraph name.
-# 17. Create issue for deployment tracking: Automatically create a GitHub issue to track the deployment process.
-# 18. Check Node.js version (debugging): Verify the Node.js version in use (node -v).
-# 19. Generate Changelog: Run a custom script (.github/actions-scripts/generateChangelog.mjs) to generate a changelog between the last tag and the new version.
-# 20. Create GitHub Release: Draft a new GitHub release with the generated changelog for the new version.
+# 15. Prepare dynamic manifest and regenerate subgraph code if polygon-digital-carbon or carbonmark
+# 16. Build Subgraph: Run the build process for the subgraph (npm run build).
+# 17. Determine if branch is staging or not: Identify if the branch is staging or another branch, and set a prefix for the subgraph name.
+# 18. Create issue for deployment tracking: Automatically create a GitHub issue to track the deployment process.
+# 19. Check Node.js version (debugging): Verify the Node.js version in use (node -v).
+# 20. Generate Changelog: Run a custom script (.github/actions-scripts/generateChangelog.mjs) to generate a changelog between the last tag and the new version.
+# 21. Create GitHub Release: Draft a new GitHub release with the generated changelog for the new version.
 
 name: Deployment
 
@@ -56,13 +57,16 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
           node-version: '16'
+
       - name: Install dependencies
         run: yarn --frozen-lockfile
         working-directory: '${{ matrix.value }}'
+
       - name: Get last release tag
         if: ${{ env.IS_MAIN == 'true' }}
         id: get_last_tag
@@ -74,6 +78,7 @@ jobs:
           echo "last_tag=$LAST_TAG" >> $GITHUB_OUTPUT
           echo "Fetched LAST_TAG: $LAST_TAG"
         working-directory: '${{ matrix.value }}'
+
       - name: Get schema version from package.json
         id: get_schema_version
         if: ${{ env.IS_MAIN == 'true' }}
@@ -82,6 +87,7 @@ jobs:
           echo "schema_version=$SCHEMA_VERSION" >> $GITHUB_OUTPUT
           echo "Fetched SCHEMA_VERSION: $SCHEMA_VERSION"
         working-directory: '${{ matrix.value }}'
+
       - name: Compare schema versions and determine new version
         id: compare_versions
         if: ${{ env.IS_MAIN == 'true' || env.IS_STAGING == 'true' }}
@@ -143,15 +149,18 @@ jobs:
           SCHEMA_VERSION=${{ steps.get_schema_version.outputs.schema_version }}
           echo "{\"schemaVersion\": \"$SCHEMA_VERSION\", \"publishedVersion\": \"$NEW_PUBLISHED_VERSION\"}" > version.json
         working-directory: '${{ matrix.value }}'
+
       - name: Set Version in version.ts for version entity
         if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         # Updating version.ts files because the subgraph handlers can't read .json directly
         run: npm run set-version
         working-directory: '${{ matrix.value }}'
+
       - name: Prepare Manifest if polygon-digital-carbon or carbonmark
         if: ${{ (matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark') && steps.compare_versions.outputs.should_deploy == 'true'}}
         run: npm run prepare-matic
         working-directory: '${{ matrix.value }}'
+
       - name: Commit all changes
         if: ${{ steps.compare_versions.outputs.should_deploy == 'true'}}
         run: |
@@ -188,6 +197,7 @@ jobs:
             git push origin $BRANCH_NAME
           fi
         working-directory: '${{ matrix.value }}'
+
       - name: Tag the commit with the new version
         if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
@@ -216,10 +226,12 @@ jobs:
         working-directory: '${{ matrix.value }}'
       # Generate code and check for uncommitted changes
       # https://github.com/marketplace/actions/check-uncommitted-changes
+
       - name: Generate Subgraph Code
         if: ${{ steps.compare_versions.outputs.should_deploy == 'true'}}
         run: npm run codegen
         working-directory: '${{ matrix.value }}'
+
       - name: Check for uncommitted changes
         if: ${{ steps.compare_versions.outputs.should_deploy == 'true'}}
         id: check-changes
@@ -227,6 +239,13 @@ jobs:
       - name: Evaluate if there are changes
         if: ${{ steps.check-changes.outputs.outcome == 'failure'}}
         run: echo "There are uncommitted changes - execute 'npm run codegen' locally and commit the generated files!"
+
+      - name: Prepare dynamic manifest and regenerate subgraph code if polygon-digital-carbon or carbonmark
+        if: ${{ (matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark') && steps.compare_versions.outputs.should_deploy == 'true'}}
+        run: |
+          npm run prepare-matic-dynamic
+          npm run codegen
+        working-directory: '${{ matrix.value }}'
 
       - name: Build Subgraph
         if: ${{ steps.compare_versions.outputs.should_deploy == 'true'}}
@@ -256,6 +275,7 @@ jobs:
           fi
         env:
           REF: ${{ github.ref }}
+
       - name: Deploy Subgraph to Studio
         if: steps.compare_versions.outputs.should_deploy == 'true'
         run: |
@@ -263,6 +283,7 @@ jobs:
 
           ../node_modules/.bin/graph deploy --studio --deploy-key ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY }} "${{ steps.staging_or_not.outputs.subgraph }}" --version-label "$VERSION_LABEL"
         working-directory: '${{ matrix.value }}'
+
       - name: Deploy Subgraph to Alchemy Hosted Service
         if: ${{ (matrix.value == 'carbonmark' || matrix.value == 'polygon-digital-carbon' || matrix.value == 'pairs' || matrix.value == 'ethereum-bridged-carbon') && env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true' }}
         run: |
@@ -270,6 +291,7 @@ jobs:
 
           ../node_modules/.bin/graph deploy "${{ steps.staging_or_not.outputs.subgraph }}" --deploy-key ${{ secrets.SUBGRAPH_ALCHEMY_HOSTED_SERVICE_DEPLOY_KEY }} --node https://subgraphs.alchemy.com/api/subgraphs/deploy --ipfs https://ipfs.satsuma.xyz --version-label "$VERSION_LABEL"
         working-directory: '${{ matrix.value }}'
+
       - name: Create issue for deployment tracking
         uses: JasonEtco/create-an-issue@v2
         if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true'}}
@@ -277,12 +299,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLISHED_VERSION: ${{ steps.compare_versions.outputs.new_published_version }}
           SUBGRAPH_NAME: ${{ matrix.value }}
+
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
           node-version: '18'
+
       - name: Check Node.js version (debugging)
         run: node -v
+
       - name: Generate Changelog
         if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true'}}
         id: generate_changelog
@@ -294,6 +319,7 @@ jobs:
         run: |
           echo "Generating changelog for ${{ matrix.value }} v${{ steps.compare_versions.outputs.new_published_version }}"
           node .github/actions-scripts/generateChangelog.mjs
+
       - name: Create GitHub Release
         if: ${{ env.IS_MAIN == 'true' && steps.compare_versions.outputs.should_deploy == 'true'}}
         uses: actions/create-release@v1

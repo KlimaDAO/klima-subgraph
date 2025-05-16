@@ -11,16 +11,17 @@ import {
 import { Address, Bytes, ethereum } from '@graphprotocol/graph-ts'
 import { Issued } from '../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditTokenFactory'
 import { handleNewCarbonmarkCredit } from '../src/templates/CarbonmarkCreditTokenFactory'
-import { TVER_PROJECT_INFO } from '../../lib/utils/TVERProjectInfo'
+import { PROJECT_INFO } from '../../lib/projects/Projects'
 import { Transfer } from '../generated/BCT/ERC20'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Retired } from '../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditToken'
 import { handleCarbonmarkCreditRetirement, handleCarbonmarkCreditTransfer } from '../src/templates/CarbonmarkCreditToken'
+import { ProjectInfo } from '../../lib/types'
 
 
 const ISSUED_TOKEN_ADDRESS = '0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9'
 const ISSUED_TOKEN_BENEFICIARY = '0x3Da300661Eb0f04a4044A4fB01d79E66C8c81ED9'
-const ISSUED_TOKEN_PROJECT_ID = 'TVER-1'
+const ISSUED_TOKEN_PROJECT_ID = 'TVER-0'
 const ISSUED_TOKEN_VINTAGE = '2025'
 const ISSUED_TOKEN_CREDIT_ID = `${ISSUED_TOKEN_PROJECT_ID}-${ISSUED_TOKEN_VINTAGE}`
 const ISSUED_TOKEN_SYMBOL = ISSUED_TOKEN_CREDIT_ID
@@ -162,6 +163,18 @@ describe('TVER tests', () => {
     const event = newIssuedEvent()
     let id = issuedTokenAddress.toHexString()
 
+    let projectInfo: ProjectInfo | null = null
+    for (let i = 0; i < PROJECT_INFO.length; i++) {
+      if (PROJECT_INFO[i].projectId === ISSUED_TOKEN_PROJECT_ID) {
+        projectInfo = PROJECT_INFO[i]
+        break
+      }
+    }
+
+    if (!projectInfo) {
+      throw new Error('Project info not found')
+    }
+
     handleNewCarbonmarkCredit(event)
     assert.fieldEquals('CarbonCredit', id, 'tokenAddress', ISSUED_TOKEN_ADDRESS)
     assert.fieldEquals('CarbonCredit', id, 'bridgeProtocol', 'TVER')
@@ -176,11 +189,11 @@ describe('TVER tests', () => {
     assert.fieldEquals('CarbonCredit', id, 'isExAnte', 'false')
 
     assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'registry', 'TVER')
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'name', TVER_PROJECT_INFO[0][1])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'methodologies', TVER_PROJECT_INFO[0][2])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'category', TVER_PROJECT_INFO[0][3])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'country', TVER_PROJECT_INFO[0][4])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'region', TVER_PROJECT_INFO[0][5])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'name', projectInfo.name)
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'methodologies', projectInfo.methodology)
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'category', projectInfo.category)
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'country', projectInfo.country)
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'region', projectInfo.region)
 
     assert.fieldEquals('Token', id, 'tokenAddress', ISSUED_TOKEN_ADDRESS)
     assert.fieldEquals('Token', id, 'name', ISSUED_TOKEN_NAME)

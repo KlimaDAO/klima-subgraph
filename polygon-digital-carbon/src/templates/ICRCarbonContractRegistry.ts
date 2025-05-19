@@ -1,7 +1,7 @@
 import { ICRProjectToken } from '../../generated/templates'
 import { ProjectCreated } from '../../generated/ICRCarbonContractRegistry/ICRCarbonContractRegistry'
 import { loadOrCreateCarbonCredit } from '../utils/CarbonCredit'
-import { loadOrCreateOrUpdateCarbonProject } from '../utils/CarbonProject'
+import { loadOrCreateCarbonProject } from '../utils/CarbonProject'
 import { BigInt, log } from '@graphprotocol/graph-ts'
 
 export function handleNewICC(event: ProjectCreated): void {
@@ -12,7 +12,7 @@ export function handleNewICC(event: ProjectCreated): void {
 
   ICRProjectToken.create(projectAddress)
 
-  let project = loadOrCreateOrUpdateCarbonProject('ICR', event.params.projectId.toString())
+  let project = loadOrCreateCarbonProject('ICR', event.params.projectId.toString(), projectAddress.toHexString())
 
   // Load a default credit with ID 0 for future use
   let credit = loadOrCreateCarbonCredit(projectAddress, 'ICR', BigInt.fromI32(0))

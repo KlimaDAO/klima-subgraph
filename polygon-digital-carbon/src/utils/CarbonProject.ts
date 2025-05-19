@@ -1,12 +1,11 @@
 import { PROJECT_INFO } from '../../../lib/projects/Projects'
 
 import { CarbonProject } from '../../generated/schema'
-import { log } from '@graphprotocol/graph-ts'
-function loadOrCreateCarbonProjectHelper(registry: string, projectID: string, forceUpdate: boolean): CarbonProject {
+import { Address, log } from '@graphprotocol/graph-ts'
+
+export function loadOrCreateCarbonProject(registry: string, projectID: string, projectAddress: string | null = null): CarbonProject {
   // Find the project + vintage ID from token address
   let project = CarbonProject.load(projectID)
-
-  let newProject = project == null
 
   if (project == null) {
     project = new CarbonProject(projectID)
@@ -17,11 +16,11 @@ function loadOrCreateCarbonProjectHelper(registry: string, projectID: string, fo
     project.category = ''
     project.country = ''
     project.region = ''
-  }
 
-  if (newProject || forceUpdate) {
     for (let i = 0; i < PROJECT_INFO.length; i++) {
-      if (projectID.toLowerCase() == PROJECT_INFO[i].projectId.toLowerCase()) {
+      if ((projectID && projectID.toLowerCase() == PROJECT_INFO[i].projectId.toLowerCase())
+        || (projectAddress && projectAddress.toLowerCase() == PROJECT_INFO[i].address.toLowerCase())
+      ) {
         project.projectID = projectID
         project.name = PROJECT_INFO[i].name
         project.methodologies = PROJECT_INFO[i].methodology
@@ -35,12 +34,3 @@ function loadOrCreateCarbonProjectHelper(registry: string, projectID: string, fo
   }
   return project as CarbonProject
 }
-
-export function loadOrCreateCarbonProject(registry: string, projectID: string): CarbonProject {
-  return loadOrCreateCarbonProjectHelper(registry, projectID, false)
-}
-
-export function loadOrCreateOrUpdateCarbonProject(registry: string, projectID: string): CarbonProject {
-  return loadOrCreateCarbonProjectHelper(registry, projectID, true)
-}
-

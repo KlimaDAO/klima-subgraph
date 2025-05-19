@@ -17,6 +17,7 @@ import {
   KLIMA_BCT_PAIR_BLOCK,
   KLIMA_MCO2_PAIR_BLOCK,
   KLIMA_CCO2_PAIR_BLOCK,
+  MIN_PRICE_GUARD,
 } from '../../lib/utils/Constants'
 import { BigInt, BigDecimal, log, ethereum } from '@graphprotocol/graph-ts'
 import { Pair, Token, Swap, SubgraphVersion } from '../generated/schema'
@@ -149,6 +150,27 @@ function toUnits(x: BigInt, decimals: number): BigDecimal {
   return x.toBigDecimal().div(denom)
 }
 
+function minPriceGuard(
+  quote: BigInt,
+  token0_dec: number,
+  token1_dec: number,
+  amountIn: BigInt,
+  amountOut: BigInt,
+  hash: string,
+  pair: PairContract
+): BigDecimal {
+  //  if value is greater than minimum, return price as is and avoid unnecessary calls
+  if (quote.ge(MIN_PRICE_GUARD)) {
+    return toUnits(amountIn, token0_dec).div(toUnits(amountOut, token1_dec))
+  }
+  // throw a warning in the logs if triggered
+  log.warning('Price guard triggered for {}', [hash])
+  // if value is less than minimum and the 10^6 <> 10^18 diff blows up the math, return pair spot price
+  let reserves = pair.getReserves()
+
+  return toUnits(reserves.value0, token0_dec).div(toUnits(reserves.value1, token1_dec))
+}
+
 export function handleSwap(event: SwapEvent): void {
   let treasury_address = TREASURY_ADDRESS
   let pair = getCreatePair(event.address)
@@ -184,7 +206,15 @@ export function handleSwap(event: SwapEvent): void {
   }
 
   if (event.params.amount0In == BigIntZero && event.params.amount0Out != BigIntZero) {
-    price = toUnits(event.params.amount0Out, token0_decimals).div(toUnits(event.params.amount1In, token1_decimals))
+    price = minPriceGuard(
+      event.params.amount0Out,
+      token0_decimals,
+      token1_decimals,
+      event.params.amount0Out,
+      event.params.amount1In,
+      event.transaction.hash.toHexString(),
+      contract
+    )
     token0qty = toUnits(event.params.amount0Out, token0_decimals)
     token1qty = toUnits(event.params.amount1In, token1_decimals)
     lastreserves0 = toUnits(contract.getReserves().value0, token0_decimals).plus(token0qty)
@@ -196,7 +226,15 @@ export function handleSwap(event: SwapEvent): void {
     volume = token0qty
   }
   if (event.params.amount0Out == BigIntZero && event.params.amount0In != BigIntZero) {
-    price = toUnits(event.params.amount0In, token0_decimals).div(toUnits(event.params.amount1Out, token1_decimals))
+    price = minPriceGuard(
+      event.params.amount0In,
+      token0_decimals,
+      token1_decimals,
+      event.params.amount0In,
+      event.params.amount1Out,
+      event.transaction.hash.toHexString(),
+      contract
+    )
     token0qty = toUnits(event.params.amount0In, token0_decimals)
     token1qty = toUnits(event.params.amount1Out, token1_decimals)
     lastreserves0 = toUnits(contract.getReserves().value0, token0_decimals).minus(token0qty)

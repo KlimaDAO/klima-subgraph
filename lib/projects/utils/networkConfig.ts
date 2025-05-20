@@ -9,7 +9,7 @@ export const networkConfig = {
         address: '0xD973F90a4C49607EABeFdb2C45d4F39436c7e7fA',
       },
       creditManager: {
-        address: '0xeC78c8c2Df560e5598EeeaE388D20465D6e65f84',
+        address: '0x1247D7c744D0f4671E3053B4a513f6B1db221218',
       },
     },
   },
@@ -20,7 +20,7 @@ export const networkConfig = {
         address: '',
       },
       creditManager: {
-        address: '0x6E7070CA35df41A9f856d9530d3BA42C9a0E06Fa',
+        address: '0x22A0C44A934E0CfE33bD0241AA1454d1e9916422',
       },
     },
   },

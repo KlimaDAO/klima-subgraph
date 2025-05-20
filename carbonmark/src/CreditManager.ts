@@ -25,6 +25,7 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
   project.tokenId = event.params.tokenId
   project.category = event.params.category
   project.country = event.params.country
+  project.dataSource = 'Event'
   project.save()
 
   createCountry(project.country)

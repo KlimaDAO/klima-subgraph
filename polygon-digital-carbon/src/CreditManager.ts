@@ -5,9 +5,7 @@ import {
 import { CarbonProject } from '../generated/schema'
 
 export function handleCreditAdded(event: CreditAddedEvent): void {
-  log.info('fd', [])
   log.info('handleProjectAdded fired {}-{}', [event.params.tokenAddress.toHexString(), event.params.tokenId.toString()])
-  log.info('fds', [])
 
   const id = event.params.projectId
   let project = CarbonProject.load(id)
@@ -35,5 +33,6 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
   project.category = event.params.category
   project.region = event.params.region
   project.country = event.params.country
+  project.dataSource = 'Event'
   project.save()
 }

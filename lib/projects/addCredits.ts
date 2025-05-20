@@ -51,12 +51,13 @@ const addCredits = async (network: string, creditIds: string[]) => {
       const tx = await creditManagerContract.addCreditBatch(currentBatch)
 
       await tx.wait()
-      console.log(`Batch ${i + 1} of ${numberOfBatches} processed successfully`)
+      console.log(`✅Batch ${i + 1} of ${numberOfBatches} processed successfully`)
     } catch (error) {
-      console.error(`Error adding batch ${i + 1}:`, error)
+      console.error(`☠ Error adding batch ${i + 1}:`, error)
       console.log('fix', currentBatch)
     }
   }
+  console.info("⚠ Do not forget to execute `npm run prepare-matic-dynamic` in the carbonmark and polygon-digital-carbon subdirectories and commit the changes if necessary")
 }
 
 // Parse and check arguments

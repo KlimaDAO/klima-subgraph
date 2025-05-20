@@ -57,5 +57,5 @@ Projects can be added on the fly (without redeployuing the contracts) by updatin
 - update the `lib/projects/Projects.ts` file with the new project's definitions
 - set your `ALCHEMY_API_KEY` environment variable
 - set your `PRIVATE_KEY` environment variable
-- execute `npm run addCredits-polygon`
+- execute `npm run addCredits-polygon <creditId>`
 

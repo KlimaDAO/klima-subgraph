@@ -13,13 +13,12 @@
 # 12. Generate Subgraph Code: Run the npm run codegen command to generate code for the subgraph if changes are detected.
 # 13. Check for uncommitted changes: Ensure there are no uncommitted changes in the subgraph after code generation.
 # 14. Evaluate if there are changes: Print a message indicating if there are uncommitted changes and advise executing code generation locally if necessary.
-# 15. Prepare dynamic manifest and regenerate subgraph code if polygon-digital-carbon or carbonmark
-# 16. Build Subgraph: Run the build process for the subgraph (npm run build).
-# 17. Determine if branch is staging or not: Identify if the branch is staging or another branch, and set a prefix for the subgraph name.
-# 18. Create issue for deployment tracking: Automatically create a GitHub issue to track the deployment process.
-# 19. Check Node.js version (debugging): Verify the Node.js version in use (node -v).
-# 20. Generate Changelog: Run a custom script (.github/actions-scripts/generateChangelog.mjs) to generate a changelog between the last tag and the new version.
-# 21. Create GitHub Release: Draft a new GitHub release with the generated changelog for the new version.
+# 15. Build Subgraph: Run the build process for the subgraph (npm run build).
+# 16. Determine if branch is staging or not: Identify if the branch is staging or another branch, and set a prefix for the subgraph name.
+# 17. Create issue for deployment tracking: Automatically create a GitHub issue to track the deployment process.
+# 18. Check Node.js version (debugging): Verify the Node.js version in use (node -v).
+# 19. Generate Changelog: Run a custom script (.github/actions-scripts/generateChangelog.mjs) to generate a changelog between the last tag and the new version.
+# 20. Create GitHub Release: Draft a new GitHub release with the generated changelog for the new version.
 
 name: Deployment
 
@@ -238,13 +237,6 @@ jobs:
       - name: Evaluate if there are changes
         if: ${{ steps.check-changes.outputs.outcome == 'failure'}}
         run: echo "There are uncommitted changes - execute 'npm run codegen' locally and commit the generated files!"
-
-      - name: Prepare dynamic manifest and regenerate subgraph code if polygon-digital-carbon or carbonmark
-        if: ${{ (matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark') && steps.compare_versions.outputs.should_deploy == 'true'}}
-        run: |
-          npm run prepare-matic-dynamic
-          npm run codegen
-        working-directory: '${{ matrix.value }}'
 
       - name: Build Subgraph
         if: ${{ steps.compare_versions.outputs.should_deploy == 'true'}}

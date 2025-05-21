@@ -21,8 +21,7 @@
       { "indexed": false, "internalType": "string[]", "name": "methodologies", "type": "string[]" },
       { "indexed": false, "internalType": "string", "name": "category", "type": "string" },
       { "indexed": false, "internalType": "string", "name": "country", "type": "string" },
-      { "indexed": false, "internalType": "string", "name": "region", "type": "string" },
-      { "indexed": false, "internalType": "string", "name": "description", "type": "string" }
+      { "indexed": false, "internalType": "string", "name": "region", "type": "string" }
     ],
     "name": "CreditAdded",
     "type": "event"
@@ -100,8 +99,7 @@
           { "internalType": "string[]", "name": "methodologies", "type": "string[]" },
           { "internalType": "string", "name": "category", "type": "string" },
           { "internalType": "string", "name": "country", "type": "string" },
-          { "internalType": "string", "name": "region", "type": "string" },
-          { "internalType": "string", "name": "description", "type": "string" }
+          { "internalType": "string", "name": "region", "type": "string" }
         ],
         "internalType": "struct CreditManager.Credit",
         "name": "credit",
@@ -126,8 +124,7 @@
           { "internalType": "string[]", "name": "methodologies", "type": "string[]" },
           { "internalType": "string", "name": "category", "type": "string" },
           { "internalType": "string", "name": "country", "type": "string" },
-          { "internalType": "string", "name": "region", "type": "string" },
-          { "internalType": "string", "name": "description", "type": "string" }
+          { "internalType": "string", "name": "region", "type": "string" }
         ],
         "internalType": "struct CreditManager.Credit[]",
         "name": "credits",

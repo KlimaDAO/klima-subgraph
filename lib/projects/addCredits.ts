@@ -50,7 +50,7 @@ const addCredits = async (network: string, creditIds: string[]) => {
       const tx = await creditManagerContract.addCreditBatch(currentBatch)
 
       await tx.wait()
-      console.log(`✅Batch ${i + 1} of ${numberOfBatches} processed successfully`)
+      console.log(`✅ Batch ${i + 1} of ${numberOfBatches} processed successfully`)
     } catch (error) {
       console.error(`☠ Error adding batch ${i + 1}:`, error)
       console.log('fix', currentBatch)

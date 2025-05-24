@@ -17,7 +17,8 @@ enum RetireSource {
   OTHER
 }
 
-enum DataSource {
+
+enum ProjectDataSource {
   CSV
   Event
 }
@@ -199,7 +200,7 @@ type CarbonProject @entity {
   carbonCredits: [CarbonCredit!]! @derivedFrom(field: "project")
 
   "Source of the project data"
-  dataSource: DataSource!
+  projectDataSource: ProjectDataSource!
 }
 
 type CarbonCredit @entity {

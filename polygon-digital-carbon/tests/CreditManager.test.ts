@@ -89,6 +89,6 @@ describe('CreditManager tests', () => {
     assert.fieldEquals('CarbonProject', id, 'country', COUNTRY)
     assert.fieldEquals('CarbonProject', id, 'region', REGION)
     assert.fieldEquals('CarbonProject', id, 'registry', REGISTRY)
-    assert.fieldEquals('CarbonProject', id, 'dataSource', 'Event')
+    assert.fieldEquals('CarbonProject', id, 'projectDataSource', 'Event')
   })
 })

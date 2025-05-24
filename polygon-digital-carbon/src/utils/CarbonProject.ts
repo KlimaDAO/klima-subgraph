@@ -30,7 +30,7 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string, p
         break
       }
     }
-    project.dataSource = 'CSV'
+    project.projectDataSource = 'CSV'
     project.save()
   }
   return project as CarbonProject

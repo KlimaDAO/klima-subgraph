@@ -9,7 +9,7 @@ enum ActivityType {
   DeletedListing
 }
 
-enum DataSource {
+enum CreditDataSource {
   CSV
   Event
 }
@@ -67,7 +67,7 @@ type Project @entity {
   isExAnte: Boolean!
 
   "Source of the credit data"
-  dataSource: DataSource!
+  creditDataSource: CreditDataSource!
 }
 
 type Country @entity {

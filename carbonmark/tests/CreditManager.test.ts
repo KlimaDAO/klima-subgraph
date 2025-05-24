@@ -92,6 +92,6 @@ describe('CreditManager tests', () => {
     assert.fieldEquals('Project', id, 'tokenId', TOKEN_ID.toString())
     assert.fieldEquals('Project', id, 'category', CATEGORY)
     assert.fieldEquals('Project', id, 'country', COUNTRY)
-    assert.fieldEquals('Project', id, 'dataSource', 'Event')
+    assert.fieldEquals('Project', id, 'creditDataSource', 'Event')
   })
 })

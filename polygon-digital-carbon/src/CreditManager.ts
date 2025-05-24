@@ -33,6 +33,6 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
   project.category = event.params.category
   project.region = event.params.region
   project.country = event.params.country
-  project.dataSource = 'Event'
+  project.projectDataSource = 'Event'
   project.save()
 }

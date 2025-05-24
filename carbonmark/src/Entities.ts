@@ -33,7 +33,7 @@ export function loadOrCreateProject(token: Address, tokenId: BigInt): Project {
     project.country = PROJECT_INFO[projectIndex].country
     project.tokenId = tokenId
     project.isExAnte = PROJECT_INFO[projectIndex].isExAnte
-    project.dataSource = 'CSV'
+    project.creditDataSource = 'CSV'
     project.save()
 
     createCountry(project.country)

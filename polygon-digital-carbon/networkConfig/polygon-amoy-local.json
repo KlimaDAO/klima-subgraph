@@ -71,6 +71,10 @@
     "sKlimaERC20V1": {
       "address": "0xb0C22d8D350C67420f06F48936654f567C73E8C8",
       "startBlock": "20190686"
+    },
+    "CreditManager": {
+      "address": "0x1B0128280d7f42Ea7E2c4d581ADc944C64303f7a",
+      "startBlock": "71579845"
     }
-  }
 }
+

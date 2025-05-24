@@ -1,11 +1,12 @@
 {
   "name": "polygon-carbon",
-  "version": "1.5.5",
+  "version": "1.6.0",
   "repository": "https://github.com/KlimaDAO/klima-subgraphs/polygon-carbon",
   "license": "MIT",
   "scripts": {
     "prepare-local": "npx mustache networkConfig/localhost.json subgraph.template.yaml > subgraph.yaml",
     "prepare-matic": "npx mustache networkConfig/matic.json subgraph.template.yaml > subgraph.yaml",
+    "prepare-matic-dynamic": "bun ../lib/projects/updateNetworkConfig.ts networkConfig/matic.json && npm run prepare-matic",
     "prepare-mumbai": "npx mustache networkConfig/mumbai.json subgraph.template.yaml > subgraph.yaml",
     "codegen": "rm -rf ./generated && graph codegen",
     "test": "graph test",

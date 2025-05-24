@@ -39,9 +39,11 @@ jobs:
       - name: Generate Subgraph Code
         run: npm run codegen
         working-directory: '${{ matrix.value }}'
+
       - name: Check for uncommitted changes
         id: check-changes
         uses: mskri/check-uncommitted-changes-action@v1.0.1
+
       - name: Evaluate if there are changes
         if: steps.check-changes.outputs.outcome == failure()
         run: echo "There are uncommitted changes - execute 'npm run codegen' locally and commit the generated files!"

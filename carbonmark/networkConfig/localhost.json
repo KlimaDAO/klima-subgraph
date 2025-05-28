@@ -3,5 +3,9 @@
     "Carbonmark": {
       "address": "0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821",
       "startBlock": "57799711"
+    },
+    "CreditManager": {
+      "address": "0x2dF21aaCAD1aBc83db34227C5aBadBE3aE0B3DF2",
+      "startBlock": "71580495"
     }
 }

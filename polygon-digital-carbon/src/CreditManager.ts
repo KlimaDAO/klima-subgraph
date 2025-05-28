@@ -12,18 +12,18 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
   if (project == null) {
     project = new CarbonProject(id)
   }
-    // Need to convert registry to the values we have previsouly hard coded in CarbonProject.ts
-    let registry = ''
-    const registryEvent = event.params.projectId.split('-')[0]
-    if (registryEvent == 'PURO') {
-      registry = 'PURO_EARTH'
-    } else if (registryEvent == 'VCS') {
-      registry = 'VERRA'
-    } else if (registryEvent == 'ECO') {
-      registry = 'ECO_REGISTRY'
-    } else {
-      registry = registryEvent
-    }
+  // Need to convert registry to the values we have previsouly hard coded in CarbonProject.ts
+  let registry = ''
+  const registryEvent = event.params.projectId.split('-')[0]
+  if (registryEvent == 'PURO') {
+    registry = 'PURO_EARTH'
+  } else if (registryEvent == 'VCS') {
+    registry = 'VERRA'
+  } else if (registryEvent == 'ECO') {
+    registry = 'ECO_REGISTRY'
+  } else {
+    registry = registryEvent
+  }
 
     
   project.projectID = event.params.projectId

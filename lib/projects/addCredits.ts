@@ -25,7 +25,7 @@ const getCreditInfo = (creditId: string) => {
     [info.methodology],
     info.category,
     info.country,
-    "unknown", // region
+    "", // region
   ]
 }
 

@@ -11,10 +11,7 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
   const registry = event.params.projectId.split('-')[0]
 
   const id = event.params.projectId + '-' + event.params.vintage
-  let project = Project.load(id)
-  if (project == null) {
-    project = new Project(id)
-  }
+  let project = new Project(id)
   project.key = event.params.projectId 
   project.name = event.params.name
   project.methodology = event.params.methodologies[0]

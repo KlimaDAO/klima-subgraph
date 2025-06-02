@@ -8,10 +8,8 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
   log.info('handleProjectAdded fired {}-{}', [event.params.tokenAddress.toHexString(), event.params.tokenId.toString()])
 
   const id = event.params.projectId
-  let project = CarbonProject.load(id)
-  if (project == null) {
-    project = new CarbonProject(id)
-  }
+  let project = new CarbonProject(id)
+
   // Need to convert registry to the values we have previsouly hard coded in CarbonProject.ts
   let registry = ''
   const registryEvent = event.params.projectId.split('-')[0]

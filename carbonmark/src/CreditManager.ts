@@ -6,7 +6,7 @@ import { Project } from '../generated/schema'
 import { createCategory, createCountry } from './Entities'
 
 export function handleCreditAdded(event: CreditAddedEvent): void {
-  log.info('handleProjectAdded fired {}-{}', [event.params.tokenAddress.toHexString(), event.params.tokenId.toString()])
+  log.info('handleCreditAdded fired {}-{}', [event.params.tokenAddress.toHexString(), event.params.tokenId.toString()])
 
   const registry = event.params.projectId.split('-')[0]
 

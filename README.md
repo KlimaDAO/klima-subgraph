@@ -53,7 +53,7 @@ You can use the workaround described here: https://github.com/graphprotocol/grap
 Adding credits definitions normally requires updating the `lib/projects/Projects.ts` file and recompiling and redeploying the Marketplace and Polygon Digital Carbon subgraphs.
 This process is not optimal because the subgraphs deployments are tedious and long.
 
-Projects can be added on the fly (without redeployuing the contracts) by updating the CreditManager contract.
+Projects can be added on the fly (without redeploying the contracts) by updating the CreditManager contract.
 - update the `lib/projects/Projects.ts` file with the new project's definitions
 - set your `ALCHEMY_API_KEY` environment variable
 - set your `PRIVATE_KEY` environment variable

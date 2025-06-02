@@ -56,7 +56,7 @@ const addCredits = async (network: string, creditIds: string[]) => {
       console.log('fix', currentBatch)
     }
   }
-  console.info("⚠ Do not forget to execute `npm run prepare-matic-dynamic` in the carbonmark and polygon-digital-carbon subdirectories and commit the changes if necessary")
+  console.info("⚠ Do not forget to execute `npm run prepare-matic-dynamic` in the carbonmark and polygon-digital-carbon subdirectories and commit the changes if necessary (eg. If you intend to redeploy the subgraaph)")
 }
 
 // Parse and check arguments

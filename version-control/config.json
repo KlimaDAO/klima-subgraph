@@ -25,11 +25,6 @@
     "outputFile": "src/utils/version.ts"
   },
   {
-    "name": "polygon-bridged-carbon",
-    "versionJsonPath": "version.json",
-    "outputFile": "src/utils/version.ts"
-  },
-  {
     "name": "polygon-digital-carbon",
     "versionJsonPath": "version.json",
     "outputFile": "src/utils/version.ts"

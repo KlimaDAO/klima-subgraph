@@ -211,14 +211,13 @@ export function handleMossRetirement(event: CarbonOffset): void {
 
   // Set up project/default info for Moss "project"
 
+  let project = loadOrCreateCarbonProject('VERRA', 'Moss')
+  credit.project = project.id
+  
   if (credit.vintage == 1970) {
     credit.vintage = 2021
-    credit.project = 'Moss'
-    credit.save()
-
-    loadOrCreateCarbonProject('VERRA', 'Moss')
   }
-
+  
   credit.retired = credit.retired.plus(event.params.carbonTon)
   credit.save()
 

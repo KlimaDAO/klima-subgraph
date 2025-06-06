@@ -7,15 +7,17 @@ import {
   newMockEvent,
   beforeEach,
   assert,
+  log,
 } from 'matchstick-as'
 import { Address, Bytes, ethereum } from '@graphprotocol/graph-ts'
 import { Issued } from '../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditTokenFactory'
 import { handleNewCarbonmarkCredit } from '../src/templates/CarbonmarkCreditTokenFactory'
-import { CMARK_PROJECT_INFO } from '../../lib/utils/CMARKProjectInfo'
+import { PROJECT_INFO } from '../../lib/projects/Projects'
 import { Transfer } from '../generated/BCT/ERC20'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Retired } from '../generated/CarbonmarkCreditTokenFactory/CarbonmarkCreditToken'
 import { handleCarbonmarkCreditRetirement, handleCarbonmarkCreditTransfer } from '../src/templates/CarbonmarkCreditToken'
+import { ProjectInfo } from '../../lib/types'
 
 
 const ISSUED_TOKEN_ADDRESS = '0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9'
@@ -162,6 +164,20 @@ describe('CMARK tests', () => {
     const event = newIssuedEvent()
     let id = issuedTokenAddress.toHexString()
 
+    let projectInfo: ProjectInfo | null = null
+    for (let i = 0; i < PROJECT_INFO.length; i++) {
+      if (PROJECT_INFO[i].projectId === ISSUED_TOKEN_PROJECT_ID) {
+        projectInfo = PROJECT_INFO[i]
+        break
+      }
+    }
+
+    if (!projectInfo) {
+      throw new Error('Project info not found')
+    }
+    
+    log.info("name {}", [projectInfo.name])
+
     handleNewCarbonmarkCredit(event)
     assert.fieldEquals('CarbonCredit', id, 'tokenAddress', ISSUED_TOKEN_ADDRESS)
     assert.fieldEquals('CarbonCredit', id, 'bridgeProtocol', 'CMARK')
@@ -176,11 +192,11 @@ describe('CMARK tests', () => {
     assert.fieldEquals('CarbonCredit', id, 'isExAnte', 'false')
 
     assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'registry', 'CMARK')
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'name', CMARK_PROJECT_INFO[1][1])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'methodologies', CMARK_PROJECT_INFO[1][2])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'category', CMARK_PROJECT_INFO[1][3])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'country', CMARK_PROJECT_INFO[1][4])
-    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'region', CMARK_PROJECT_INFO[1][5])
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'name', projectInfo.name)
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'methodologies', projectInfo.methodology)
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'category', projectInfo.category)
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'country', projectInfo.country)
+    assert.fieldEquals('CarbonProject', ISSUED_TOKEN_PROJECT_ID, 'region', projectInfo.region)
 
     assert.fieldEquals('Token', id, 'tokenAddress', ISSUED_TOKEN_ADDRESS)
     assert.fieldEquals('Token', id, 'name', ISSUED_TOKEN_NAME)

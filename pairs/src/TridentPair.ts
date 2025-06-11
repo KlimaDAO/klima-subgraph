@@ -11,7 +11,7 @@ import { Pair as PairContract } from '../generated/KLIMA_USDC/Pair'
 import { Swap as SwapEvent, TridentPair as TridentPairContract } from '../generated/KLIMA_UBO/TridentPair'
 import { ERC20 as ERC20Contract } from '../generated/KLIMA_USDC/ERC20'
 import { Address } from '@graphprotocol/graph-ts'
-import { BigDecimalZero } from './utils/utils'
+import { BigDecimalZero, BigIntZero } from './utils/utils'
 import { hourTimestamp } from '../../lib/utils/Dates'
 import { PriceUtil } from '../../lib/utils/Price'
 
@@ -45,6 +45,11 @@ export function getCreatePair(address: Address): Pair {
     pair.totalvolume = BigDecimalZero
     pair.totalklimaearnedfees = BigDecimalZero
     pair.lastupdate = ''
+    pair.reserve0 = BigDecimalZero
+    pair.reserve1 = BigDecimalZero
+    pair.reserve0Raw = BigIntZero
+    pair.reserve1Raw = BigIntZero
+    pair.reservesLastUpdate = ''
     pair.save()
   }
 
@@ -178,5 +183,13 @@ export function handleSwap(event: SwapEvent): void {
   pair.totalvolume = pair.totalvolume.plus(swap.volume)
   pair.totalklimaearnedfees = pair.totalklimaearnedfees.plus(swap.klimaearnedfees)
   pair.lastupdate = hour_timestamp
+  
+  let reserves = contract.getReserves()
+  pair.reserve0 = toUnits(reserves.value0, token0_decimals)
+  pair.reserve1 = toUnits(reserves.value1, token1_decimals)
+  pair.reserve0Raw = reserves.value0
+  pair.reserve1Raw = reserves.value1
+  pair.reservesLastUpdate = hour_timestamp
+  
   pair.save()
 }

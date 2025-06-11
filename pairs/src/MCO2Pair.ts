@@ -38,6 +38,11 @@ export function getCreatePair(address: Address): Pair {
     pair.totalvolume = BigDecimalZero
     pair.totalklimaearnedfees = BigDecimalZero
     pair.lastupdate = ''
+    pair.reserve0 = BigDecimalZero
+    pair.reserve1 = BigDecimalZero
+    pair.reserve0Raw = BigIntZero
+    pair.reserve1Raw = BigIntZero
+    pair.reservesLastUpdate = ''
     pair.save()
   }
 
@@ -144,5 +149,13 @@ export function handleSwap(event: SwapEvent): void {
   pair.totalvolume = pair.totalvolume.plus(swap.volume)
   pair.totalklimaearnedfees = pair.totalklimaearnedfees.plus(swap.klimaearnedfees)
   pair.lastupdate = hour_timestamp
+  
+  let reserves = contract.getReserves()
+  pair.reserve0 = toUnits(reserves.value0, token0_decimals)
+  pair.reserve1 = toUnits(reserves.value1, token1_decimals)
+  pair.reserve0Raw = reserves.value0
+  pair.reserve1Raw = reserves.value1
+  pair.reservesLastUpdate = hour_timestamp
+  
   pair.save()
 }

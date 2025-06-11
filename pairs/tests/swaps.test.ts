@@ -57,6 +57,14 @@ describe('handleSwap', () => {
     // Assert that the pair price is updated correctly
     assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'currentprice', '0.01846581475982910603740163507456394')
     assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'currentpricepertonne', '18.46581475982910603740163507456394')
+    
+    // Assert that the reserve fields are updated correctly
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'reserve0', '0.000023211174326211')
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'reserve1', '2518999568.458520093807838')
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'reserve0Raw', '23211174326211')
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'reserve1Raw', '2518999568458520093807838')
+    // reservesLastUpdate should be set to hour timestamp
+    assert.assertNotNull(assert.loadField('Pair', KLIMA_CCO2_PAIR.toHex(), 'reservesLastUpdate'))
   })
 
   test('KLIMA_CCO2_PAIR:Subsequent swap updates pair price correctly', () => {
@@ -73,6 +81,14 @@ describe('handleSwap', () => {
     // Assert that the pair price is updated correctly
     assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'currentprice', '0.004616453689957276509350408768640985')
     assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'currentpricepertonne', '4.616453689957276509350408768640985')
+    
+    // Assert that the reserve fields are updated correctly
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'reserve0', '0.000023211174326211')
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'reserve1', '2518999568.458520093807838')
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'reserve0Raw', '23211174326211')
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'reserve1Raw', '2518999568458520093807838')
+    // reservesLastUpdate should be set to hour timestamp
+    assert.assertNotNull(assert.loadField('Pair', KLIMA_CCO2_PAIR.toHex(), 'reservesLastUpdate'))
   })
 
   // ────────────────────────────────────────────────────────────────────────────
@@ -90,6 +106,14 @@ describe('handleSwap', () => {
 
     // should equal current spot price from getReserves
     assert.fieldEquals('Pair', NCT_USDC_PAIR.toHex(), 'currentprice', '0.4427864244831998538451559952378756')
+    
+    // Assert that the reserve fields are updated correctly
+    assert.fieldEquals('Pair', NCT_USDC_PAIR.toHex(), 'reserve0', '54896.292369')
+    assert.fieldEquals('Pair', NCT_USDC_PAIR.toHex(), 'reserve1', '123979167.683545067983988')
+    assert.fieldEquals('Pair', NCT_USDC_PAIR.toHex(), 'reserve0Raw', '54896292369')
+    assert.fieldEquals('Pair', NCT_USDC_PAIR.toHex(), 'reserve1Raw', '123979167683545067983988')
+    // reservesLastUpdate should be set to hour timestamp
+    assert.assertNotNull(assert.loadField('Pair', NCT_USDC_PAIR.toHex(), 'reservesLastUpdate'))
   })
 
   afterEach(() => {

@@ -8,6 +8,11 @@ type Pair @entity {
   totalvolume: BigDecimal!
   lastupdate: String!
   swaps: [Swap!]! @derivedFrom(field: "pair")
+  reserve0: BigDecimal!
+  reserve1: BigDecimal!
+  reserve0Raw: BigInt!
+  reserve1Raw: BigInt!
+  reservesLastUpdate: String!
 }
 
 type Token @entity {

@@ -21,7 +21,8 @@ export function loadOrCreateCarbonProject(registry: string, projectID: string, p
       if ((projectID && projectID.toLowerCase() == PROJECT_INFO[i].projectId.toLowerCase())
         || (projectAddress && projectAddress.toLowerCase() == PROJECT_INFO[i].address.toLowerCase())
       ) {
-        project.projectID = projectID
+        project.id = PROJECT_INFO[i].projectId
+        project.projectID = PROJECT_INFO[i].projectId
         project.name = PROJECT_INFO[i].name
         project.methodologies = PROJECT_INFO[i].methodology
         project.category = PROJECT_INFO[i].category

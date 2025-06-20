@@ -11564,14 +11564,58 @@ export const PROJECT_INFO: ProjectInfo[] = [
     false
   ),
   new ProjectInfo(
-    // TODO: Add token address here
-    '',
+    '0x678a3a1a507d351c0407c8c4ea46e65bed11657d',
     'CMARK-1',
     '2022',
     'Black Earth 2022 OWC',
     'ACM0022',
     'Other',
     'United States',
+    '0',
+    false
+  ),
+  new ProjectInfo(
+    '0x9cc632d5d7b0ac86a9d26af7d8d72f026d688d07',
+    'CMARK-1',
+    '2023',
+    'Black Earth 2022 OWC',
+    'ACM0022',
+    'Other',
+    'United States',
+    '0',
+    false
+  ),
+  new ProjectInfo(
+    '0x928437e8d4d5affed566eee7e9b29ba591d7a2c1',
+    'CMARK-2',
+    '2024',
+    'CO2 storage following the application of Limenet technology in Augusta site',
+    'LM_V1_Storage',
+    'Blue Carbon',
+    'Italy',
+    '0',
+    false
+  ),
+
+  new ProjectInfo(
+    '0x023eb0b4f9b4dbff04a7026c085e6da6b4e93d4f',
+    'TVER-0',
+    '9999',
+    'Testing Project 0',
+    'C05000000',
+    'Other',
+    'Canada',
+    '0',
+    false
+  ),
+  new ProjectInfo(
+    '0xe71ffe27d210cc272c0b906623f959a77ec3e4c7',
+    'TVER-40',
+    '2021', 
+    'Large Scale Sustainable Forestation Project in Khun Mae Kum Mee, Wung Chin, and Mae Yom-Mae Pang plantation, Phrae Province',
+    'T-VER-METH-FOR-03',
+    'Forestry',
+    'Thailand',
     '0',
     false
   ),

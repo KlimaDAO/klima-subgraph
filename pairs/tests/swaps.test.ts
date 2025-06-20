@@ -1,24 +1,21 @@
 import {
   clearStore,
   test,
-  afterAll,
   describe,
-  createMockedFunction,
   newMockEvent,
   beforeEach,
   assert,
   log,
+  afterEach,
+  createMockedFunction,
 } from 'matchstick-as'
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 import { Swap as SwapEvent } from '../generated/KLIMA_USDC/Pair'
+import { PairTwapState } from '../generated/schema'
 import { handleSwap } from '../src/Pair'
-import {
-  CCO2_ERC20_CONTRACT,
-  KLIMA_CCO2_PAIR,
-  KLIMA_ERC20_V1_CONTRACT,
-  KLIMA_USDC_PAIR,
-  TREASURY_ADDRESS,
-} from '../../lib/utils/Constants'
+import { KLIMA_CCO2_PAIR, NCT_USDC_PAIR } from '../../lib/utils/Constants'
+import { create_SWAP_EVENT_MOCKS } from './swapsHelper.test'
+
 // Helper function to create a Swap event
 function newSwapEvent(
   address: Address,
@@ -26,7 +23,8 @@ function newSwapEvent(
   amount1In: BigInt,
   amount0Out: BigInt,
   amount1Out: BigInt,
-  to: Address
+  to: Address,
+  blockTimestamp: BigInt = BigInt.fromI32(0) // default to 0
 ): SwapEvent {
   let mockEvent = newMockEvent()
   let swapEvent = new SwapEvent(
@@ -49,110 +47,141 @@ function newSwapEvent(
   swapEvent.parameters.push(new ethereum.EventParam('amount1Out', ethereum.Value.fromUnsignedBigInt(amount1Out)))
   swapEvent.parameters.push(new ethereum.EventParam('to', ethereum.Value.fromAddress(to)))
 
+  // Set block timestamp to 0 to avoid TWAP logic and use reserves to set price
+  swapEvent.block.timestamp = blockTimestamp
+
   return swapEvent
 }
 
-const pairAddress = KLIMA_CCO2_PAIR
-
 describe('handleSwap', () => {
   beforeEach(() => {
-    createMockedFunction(KLIMA_USDC_PAIR, 'getReserves', 'getReserves():(uint112,uint112,uint32)').returns([
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('23211174326211')),
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('2518999568458520093807838')),
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1725456599')),
+    create_SWAP_EVENT_MOCKS()
+
+    // Set up realistic TWAP mocks for KLIMA_CCO2_PAIR
+    // Simulate price0 cumulative that increased by 1e18 over 600 seconds (10 minutes)
+    // This represents a price change from 1.0 to 2.0 over 10 minutes
+    createMockedFunction(KLIMA_CCO2_PAIR, 'price0CumulativeLast', 'price0CumulativeLast():(uint256)').returns([
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('2000000000000000000000000')), // Current cumulative
+    ])
+    createMockedFunction(KLIMA_CCO2_PAIR, 'price1CumulativeLast', 'price1CumulativeLast():(uint256)').returns([
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1500000000000000000000000')), // Different cumulative
     ])
 
-    // set token0 to KLIMA and mock the name, symbol and decimals
-    createMockedFunction(KLIMA_CCO2_PAIR, 'token0', 'token0():(address)').returns([
-      ethereum.Value.fromAddress(KLIMA_ERC20_V1_CONTRACT),
+    // Set up realistic TWAP mocks for NCT_USDC_PAIR
+    // Simulate a more stable price with smaller changes
+    createMockedFunction(NCT_USDC_PAIR, 'price0CumulativeLast', 'price0CumulativeLast():(uint256)').returns([
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1100000000000000000000000')), // Small increase
     ])
-
-    createMockedFunction(KLIMA_ERC20_V1_CONTRACT, 'name', 'name():(string)').returns([
-      ethereum.Value.fromString('KLIMA'),
-    ])
-
-    createMockedFunction(KLIMA_ERC20_V1_CONTRACT, 'symbol', 'symbol():(string)').returns([
-      ethereum.Value.fromString('KLIMA'),
-    ])
-
-    createMockedFunction(KLIMA_ERC20_V1_CONTRACT, 'decimals', 'decimals():(uint8)').returns([
-      ethereum.Value.fromI32(18),
-    ])
-
-    // set token1 to CCO2 and mock the name, symbol and decimals
-
-    createMockedFunction(KLIMA_CCO2_PAIR, 'token1', 'token1():(address)').returns([
-      ethereum.Value.fromAddress(CCO2_ERC20_CONTRACT),
-    ])
-
-    createMockedFunction(CCO2_ERC20_CONTRACT, 'name', 'name():(string)').returns([ethereum.Value.fromString('CCO2')])
-
-    createMockedFunction(CCO2_ERC20_CONTRACT, 'symbol', 'symbol():(string)').returns([
-      ethereum.Value.fromString('CCO2'),
-    ])
-
-    createMockedFunction(CCO2_ERC20_CONTRACT, 'decimals', 'decimals():(uint8)').returns([ethereum.Value.fromI32(18)])
-
-    // set total supply and balance of to address
-    createMockedFunction(KLIMA_CCO2_PAIR, 'totalSupply', 'totalSupply():(uint256)').returns([
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('7645055334322312917')),
-    ])
-
-    createMockedFunction(KLIMA_CCO2_PAIR, 'balanceOf', 'balanceOf(address):(uint256)')
-      .withArgs([ethereum.Value.fromAddress(TREASURY_ADDRESS)])
-      .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
-
-    createMockedFunction(KLIMA_CCO2_PAIR, 'getReserves', 'getReserves():(uint112,uint112,uint32)').returns([
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('23211174326211')),
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('2518999568458520093807838')),
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1725456599')),
-    ])
-
-    // mock cco2 contract calls
-
-    createMockedFunction(CCO2_ERC20_CONTRACT, 'decimalRatio', 'decimalRatio():(uint256)').returns([
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('10000')),
-    ])
-
-    createMockedFunction(CCO2_ERC20_CONTRACT, 'burningPercentage', 'burningPercentage():(uint256)').returns([
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('20')),
+    createMockedFunction(NCT_USDC_PAIR, 'price1CumulativeLast', 'price1CumulativeLast():(uint256)').returns([
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('900000000000000000000000')), // Small decrease
     ])
   })
 
-  test('Initial swap updates pair price correctly', () => {
+  test('KLIMA_CCO2_PAIR:Initial swap updates pair price correctly. ', () => {
     let toAddress = Address.fromString('0x0987654321098765432109876543210987654321')
     let amount0In = BigInt.fromI32(1000)
     let amount1In = BigInt.fromI32(0)
     let amount0Out = BigInt.fromI32(0)
     let amount1Out = BigInt.fromI32(2000000000)
 
-    let swapEvent = newSwapEvent(pairAddress, amount0In, amount1In, amount0Out, amount1Out, toAddress)
+    let swapEvent = newSwapEvent(
+      KLIMA_CCO2_PAIR,
+      amount0In,
+      amount1In,
+      amount0Out,
+      amount1Out,
+      toAddress,
+      BigInt.fromI32(0)
+    )
 
     handleSwap(swapEvent)
 
-    // Assert that the pair price is updated correctly
-    assert.fieldEquals('Pair', pairAddress.toHex(), 'currentprice', '0.01846581475982910603740163507456394')
-    assert.fieldEquals(
-      'Pair',
-      pairAddress.toHex(),
-      'currentpricepertonne',
-      '18.46581475982910603740163507456394'
-    )
+    // Assert that the pair price is updated correctly (TWAP logic)
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'currentprice', '1002.004008016032064128256513026052')
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'currentpricepertonne', '1002004.008016032064128256513026052')
   })
 
-  test('Subsequent swap updates pair price correctly', () => {
+  test('KLIMA_CCO2_PAIR:Subsequent swap updates pair price correctly', () => {
     let toAddress = Address.fromString('0x0987654321098765432109876543210987654321')
     let amount0In = BigInt.fromI32(1000)
     let amount1In = BigInt.fromI32(0)
     let amount0Out = BigInt.fromI32(0)
     let amount1Out = BigInt.fromI32(500000000)
 
-    let swapEvent = newSwapEvent(pairAddress, amount0In, amount1In, amount0Out, amount1Out, toAddress)
+    let swapEvent = newSwapEvent(
+      KLIMA_CCO2_PAIR,
+      amount0In,
+      amount1In,
+      amount0Out,
+      amount1Out,
+      toAddress,
+      BigInt.fromI32(0)
+    )
 
     handleSwap(swapEvent)
 
-    // Assert that the pair price is updated correctly
-    assert.fieldEquals('Pair', pairAddress.toHex(), 'currentprice', '0.004616453689957276509350408768640985')
-    assert.fieldEquals('Pair', pairAddress.toHex(), 'currentpricepertonne', '4.616453689957276509350408768640985')
+    // Assert that the pair price is updated correctly (TWAP logic)
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'currentprice', '1002.004008016032064128256513026052')
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'currentpricepertonne', '1002004.008016032064128256513026052')
+  })
+
+  // ────────────────────────────────────────────────────────────────────────────
+  test('NCT_USDC_PAIR: Dust-quote swap returns spot price', () => {
+    let toAddress = Address.fromString('0x0123012301230123012301230123012301230123')
+    let amount0In = BigInt.fromI32(1) // 1 wei USDC
+    let amount1In = BigInt.fromI32(0)
+    let amount0Out = BigInt.fromI32(0)
+    let amount1Out = BigInt.fromI32(1111) // 1 111 wei NCT
+
+    let swapEvent = newSwapEvent(
+      NCT_USDC_PAIR,
+      amount0In,
+      amount1In,
+      amount0Out,
+      amount1Out,
+      toAddress,
+      BigInt.fromI32(0)
+    )
+
+    handleSwap(swapEvent)
+
+    // should equal current spot price from getReserves
+    assert.fieldEquals('Pair', NCT_USDC_PAIR.toHex(), 'currentprice', '0.4427864244831998538451559952378756')
+  })
+
+  test('KLIMA_CCO2_PAIR: TWAP calculation with proper time window', () => {
+    // Create initial TWAP state with timestamp 600 seconds ago (10 minutes)
+    let twapState = new PairTwapState(KLIMA_CCO2_PAIR.toHex())
+    twapState.price0Cumul = BigInt.fromString('1000000000000000000000000') // Previous cumulative
+    twapState.price1Cumul = BigInt.fromString('1000000000000000000000000') // Previous cumulative
+    twapState.timestamp = BigInt.fromI32(0) // 600 seconds ago
+    twapState.save()
+
+    let toAddress = Address.fromString('0x0987654321098765432109876543210987654321')
+    let amount0In = BigInt.fromI32(1000)
+    let amount1In = BigInt.fromI32(0)
+    let amount0Out = BigInt.fromI32(0)
+    let amount1Out = BigInt.fromI32(2000000000)
+
+    // Use timestamp 600 (current time) to trigger TWAP calculation
+    let swapEvent = newSwapEvent(
+      KLIMA_CCO2_PAIR,
+      amount0In,
+      amount1In,
+      amount0Out,
+      amount1Out,
+      toAddress,
+      BigInt.fromI32(600)
+    )
+
+    handleSwap(swapEvent)
+
+    // The TWAP calculation should be: (2000000000000000000000000 - 1000000000000000000000000) / 600 / 2^112
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'currentprice', '1002.004008016032064128256513026052')
+    assert.fieldEquals('Pair', KLIMA_CCO2_PAIR.toHex(), 'currentpricepertonne', '1002004.008016032064128256513026052')
+  })
+
+  afterEach(() => {
+    clearStore()
   })
 })

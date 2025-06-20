@@ -1,6 +1,6 @@
 {
   "name": "klimadao-user-carbon",
-  "version": "0.0.6",
+  "version": "0.0.10",
   "repository": "https://github.com/KlimaDAO/klima-subgraph",
   "license": "MIT",
   "scripts": {

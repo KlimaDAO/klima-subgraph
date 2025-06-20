@@ -17,10 +17,9 @@ import {
   KLIMA_BCT_PAIR_BLOCK,
   KLIMA_MCO2_PAIR_BLOCK,
   KLIMA_CCO2_PAIR_BLOCK,
-  MIN_PRICE_GUARD,
 } from '../../lib/utils/Constants'
 import { BigInt, BigDecimal, log, ethereum } from '@graphprotocol/graph-ts'
-import { Pair, Token, Swap, SubgraphVersion } from '../generated/schema'
+import { Pair, Token, Swap, SubgraphVersion, PairTwapState } from '../generated/schema'
 import { Swap as SwapEvent, Pair as PairContract } from '../generated/KLIMA_USDC/Pair'
 import { ERC20 as ERC20Contract } from '../generated/KLIMA_USDC/ERC20'
 import { Address } from '@graphprotocol/graph-ts'
@@ -29,6 +28,12 @@ import { calculateCCO2AdjustedPrice } from './pair.utils'
 import { hourTimestamp } from '../../lib/utils/Dates'
 import { PriceUtil } from '../../lib/utils/Price'
 import { SCHEMA_VERSION, PUBLISHED_VERSION } from './utils/version'
+
+const Q112 = BigInt.fromI32(2).pow(112 as u8)
+
+export function decodeUQ112x112(x: BigInt): BigDecimal {
+  return x.toBigDecimal().div(Q112.toBigDecimal())
+}
 
 // Create or Load Token
 export function getCreateToken(address: Address): Token {
@@ -150,27 +155,6 @@ function toUnits(x: BigInt, decimals: number): BigDecimal {
   return x.toBigDecimal().div(denom)
 }
 
-function minPriceGuard(
-  quote: BigInt,
-  token0_dec: number,
-  token1_dec: number,
-  amountIn: BigInt,
-  amountOut: BigInt,
-  hash: string,
-  pair: PairContract
-): BigDecimal {
-  //  if value is greater than minimum, return price as is and avoid unnecessary calls
-  if (quote.ge(MIN_PRICE_GUARD)) {
-    return toUnits(amountIn, token0_dec).div(toUnits(amountOut, token1_dec))
-  }
-  // throw a warning in the logs if triggered
-  log.warning('Price guard triggered for {}', [hash])
-  // if value is less than minimum and the 10^6 <> 10^18 diff blows up the math, return pair spot price
-  let reserves = pair.getReserves()
-
-  return toUnits(reserves.value0, token0_dec).div(toUnits(reserves.value1, token1_dec))
-}
-
 export function handleSwap(event: SwapEvent): void {
   let treasury_address = TREASURY_ADDRESS
   let pair = getCreatePair(event.address)
@@ -178,7 +162,6 @@ export function handleSwap(event: SwapEvent): void {
   let total_lp = toUnits(contract.totalSupply(), 18)
   let tokenBalance = toUnits(contract.balanceOf(treasury_address), 18)
   let ownedLP = total_lp == BigDecimalZero ? BigDecimalZero : tokenBalance.div(total_lp)
-
   let hour_timestamp = hourTimestamp(event.block.timestamp)
   let hourlyId = event.address.toHexString() + hour_timestamp
 
@@ -205,16 +188,43 @@ export function handleSwap(event: SwapEvent): void {
     volume = token0qty
   }
 
+  const TWAP_WINDOW = BigInt.fromI32(600) // 10 min window
+  let twapState = PairTwapState.load(event.address.toHexString())
+  if (twapState == null) {
+    twapState = new PairTwapState(event.address.toHexString())
+    twapState.price0Cumul = BigIntZero
+    twapState.price1Cumul = BigIntZero
+    twapState.timestamp = BigIntZero
+  }
+
+  let price0CumulativeLast = contract.price0CumulativeLast()
+  let price1CumulativeLast = contract.price1CumulativeLast()
+  let now = event.block.timestamp
+
+  // https://docs.uniswap.org/contracts/v2/concepts/core-concepts/oracles
+  // update price using TWAP if the window has passed
+  if (twapState.timestamp.gt(BigIntZero) && now.minus(twapState.timestamp).ge(TWAP_WINDOW)) {
+    let timeDiff = now.minus(twapState.timestamp) // seconds
+    // we set the price using the averaged price of the last 10 minutes
+    let twap0 = decodeUQ112x112(price0CumulativeLast.minus(twapState.price0Cumul)) // price0 × dt
+      .div(timeDiff.toBigDecimal()) // ← average price0
+    price = twap0
+  }
+
+  //for initial swap or those within the first 10 minutes, read reserves and set price
+  if (price == BigDecimalZero) {
+    const r = contract.getReserves()
+    const t0 = (Token.load(pair.token0) as Token).decimals
+    const t1 = (Token.load(pair.token1) as Token).decimals
+    if (r.value0.gt(BigIntZero) && r.value1.gt(BigIntZero)) {
+      price = toUnits(r.value0, t0).div(toUnits(r.value1, t1))
+    } else {
+      /* no liquidity → ignore this dust swap */
+      return
+    }
+  }
+
   if (event.params.amount0In == BigIntZero && event.params.amount0Out != BigIntZero) {
-    price = minPriceGuard(
-      event.params.amount0Out,
-      token0_decimals,
-      token1_decimals,
-      event.params.amount0Out,
-      event.params.amount1In,
-      event.transaction.hash.toHexString(),
-      contract
-    )
     token0qty = toUnits(event.params.amount0Out, token0_decimals)
     token1qty = toUnits(event.params.amount1In, token1_decimals)
     lastreserves0 = toUnits(contract.getReserves().value0, token0_decimals).plus(token0qty)
@@ -226,15 +236,6 @@ export function handleSwap(event: SwapEvent): void {
     volume = token0qty
   }
   if (event.params.amount0Out == BigIntZero && event.params.amount0In != BigIntZero) {
-    price = minPriceGuard(
-      event.params.amount0In,
-      token0_decimals,
-      token1_decimals,
-      event.params.amount0In,
-      event.params.amount1Out,
-      event.transaction.hash.toHexString(),
-      contract
-    )
     token0qty = toUnits(event.params.amount0In, token0_decimals)
     token1qty = toUnits(event.params.amount1Out, token1_decimals)
     lastreserves0 = toUnits(contract.getReserves().value0, token0_decimals).minus(token0qty)
@@ -366,6 +367,11 @@ export function handleSwap(event: SwapEvent): void {
     pair.lastupdate = hour_timestamp
     pair.save()
   }
+
+  twapState.price0Cumul = price0CumulativeLast
+  twapState.price1Cumul = price1CumulativeLast
+  twapState.timestamp = now
+  twapState.save()
 }
 
 export function handleSetSubgraphVersion(block: ethereum.Block): void {

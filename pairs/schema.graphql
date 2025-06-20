@@ -31,6 +31,13 @@ type Swap @entity {
   pair: Pair!
 }
 
+type PairTwapState @entity {
+  id: ID!                    # pair address
+  price0Cumul:   BigInt!     # last snapshot of price0CumulativeLast
+  price1Cumul:   BigInt!     # last snapshot of price1CumulativeLast
+  timestamp:     BigInt!     # snapshot timestamp
+}
+
 # Subgraph Versioning
 
 type SubgraphVersion @entity(immutable: true)  {

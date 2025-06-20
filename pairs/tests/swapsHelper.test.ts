@@ -31,6 +31,14 @@ function create_KLIMA_USDC_PAIR_MOCKS(): void {
     ethereum.Value.fromUnsignedBigInt(BigInt.fromString('2518999568458520093807838')),
     ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1725456599')),
   ])
+
+  // Add TWAP-related mocks
+  createMockedFunction(KLIMA_USDC_PAIR, 'price0CumulativeLast', 'price0CumulativeLast():(uint256)').returns([
+    ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1000000000000000000000000')),
+  ])
+  createMockedFunction(KLIMA_USDC_PAIR, 'price1CumulativeLast', 'price1CumulativeLast():(uint256)').returns([
+    ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1000000000000000000000000')),
+  ])
 }
 
 function create_KLIMA_ERC20_V1_CONTRACT_MOCKS(): void {
@@ -85,6 +93,16 @@ function createPairMocks(
     ethereum.Value.fromUnsignedBigInt(getReserves[1]),
     ethereum.Value.fromUnsignedBigInt(getReserves[2]),
   ])
+
+  // Add TWAP-related mocks for all pairs except KLIMA_CCO2_PAIR
+  if (pair != KLIMA_CCO2_PAIR) {
+    createMockedFunction(pair, 'price0CumulativeLast', 'price0CumulativeLast():(uint256)').returns([
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1100000000000000000000000')),
+    ])
+    createMockedFunction(pair, 'price1CumulativeLast', 'price1CumulativeLast():(uint256)').returns([
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromString('900000000000000000000000')),
+    ])
+  }
 }
 
 function create_KLIMA_CCO2_PAIR_MOCKS(): void {

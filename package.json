@@ -40,5 +40,5 @@
     "mustache": "4.2.0",
     "octokit": "4.0.2"
   },
-  "version": "0.0.1"
+  "version": "0.0.2"
 }

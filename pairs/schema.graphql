@@ -1,4 +1,4 @@
-type Pair @entity {
+type Pair @entity(immutable: false) {
   id: ID!
   token0: Token!
   token1: Token!
@@ -15,14 +15,14 @@ type Pair @entity {
   reservesLastUpdate: String!
 }
 
-type Token @entity {
+type Token @entity(immutable: true) {
   id: ID!
   name: String!
   symbol: String!
   decimals: Int!
 }
 
-type Swap @entity {
+type Swap @entity(immutable: true) {
   id: ID! # PAIR_ADDR-TIMESTAMP
   open: BigDecimal!
   high: BigDecimal!

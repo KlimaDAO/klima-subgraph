@@ -21,10 +21,5 @@
     "version:patch": "npm version patch",
     "version:minor": "npm version minor",
     "version:major": "npm version major"
-  },
-  "devDependencies": {
-    "@graphprotocol/graph-cli": "0.56.0",
-    "@graphprotocol/graph-ts": "0.31.0",
-    "prettier": "2.7.1"
   }
 }

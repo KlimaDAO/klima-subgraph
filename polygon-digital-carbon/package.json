@@ -1,5 +1,5 @@
 {
-  "name": "polygon-carbon",
+  "name": "polygon-digital-carbon",
   "version": "1.6.0",
   "repository": "https://github.com/KlimaDAO/klima-subgraphs/polygon-carbon",
   "license": "MIT",
@@ -28,11 +28,6 @@
     "version:prepatch": "npm version prepatch",
     "version:preminor": "npm version preminor",
     "version:premajor": "npm version premajor"
-  },
-  "devDependencies": {
-    "@graphprotocol/graph-cli": "0.69.1",
-    "@graphprotocol/graph-ts": "0.34.0",
-    "prettier": "2.7.1"
   },
   "private": true
 }

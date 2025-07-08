@@ -10,7 +10,7 @@ import { BIG_INT_1E18, ZERO_BI } from '../../lib/utils/Decimals'
 import { C3OffsetNFT, VCUOMinted, VCUOMetaDataUpdated } from '../generated/C3-Offset/C3OffsetNFT'
 import { CarbonOffset } from '../generated/MossCarbonOffset/CarbonChain'
 import { StartAsyncToken, EndAsyncToken } from '../generated/C3ProjectTokenFactory/C3ProjectTokenFactory'
-import { RetiredVintage } from '../generated/templates/ICRProjectToken/ICRProjectToken'
+import { RetiredVintage } from '../generated/templates/ICRProjectContract/ICRProjectContract'
 import { Retired, Retired1 as Retired_1_4_0 } from '../generated/templates/ToucanCarbonOffsets/ToucanCarbonOffsets'
 import { RetirementRequested } from '../generated/templates/ToucanPuroCarbonOffsets/ToucanPuroCarbonOffsets'
 import { burnedCO2Token } from '../generated/CCO2/CCO2'
@@ -213,11 +213,11 @@ export function handleMossRetirement(event: CarbonOffset): void {
 
   let project = loadOrCreateCarbonProject('VERRA', 'Moss')
   credit.project = project.id
-  
+
   if (credit.vintage == 1970) {
     credit.vintage = 2021
   }
-  
+
   credit.retired = credit.retired.plus(event.params.carbonTon)
   credit.save()
 

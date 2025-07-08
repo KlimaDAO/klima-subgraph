@@ -99,5 +99,9 @@
   "TVER": {
     "address": "0xB95A8C12D0F49e7388De4CF9a17EEE28d734D7A1",
     "startBlock": "68650000"
+  },
+  "CreditManager": {
+    "address": "0x2dF21aaCAD1aBc83db34227C5aBadBE3aE0B3DF2",
+    "startBlock": "71756166"
   }
 }

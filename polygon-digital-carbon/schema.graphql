@@ -17,6 +17,12 @@ enum RetireSource {
   OTHER
 }
 
+
+enum ProjectDataSource {
+  CSV
+  Event
+}
+
 enum BridgeProtocol {
   TOUCAN
   C3
@@ -192,6 +198,9 @@ type CarbonProject @entity {
 
   "Carbon credit tokens related to this project"
   carbonCredits: [CarbonCredit!]! @derivedFrom(field: "project")
+
+  "Source of the project data"
+  projectDataSource: ProjectDataSource!
 }
 
 type CarbonCredit @entity {

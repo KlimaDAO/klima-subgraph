@@ -25,7 +25,6 @@ jobs:
             'pairs',
             'celo-bridged-carbon',
             'ethereum-bridged-carbon',
-            'polygon-bridged-carbon',
             'polygon-digital-carbon',
           ]
     steps:

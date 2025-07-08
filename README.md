@@ -43,11 +43,19 @@ After the subgraph is deployed, navigate to http://127.0.01:8000/subgraphs/name/
 - Ethereum Bridged Carbon: [Staging](https://thegraph.com/hosted-service/subgraph/klimadao/staging-ethereum-bridged-carbon) | [Production](https://thegraph.com/hosted-service/subgraph/klimadao/ethereum-bridged-carbon)
 - Celo Bridged Carbon: [Staging](https://thegraph.com/hosted-service/subgraph/klimadao/staging-celo-bridged-carbon) | [Production](https://thegraph.com/hosted-service/subgraph/klimadao/celo-bridged-carbon)
 
-### Deprecated Subgraph Deployments
-
-- Polygon Bridged Carbon: [Staging](https://thegraph.com/hosted-service/subgraph/klimadao/staging-polygon-bridged-carbon) | [Production](https://thegraph.com/hosted-service/subgraph/klimadao/polygon-bridged-carbon)
-
 ### Note for non Ubuntu linux developers
 
 A bug in Matchstick prevents the `npm run test` copmmand to run correctly.
 You can use the workaround described here: https://github.com/graphprotocol/graph-tooling/issues/1546#issuecomment-2182244898
+
+### Add credits definitions on the fly
+
+Adding credits definitions normally requires updating the `lib/projects/Projects.ts` file and recompiling and redeploying the Marketplace and Polygon Digital Carbon subgraphs.
+This process is not optimal because the subgraphs deployments are tedious and long.
+
+Projects can be added on the fly (without redeploying the contracts) by updating the CreditManager contract.
+- update the `lib/projects/Projects.ts` file with the new project's definitions
+- set your `ALCHEMY_API_KEY` environment variable
+- set your `PRIVATE_KEY` environment variable
+- execute `npm run addCredits-polygon <creditId>`
+

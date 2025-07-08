@@ -9,6 +9,11 @@ enum ActivityType {
   DeletedListing
 }
 
+enum CreditDataSource {
+  CSV
+  Event
+}
+
 type User @entity {
   #id is the user's address -> also the document key on firebase
   id: Bytes!
@@ -18,24 +23,51 @@ type User @entity {
 }
 
 type Project @entity {
+ "Credit ID ({projectId}-{vintage})"
   id: ID!
+
+  "Project ID ({registry Enum String}-{registry ProjectID})"
   key: String!
+
   # projectID: String!
   # projectType: String!
   # region: String!
+
+  "Name of the project"
   name: String!
+
+  "Methodologies associated with this project"
   methodology: String!
+
+  "Vintage of the credit"
   vintage: BigInt!
+
+  "Address of the credit"
   projectAddress: Bytes!
+
+  "Token ID of the credit"
   tokenId: BigInt!
+
+  "Registry of the project"
   registry: String!
   #   #relationships
   activities: [Activity!] @derivedFrom(field: "project")
   listings: [Listing!] @derivedFrom(field: "project")
+
+  "Category associated with this project"
   category: Category!
+
+  "Country where the project takes place"
   country: Country!
+
+  "Date of the last update"
   updatedAt: BigInt
+
+  "Whether the credit is ex-ante"
   isExAnte: Boolean!
+
+  "Source of the credit data"
+  creditDataSource: CreditDataSource!
 }
 
 type Country @entity {

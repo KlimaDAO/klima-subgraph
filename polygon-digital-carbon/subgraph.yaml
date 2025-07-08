@@ -616,6 +616,27 @@ dataSources:
         - event: LogRebase(indexed uint256,uint256,uint256)
           handler: handleRebase
       file: ./src/sKlimaV1.ts
+  - kind: ethereum/contract
+    name: CreditManager
+    network: matic
+    source:
+      address: '0x2dF21aaCAD1aBc83db34227C5aBadBE3aE0B3DF2'
+      abi: CreditManager
+      startBlock: 71756166
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/CreditManager.ts
+      entities:
+        - CarbonProject
+      abis:
+        - name: CreditManager
+          file: ../lib/abis/CreditManager.json
+      eventHandlers:
+        - event: CreditAdded(address,uint256,bool,string,string,string,string[],string,string,string)
+          handler: handleCreditAdded
+
 templates:
   - name: ToucanCarbonOffsets
     kind: ethereum/contract

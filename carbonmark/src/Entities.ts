@@ -1,8 +1,8 @@
 import { Activity, Category, Country, Listing, Project, Purchase, User } from '../generated/schema'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
-import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
-import { PROJECT_INFO } from './Projects'
+import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
+import { PROJECT_INFO } from '../../lib/projects/Projects'
 
 export function loadOrCreateProject(token: Address, tokenId: BigInt): Project {
   // Find the project + vintage ID from token address
@@ -33,6 +33,7 @@ export function loadOrCreateProject(token: Address, tokenId: BigInt): Project {
     project.country = PROJECT_INFO[projectIndex].country
     project.tokenId = tokenId
     project.isExAnte = PROJECT_INFO[projectIndex].isExAnte
+    project.creditDataSource = 'CSV'
     project.save()
 
     createCountry(project.country)
@@ -111,7 +112,7 @@ export function loadProject(projectId: string): Project {
   return project
 }
 
-function createCountry(id: string): void {
+export function createCountry(id: string): void {
   let country = Country.load(id)
   if (country == null) {
     country = new Country(id)
@@ -119,7 +120,7 @@ function createCountry(id: string): void {
   }
 }
 
-function createCategory(id: string): void {
+export function createCategory(id: string): void {
   let category = Category.load(id)
   if (category == null) {
     category = new Category(id)

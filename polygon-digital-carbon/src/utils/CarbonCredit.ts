@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, dataSource } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, dataSource, log } from '@graphprotocol/graph-ts'
 import { stdYearFromTimestampNew as stdYearFromTimestamp } from '../../../lib/utils/Dates'
 import { ZERO_BI } from '../../../lib/utils/Decimals'
 import { C3ProjectToken } from '../../generated/templates/C3ProjectToken/C3ProjectToken'
@@ -49,7 +49,8 @@ export function updateCarbonCreditWithCall(tokenAddress: Address, registry: stri
   let credit = loadCarbonCredit(tokenAddress)
   if (credit.bridgeProtocol == 'TOUCAN') credit = updateToucanCall(tokenAddress, credit, registry)
   else if (credit.bridgeProtocol == 'C3') credit = updateC3Call(tokenAddress, credit)
-  else if (credit.bridgeProtocol == 'CMARK' || credit.bridgeProtocol == 'TVER')  credit = updateCMARKCall(tokenAddress, credit, registry)
+  else if (credit.bridgeProtocol == 'CMARK' || credit.bridgeProtocol == 'TVER')
+    credit = updateCMARKCall(tokenAddress, credit, registry)
   return credit
 }
 
@@ -193,7 +194,8 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
   carbonCredit.save()
 
   project.methodologies = attributes.methodology
-  project.category = project.category != '' ? project.category : MethodologyCategories.getMethodologyCategory(project.methodologies)
+  project.category =
+    project.category != '' ? project.category : MethodologyCategories.getMethodologyCategory(project.methodologies)
   project.region = attributes.region
   project.save()
 
@@ -202,8 +204,8 @@ function updateC3Call(tokenAddress: Address, carbonCredit: CarbonCredit): Carbon
 
 function updateCMARKCall(tokenAddress: Address, carbonCredit: CarbonCredit, prefix: string): CarbonCredit {
   let token = loadOrCreateToken(tokenAddress)
-  let splittedSymbol = token.symbol.split("-")
-  let projectId = splittedSymbol.slice(0,2).join("-")
+  let splittedSymbol = token.symbol.split('-')
+  let projectId = splittedSymbol.slice(0, 2).join('-')
   let vintage = splittedSymbol[2]
 
   let project = loadOrCreateCarbonProject(prefix, projectId)
@@ -216,11 +218,12 @@ function updateCMARKCall(tokenAddress: Address, carbonCredit: CarbonCredit, pref
   return carbonCredit
 }
 
-export function updateICRCredit(tokenAddress: Address, tokenId: BigInt, timestamp: BigInt): void {
-  let defaultCredit = loadOrCreateCarbonCredit(tokenAddress, 'ICR', BigInt.fromI32(0))
+export function updateICRCredit(tokenAddress: Address, tokenId: BigInt, timestamp: BigInt, projectId: string): void {
   let credit = loadOrCreateCarbonCredit(tokenAddress, 'ICR', tokenId)
 
-  credit.project = defaultCredit.project
+  if (credit.project == null || credit.project == '') {
+    credit.project = projectId
+  }
   credit.vintage = stdYearFromTimestamp(timestamp)
   credit.exPostTokenId = tokenId
   credit.save()

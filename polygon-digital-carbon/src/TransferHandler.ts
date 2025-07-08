@@ -32,7 +32,7 @@ import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/Carb
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
 import { recordProvenance } from './utils/Provenance'
-import { createICRTokenWithCall } from './utils/Token'
+import { createICRTokenWithCall, createICRProjectId } from './utils/Token'
 import { loadRetire } from './utils/Retire'
 import {
   RetirementRequested,
@@ -42,6 +42,7 @@ import { loadOrCreateAsyncRetireRequest } from './utils/AsyncRetireRequest'
 import { AsyncRetireRequestStatus } from '../utils/enums'
 import { convertToAmountTonnes, createAsyncRetireRequestId } from '../utils/helpers'
 import { burnedCO2Token } from '../generated/CCO2/CCO2'
+import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 
 export function handleCreditTransfer(event: Transfer): void {
   recordTransfer(
@@ -186,7 +187,12 @@ export function handleICRRetired(event: RetiredVintage): void {
 }
 
 export function handleExPostCreated(event: ExPostCreated): void {
-  updateICRCredit(event.address, event.params.tokenId, event.params.verificationPeriodStart)
+  let project = loadOrCreateCarbonProject(
+    'ICR',
+    createICRProjectId(event.params.serialization),
+    event.address.toHexString()
+  )
+  updateICRCredit(event.address, event.params.tokenId, event.params.verificationPeriodStart, project.id)
   createICRTokenWithCall(event.address, event.params.tokenId)
 }
 

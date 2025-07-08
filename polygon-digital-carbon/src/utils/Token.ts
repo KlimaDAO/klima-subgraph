@@ -1,7 +1,7 @@
 import { Address, BigInt, Bytes, log, ethereum, BigDecimal, store } from '@graphprotocol/graph-ts'
 import { CarbonProject, Token } from '../../generated/schema'
 import { ERC20 } from '../../generated/ToucanFactory/ERC20'
-import { ICRProjectToken } from '../../generated/ICRCarbonContractRegistry/ICRProjectToken'
+import { ICRProjectContract } from '../../generated/ICRCarbonContractRegistry/ICRProjectContract'
 import { PuroIdMigration } from '../../generated/schema'
 import { PURO_ID_MIGRATION_BLOCK } from '../../../lib/utils/Constants'
 import { ProjectIdUpdated } from '../../generated/CarbonProjectsAddress/CarbonProjectsAddress'
@@ -62,7 +62,7 @@ export function createICRSymbolFromSerialization(serialization: string): string 
 export function createICRTokenWithCall(tokenAddress: Address, tokenId: BigInt): void {
   log.info('Creating ICR Tokens for token address {}', [tokenAddress.toHexString()])
 
-  let tokenContract = ICRProjectToken.bind(tokenAddress)
+  let tokenContract = ICRProjectContract.bind(tokenAddress)
 
   const isExPost = tokenContract.isExPostToken(tokenId)
 

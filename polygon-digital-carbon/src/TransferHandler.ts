@@ -15,7 +15,7 @@ import {
   RetiredVintage,
   ExPostCreated,
   ExAnteMinted,
-} from '../generated/templates/ICRProjectToken/ICRProjectToken'
+} from '../generated/templates/ICRProjectContract/ICRProjectContract'
 import { loadOrCreateHolding } from './utils/Holding'
 import { ZERO_BI, BIG_INT_1E18 } from '../../lib/utils/Decimals'
 import { loadOrCreateAccount } from './utils/Account'

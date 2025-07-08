@@ -9,9 +9,9 @@ import {
   beforeEach,
   assert,
 } from 'matchstick-as'
-import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts'
-import { ICRProjectToken } from '../generated/ICRCarbonContractRegistry/ICRProjectToken'
-import { ExPostCreated } from '../generated/templates/ICRProjectToken/ICRProjectToken'
+import { Address, BigInt, ethereum, Bytes } from '@graphprotocol/graph-ts'
+import { ICRProjectContract } from '../generated/ICRCarbonContractRegistry/ICRProjectContract'
+import { ExPostCreated } from '../generated/templates/ICRProjectContract/ICRProjectContract'
 import { handleExPostCreated } from '../src/TransferHandler'
 import { createICRTokenWithCall, createICRTokenID, createICRProjectId } from '../src/utils/Token'
 import { ProjectCreated } from '../generated/ICRCarbonContractRegistry/ICRCarbonContractRegistry'
@@ -19,7 +19,7 @@ import { handleNewICC } from '../src/templates/ICRCarbonContractRegistry'
 
 test(
   'Should throw an error. Confirm test is working',
-  () => {
+  () => { 
     throw new Error()
   },
   true
@@ -27,7 +27,7 @@ test(
 
 const tokenAddress = Address.fromString('0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9')
 
-const tokenContract = ICRProjectToken.bind(tokenAddress)
+const tokenContract = ICRProjectContract.bind(tokenAddress)
 
 const exPostTokenId = 6
 
@@ -152,7 +152,7 @@ describe('Token Creation Tests', () => {
 
     handleNewICC(projectCreatedEvent)
 
-    assert.dataSourceExists('ICRProjectToken', tokenAddress.toHexString())
+    assert.dataSourceExists('ICRProjectContract', tokenAddress.toHexString())
 
     clearStore()
   })

@@ -15,6 +15,7 @@ import {
   RetiredVintage,
   ExPostCreated,
   ExAnteMinted,
+  ICRProjectContract,
 } from '../generated/templates/ICRProjectContract/ICRProjectContract'
 import { loadOrCreateHolding } from './utils/Holding'
 import { ZERO_BI, BIG_INT_1E18 } from '../../lib/utils/Decimals'
@@ -27,7 +28,7 @@ import {
   saveToucanRetirement_1_4_0,
 } from './RetirementHandler'
 import { saveBridge } from './utils/Bridge'
-import { CarbonCredit, CrossChainBridge, ICRProjectIntermediate } from '../generated/schema'
+import { CarbonCredit, CrossChainBridge } from '../generated/schema'
 import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/CarbonPool'
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
@@ -192,10 +193,14 @@ export function handleExPostCreated(event: ExPostCreated): void {
     createICRProjectId(event.params.serialization),
     event.address.toHexString()
   )
-  /* name is not available within ExPostCreated. The name is stored from the initiial project creation on the ICRProjectIntermediate entity */
-  let intermediateProjectEntity = ICRProjectIntermediate.load(event.address)
-  if (intermediateProjectEntity != null) {
-    project.name = intermediateProjectEntity.projectName
+  /* name is not available within ExPostCreated.
+   * If the name is NOT already set, call the projectName function to get the name.
+   */
+
+  if (project.name == '' || project.name == null) {
+    const projectName = ICRProjectContract.bind(event.address).projectName()
+
+    project.name = projectName
     project.save()
   }
   updateICRCredit(event.address, event.params.tokenId, event.params.verificationPeriodStart, project.id)

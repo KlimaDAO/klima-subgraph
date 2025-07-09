@@ -813,11 +813,6 @@ type HoldingDailySnapshot @entity {
 
 # Registry Specific Entities
 
-type ICRProjectIntermediate @entity {
-  id: Bytes!
-  projectName: String!
-}
-
 type PuroIdMigration @entity {
   id: ID!
   tokenIds: [Bytes!]!

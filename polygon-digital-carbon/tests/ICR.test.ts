@@ -56,7 +56,7 @@ export function createNewProjectCreatedEvent(): ProjectCreated {
   let projectAddress = new ethereum.EventParam('projectAddress', ethereum.Value.fromAddress(projectContractAddress))
   let projectName = new ethereum.EventParam(
     'projectName',
-    ethereum.Value.fromString('Carbon Removal Project: Skógálfar, Álfabrekka')
+    ethereum.Value.fromString('Skógálfar, Álfabrekka')
   )
   newProjectCreatedEvent.parameters.push(projectId)
   newProjectCreatedEvent.parameters.push(projectAddress)
@@ -109,7 +109,7 @@ describe('ICR Tests', () => {
       .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(exPostTokenId))])
 
     createMockedFunction(projectContractAddress, 'projectName', 'projectName():(string)').returns([
-      ethereum.Value.fromString('Carbon Removal Project: Skógálfar, Álfabrekka'),
+      ethereum.Value.fromString('Skógálfar, Álfabrekka'),
     ])
 
     createMockedFunction(
@@ -158,13 +158,6 @@ describe('ICR Tests', () => {
 
     assert.dataSourceExists('ICRProjectContract', projectContractAddress.toHexString())
 
-    assert.fieldEquals(
-      'ICRProjectIntermediate',
-      projectContractAddress.toHexString(),
-      'projectName',
-      'Carbon Removal Project: Skógálfar, Álfabrekka'
-    )
-
     clearStore()
   })
 
@@ -210,12 +203,12 @@ describe('ICR Tests', () => {
     const projectId = createICRProjectId(exPostCreatedEvent.params.serialization.toString())
     log.info('Project ID: {}', [projectId.toString()])
     assert.fieldEquals('CarbonProject', projectId, 'id', projectId)
-    assert.fieldEquals('CarbonProject', projectId, 'name', 'Carbon Removal Project: Skógálfar, Álfabrekka')
+    assert.fieldEquals('CarbonProject', projectId, 'name', 'Skógálfar, Álfabrekka')
 
     assert.equals(ethereum.Value.fromString(creditProject.projectID), ethereum.Value.fromString(projectId))
     assert.equals(
       ethereum.Value.fromString(creditProject.name),
-      ethereum.Value.fromString('Carbon Removal Project: Skógálfar, Álfabrekka')
+      ethereum.Value.fromString('Skógálfar, Álfabrekka')
     )
 
     clearStore()

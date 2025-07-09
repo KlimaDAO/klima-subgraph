@@ -53,8 +53,7 @@ export function createICRProjectId(serialization: string): string {
 export function createICRSymbolFromSerialization(serialization: string): string {
   const serializationParts = serialization.split('-')
 
-  const symbol =
-    'ICR' + '-' + serializationParts[3].toString() + '-' + serializationParts[serializationParts.length - 1].toString()
+  const symbol = createICRProjectId(serialization) + '-' + serializationParts[serializationParts.length - 1].toString()
 
   return symbol
 }

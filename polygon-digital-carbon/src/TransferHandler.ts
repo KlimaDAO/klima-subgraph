@@ -27,7 +27,7 @@ import {
   saveToucanRetirement_1_4_0,
 } from './RetirementHandler'
 import { saveBridge } from './utils/Bridge'
-import { CarbonCredit, CrossChainBridge } from '../generated/schema'
+import { CarbonCredit, CrossChainBridge, ICRProjectIntermediate } from '../generated/schema'
 import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/CarbonPool'
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
@@ -192,6 +192,12 @@ export function handleExPostCreated(event: ExPostCreated): void {
     createICRProjectId(event.params.serialization),
     event.address.toHexString()
   )
+  /* name is not available within ExPostCreated. The name is stored from the initiial project creation on the ICRProjectIntermediate entity */
+  let intermediateProjectEntity = ICRProjectIntermediate.load(event.address)
+  if (intermediateProjectEntity != null) {
+    project.name = intermediateProjectEntity.projectName
+    project.save()
+  }
   updateICRCredit(event.address, event.params.tokenId, event.params.verificationPeriodStart, project.id)
   createICRTokenWithCall(event.address, event.params.tokenId)
 }

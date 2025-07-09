@@ -16,6 +16,7 @@ import { handleExPostCreated } from '../src/TransferHandler'
 import { createICRTokenWithCall, createICRTokenID, createICRProjectId } from '../src/utils/Token'
 import { ProjectCreated } from '../generated/ICRCarbonContractRegistry/ICRCarbonContractRegistry'
 import { handleNewICC } from '../src/templates/ICRCarbonContractRegistry'
+import { CarbonCredit, CarbonProject } from '../generated/schema'
 
 test(
   'Should throw an error. Confirm test is working',
@@ -25,9 +26,9 @@ test(
   true
 )
 
-const tokenAddress = Address.fromString('0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9')
+const projectContractAddress = Address.fromString('0xae63fbd056512fc4b1d15b58a98f9aaea44b18a9')
 
-const tokenContract = ICRProjectContract.bind(tokenAddress)
+const tokenContract = ICRProjectContract.bind(projectContractAddress)
 
 const exPostTokenId = 6
 
@@ -38,7 +39,7 @@ const estimatedAmount = 115221
 export function createNewProjectCreatedEvent(): ProjectCreated {
   let mockEvent = newMockEvent()
   let newProjectCreatedEvent = new ProjectCreated(
-    tokenAddress,
+    projectContractAddress,
     mockEvent.logIndex,
     mockEvent.transactionLogIndex,
     mockEvent.logType,
@@ -52,8 +53,11 @@ export function createNewProjectCreatedEvent(): ProjectCreated {
     'unusable-ICR-project-id',
     ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
   )
-  let projectAddress = new ethereum.EventParam('projectAddress', ethereum.Value.fromAddress(tokenAddress))
-  let projectName = new ethereum.EventParam('projectName', ethereum.Value.fromString('Descriptive Project Name'))
+  let projectAddress = new ethereum.EventParam('projectAddress', ethereum.Value.fromAddress(projectContractAddress))
+  let projectName = new ethereum.EventParam(
+    'projectName',
+    ethereum.Value.fromString('Carbon Removal Project: Skógálfar, Álfabrekka')
+  )
   newProjectCreatedEvent.parameters.push(projectId)
   newProjectCreatedEvent.parameters.push(projectAddress)
   newProjectCreatedEvent.parameters.push(projectName)
@@ -65,7 +69,7 @@ export function createNewExPostCreatedEvent(): ExPostCreated {
   let mockEvent = newMockEvent()
 
   let newExPostCreatedEvent = new ExPostCreated(
-    tokenAddress,
+    projectContractAddress,
     mockEvent.logIndex,
     mockEvent.transactionLogIndex,
     mockEvent.logType,
@@ -91,25 +95,25 @@ export function createNewExPostCreatedEvent(): ExPostCreated {
   return newExPostCreatedEvent
 }
 
-describe('Token Creation Tests', () => {
+describe('ICR Tests', () => {
   beforeEach(() => {
     clearStore()
     // Mocking necessary contract methods. Need to mock for all potential tokenIds
 
-    createMockedFunction(tokenAddress, 'isExPostToken', 'isExPostToken(uint256):(bool)')
+    createMockedFunction(projectContractAddress, 'isExPostToken', 'isExPostToken(uint256):(bool)')
       .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(exPostTokenId))])
       .returns([ethereum.Value.fromBoolean(true)])
 
-    createMockedFunction(tokenAddress, 'exAnteToExPostTokenId', 'exAnteToExPostTokenId(uint256):(uint256)')
+    createMockedFunction(projectContractAddress, 'exAnteToExPostTokenId', 'exAnteToExPostTokenId(uint256):(uint256)')
       .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(exAnteTokenId))])
       .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(exPostTokenId))])
 
-    createMockedFunction(tokenAddress, 'projectName', 'projectName():(string)').returns([
-      ethereum.Value.fromString('Skógálfar, Álfabrekka'),
+    createMockedFunction(projectContractAddress, 'projectName', 'projectName():(string)').returns([
+      ethereum.Value.fromString('Carbon Removal Project: Skógálfar, Álfabrekka'),
     ])
 
     createMockedFunction(
-      tokenAddress,
+      projectContractAddress,
       'exPostVintageMapping',
       'exPostVintageMapping(uint256):(string,uint256,uint256,uint256,uint256)'
     )
@@ -136,8 +140,8 @@ describe('Token Creation Tests', () => {
     log.info('Ex Ante to Ex Post Token ID: {}', [exAnteToExPostTokenId.toString()])
     log.info('Ex Post Serialization: {}', [exPostVintageMapping.value0.toString()])
 
-    createICRTokenWithCall(tokenAddress, BigInt.fromI32(exPostTokenId))
-    const id = createICRTokenID(tokenAddress, BigInt.fromI32(exPostTokenId))
+    createICRTokenWithCall(projectContractAddress, BigInt.fromI32(exPostTokenId))
+    const id = createICRTokenID(projectContractAddress, BigInt.fromI32(exPostTokenId))
 
     assert.fieldEquals('Token', id.toHexString(), 'name', 'ICR: ICR-57-2025')
     assert.fieldEquals('Token', id.toHexString(), 'symbol', 'ICR-57-2025')
@@ -147,41 +151,72 @@ describe('Token Creation Tests', () => {
     clearStore()
   })
 
-  test('ProjectCreated event creates a new datasource', () => {
+  test('ProjectCreated event creates a new datasource + intermediate entity', () => {
     let projectCreatedEvent = createNewProjectCreatedEvent()
 
     handleNewICC(projectCreatedEvent)
 
-    assert.dataSourceExists('ICRProjectContract', tokenAddress.toHexString())
+    assert.dataSourceExists('ICRProjectContract', projectContractAddress.toHexString())
+
+    assert.fieldEquals(
+      'ICRProjectIntermediate',
+      projectContractAddress.toHexString(),
+      'projectName',
+      'Carbon Removal Project: Skógálfar, Álfabrekka'
+    )
 
     clearStore()
   })
 
   test('ExPostCreated event successfully creates Token, creates accurate Project Id and updates Credit', () => {
-    let projectCreatedEvent = createNewExPostCreatedEvent()
+    // First create the intermediate entity that contains the project name
+    let projectCreatedEvent = createNewProjectCreatedEvent()
+    handleNewICC(projectCreatedEvent)
 
-    handleExPostCreated(projectCreatedEvent)
+    let exPostCreatedEvent = createNewExPostCreatedEvent()
 
-    const id = createICRTokenID(tokenAddress, BigInt.fromI32(exPostTokenId))
+    handleExPostCreated(exPostCreatedEvent)
+
+    const id = createICRTokenID(projectContractAddress, BigInt.fromI32(exPostTokenId))
 
     assert.fieldEquals('Token', id.toHexString(), 'name', 'ICR: ICR-57-2025')
     assert.fieldEquals('Token', id.toHexString(), 'symbol', 'ICR-57-2025')
     assert.fieldEquals('Token', id.toHexString(), 'decimals', '18')
     assert.fieldEquals('Token', id.toHexString(), 'id', id.toHexString())
 
-    const creditId = Bytes.fromHexString(tokenAddress.toHexString()).concatI32(BigInt.fromI32(exPostTokenId).toI32())
+    const creditId = Bytes.fromHexString(projectContractAddress.toHexString()).concatI32(
+      BigInt.fromI32(exPostTokenId).toI32()
+    )
 
     assert.fieldEquals('CarbonCredit', creditId.toHexString(), 'project', 'ICR-57')
     assert.fieldEquals('CarbonCredit', creditId.toHexString(), 'vintage', '2025')
     assert.fieldEquals('CarbonCredit', creditId.toHexString(), 'exPostTokenId', exPostTokenId.toString())
     assert.fieldEquals('CarbonCredit', creditId.toHexString(), 'bridgeProtocol', 'ICR')
-    assert.fieldEquals('CarbonCredit', creditId.toHexString(), 'tokenAddress', tokenAddress.toHexString())
+    assert.fieldEquals('CarbonCredit', creditId.toHexString(), 'tokenAddress', projectContractAddress.toHexString())
     assert.fieldEquals('CarbonCredit', creditId.toHexString(), 'id', creditId.toHexString())
 
-    const projectId = createICRProjectId(projectCreatedEvent.params.serialization.toString())
+    const credit = CarbonCredit.load(creditId)
+
+    if (credit == null) {
+      throw new Error('Credit not found')
+    }
+
+    const creditProject = CarbonProject.load(credit.project)
+
+    if (creditProject == null) {
+      throw new Error('Credit project not found')
+    }
+
+    const projectId = createICRProjectId(exPostCreatedEvent.params.serialization.toString())
     log.info('Project ID: {}', [projectId.toString()])
     assert.fieldEquals('CarbonProject', projectId, 'id', projectId)
-    assert.fieldEquals('CarbonProject', projectId, 'name', 'Skógálfar, Álfabrekka')
+    assert.fieldEquals('CarbonProject', projectId, 'name', 'Carbon Removal Project: Skógálfar, Álfabrekka')
+
+    assert.equals(ethereum.Value.fromString(creditProject.projectID), ethereum.Value.fromString(projectId))
+    assert.equals(
+      ethereum.Value.fromString(creditProject.name),
+      ethereum.Value.fromString('Carbon Removal Project: Skógálfar, Álfabrekka')
+    )
 
     clearStore()
   })

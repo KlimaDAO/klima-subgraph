@@ -19,7 +19,7 @@ import { handleNewICC } from '../src/templates/ICRCarbonContractRegistry'
 
 test(
   'Should throw an error. Confirm test is working',
-  () => { 
+  () => {
     throw new Error()
   },
   true

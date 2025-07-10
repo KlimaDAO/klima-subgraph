@@ -1,107 +1,114 @@
-# triggers on all pushes and pull requests. This version check will fail if the commit hash for a subgraph directory has changed but the package.json version has been updated.
+# .github/workflows/check-version-update.yml
+#
+# Fails a PR / push if:
+#   – any “core” file in a sub-graph folder changes AND
+#   – the version field in that sub-graph’s package.json stays the same
+#
+# “Core” files = src/**, schema.graphql, subgraph.yaml(+template)
 
 name: Check Version Update
 
 on:
   push:
-    branches:
-      - '**'
+    branches: ['main']
   pull_request:
-    branches:
-      - '**'
+    branches: ['main']
 
 jobs:
   check-version-update:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        value:
-          [
-            'bonds',
-            'carbonmark',
-            'protocol-metrics',
-            'vesting',
-            'user-carbon',
-            'pairs',
-            'celo-bridged-carbon',
-            'ethereum-bridged-carbon',
-            'polygon-digital-carbon',
-          ]
+        subgraph:
+          - bonds
+          - carbonmark
+          - protocol-metrics
+          - vesting
+          - user-carbon
+          - pairs
+          - celo-bridged-carbon
+          - ethereum-bridged-carbon
+          - polygon-digital-carbon
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Fetch full history
+    # ────────────────────────────────────────────────────────────────
+    # 0. Checkout and choose the HEAD commit we’re validating
+    # ────────────────────────────────────────────────────────────────
+    - uses: actions/checkout@v4
+      with: { fetch-depth: 0 }
 
-      - name: Determine if it's a PR or a push
-        id: event_type
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "is_pr=true" >> $GITHUB_ENV
-          else
-            echo "is_pr=false" >> $GITHUB_ENV
-          fi
+    - name: Select HEAD SHA (PR vs push)
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          echo "HEAD_SHA=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
+        else
+          echo "HEAD_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+        fi
 
-      - name: Fetch main branch
-        run: |
-          git fetch origin main:main  # Fetch main branch for comparison
+    - name: Fetch main branch for comparison
+      run: git fetch origin main:main
 
-      - name: Initialize error log
-        run: |
-          echo "" > errors.log
+    # ────────────────────────────────────────────────────────────────
+    # 1. Detect changes inside the current sub-graph folder
+    # ────────────────────────────────────────────────────────────────
+    - name: Detect core / package changes in ${{ matrix.subgraph }}
+      id: detect
+      env: { SG: ${{ matrix.subgraph }} }
+      shell: bash
+      run: |
+        ALL_CHANGED=$(git diff --name-only origin/main "$HEAD_SHA" -- "$SG/" || true)
 
-      - name: Check for changes in subgraph folder
-        id: check_changes
-        run: |
-          echo "Checking for changes in ${{ matrix.value }}"
+        # Flag if package.json changed
+        if echo "$ALL_CHANGED" | grep -qx "$SG/package.json"; then
+          echo "pkg_changed=true" >> "$GITHUB_ENV"
+        else
+          echo "pkg_changed=false" >> "$GITHUB_ENV"
+        fi
 
-          if [[ "${{ env.is_pr }}" == "true" ]]; then
-            # For PRs: Compare the base branch (main) with the PR's head branch
-            CHANGED=$(git diff --name-only origin/main ${{ github.event.pull_request.head.sha }} -- "${{ matrix.value }}/" || true)
-            DIFF=$(git diff origin/main ${{ github.event.pull_request.head.sha }} -- "${{ matrix.value }}/")
-          else
-            # For pushes: Compare the main branch with the latest commit in the push
-            CHANGED=$(git diff --name-only origin/main ${{ github.sha }} -- "${{ matrix.value }}/" || true)
-            DIFF=$(git diff origin/main ${{ github.sha }} -- "${{ matrix.value }}/")
-          fi
+        # Flag if any “core” file changed
+        CORE_REGEX="^$SG/(src/|schema\.graphql$|subgraph\.yaml$|subgraph\.template\.yaml$)"
+        if echo "$ALL_CHANGED" | grep -E "$CORE_REGEX" -q; then
+          echo "core_changed=true" >> "$GITHUB_ENV"
+        else
+          echo "core_changed=false" >> "$GITHUB_ENV"
+        fi
 
-          if [ -n "$CHANGED" ]; then
-            echo "changes=true" >> $GITHUB_ENV
+        # Persist full file list for optional debugging
+        echo "all_changed<<EOF"  >> "$GITHUB_ENV"
+        echo "$ALL_CHANGED"       >> "$GITHUB_ENV"
+        echo "EOF"                >> "$GITHUB_ENV"
 
-            echo "Changed files: $CHANGED"
-            echo "Diff: $DIFF"
-          else
-            echo "changes=false" >> $GITHUB_ENV
-          fi
+    # ────────────────────────────────────────────────────────────────
+    # 2. Fail if core files changed but version didn’t bump
+    # ────────────────────────────────────────────────────────────────
+    - name: Enforce version bump
+      if: env.core_changed == 'true'
+      env: { SG: ${{ matrix.subgraph }} }
+      shell: bash
+      run: |
+        BASE_V=$(git show origin/main:$SG/package.json | jq -r .version)
+        NEW_V=$(git show "$HEAD_SHA":$SG/package.json | jq -r .version)
 
-      - name: Check version update if changes exist
-        if: env.changes == 'true'
-        run: |
-          echo "Comparing versions in ${{ matrix.value }} folder"
-          BASE_VERSION=$(git show origin/main:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
-          echo "Base version: $BASE_VERSION"
+        echo "Base version: $BASE_V"
+        echo "New  version: $NEW_V"
 
-          if [[ "${{ env.is_pr }}" == "true" ]]; then
-            PR_VERSION=$(git show ${{ github.event.pull_request.head.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
-          else
-            PR_VERSION=$(git show ${{ github.sha }}:${{ matrix.value }}/package.json | grep '"version":' | cut -d'"' -f4)
-          fi
-          echo "PR version: $PR_VERSION"
+        if [[ "$BASE_V" == "$NEW_V" ]]; then
+          echo "::error file=$SG/package.json,title=Version bump required::\
+Core files changed but version field stayed $BASE_V"
+          exit 1
+        else
+          echo "✅  Version correctly bumped → $NEW_V"
+        fi
 
-          if [ "$BASE_VERSION" = "$PR_VERSION" ]; then
-            # Only write error if there's a mismatch, avoiding empty spaces or newlines
-            echo "Error: Version in package.json for ${{ matrix.value }} has not been updated." >> errors.log
-          else
-            echo "Version has been updated for ${{ matrix.value }}."
-          fi
+    # ────────────────────────────────────────────────────────────────
+    # 3. Skip messages
+    # ────────────────────────────────────────────────────────────────
+    - name: Skip – only package.json updated
+      if: env.core_changed == 'false' && env.pkg_changed == 'true'
+      run: |
+        echo "🟢  Only ${{ matrix.subgraph }}/package.json changed — version bump not required."
 
-      - name: Final version check summary
-        if: env.changes == 'true'
-        run: |
-          if grep -q "Error:" errors.log; then  # Only fail if the log contains a real error. Otherwise the creation of the log is 1 byte, thus -s returns a false positive
-            echo "Errors detected in errors.log. Exiting."
-            cat errors.log
-            exit 1
-          else
-            echo "No real errors found. All subgraphs are up to date."
-          fi
+    - name: Skip – no changes in this sub-graph
+      if: env.core_changed == 'false' && env.pkg_changed == 'false'
+      run: |
+        echo "🟢  No changes in ${{ matrix.subgraph }} — nothing to check."

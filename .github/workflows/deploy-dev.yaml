@@ -37,7 +37,7 @@ jobs:
       # Generate code and check for uncommitted changes
       # https://github.com/marketplace/actions/check-uncommitted-changes
       - name: Generate Subgraph Code
-        run: npm run codegen
+        run: yarn codegen
         working-directory: '${{ matrix.value }}'
 
       - name: Check for uncommitted changes
@@ -49,7 +49,7 @@ jobs:
         run: echo "There are uncommitted changes - execute 'npm run codegen' locally and commit the generated files!"
 
       - name: Build Subgraph
-        run: npm run build
+        run: yarn build
         working-directory: '${{ matrix.value }}'
 
       - name: Create Subgraph Name

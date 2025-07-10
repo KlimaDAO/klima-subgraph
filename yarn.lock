@@ -357,6 +357,43 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@graphprotocol/graph-cli@npm:0.71.0":
+  version: 0.71.0
+  resolution: "@graphprotocol/graph-cli@npm:0.71.0"
+  dependencies:
+    "@float-capital/float-subgraph-uncrashable": ^0.0.0-alpha.4
+    "@oclif/core": 2.8.6
+    "@oclif/plugin-autocomplete": ^2.3.6
+    "@oclif/plugin-not-found": ^2.4.0
+    "@whatwg-node/fetch": ^0.8.4
+    assemblyscript: 0.19.23
+    binary-install-raw: 0.0.13
+    chalk: 3.0.0
+    chokidar: 3.5.3
+    debug: 4.3.4
+    docker-compose: 0.23.19
+    dockerode: 2.5.8
+    fs-extra: 9.1.0
+    glob: 9.3.5
+    gluegun: 5.1.6
+    graphql: 15.5.0
+    immutable: 4.2.1
+    ipfs-http-client: 55.0.0
+    jayson: 4.0.0
+    js-yaml: 3.14.1
+    prettier: 3.0.3
+    semver: 7.4.0
+    sync-request: 6.1.0
+    tmp-promise: 3.0.3
+    web3-eth-abi: 1.7.0
+    which: 2.0.2
+    yaml: 1.10.2
+  bin:
+    graph: bin/run
+  checksum: dc1eeb217591cecb3daf51db9e8ad9adbef66e8fc83d7875ad72d17a5c276a968974158938b30cd1fd2cfcfdc77ae73dea26963fac649796de2b1721da00126b
+  languageName: node
+  linkType: hard
+
 "@graphprotocol/graph-ts@npm:0.31.0":
   version: 0.31.0
   resolution: "@graphprotocol/graph-ts@npm:0.31.0"
@@ -5841,7 +5878,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "root@workspace:."
   dependencies:
-    "@graphprotocol/graph-cli": 0.56.0
+    "@graphprotocol/graph-cli": 0.71.0
     "@graphprotocol/graph-ts": 0.31.0
     arg: ^5.0.2
     conventional-changelog-cli: 5.0.0

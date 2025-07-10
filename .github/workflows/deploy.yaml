@@ -71,12 +71,12 @@ jobs:
 
     - name: Generate code
       if: steps.version.outputs.exist == 'false'
-      run: npm run codegen
+      run: yarn codegen
       working-directory: ${{ matrix.subgraph }}
 
     - name: Build subgraph
       if: steps.version.outputs.exist == 'false'
-      run: npm run build
+      run: yarn build
       working-directory: ${{ matrix.subgraph }}
 
     - name: Deploy to Subgraph Studio

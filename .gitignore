@@ -2,8 +2,7 @@
 logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+npm-error.log*
 
 # Runtime data
 pids
@@ -51,15 +50,15 @@ typings/
 # Output of 'npm pack'
 *.tgz
 
-# Yarn Integrity file
-.yarn-integrity
+# npm run Integrity file
+.npm run-integrity
 
-# Yarn local files
-.yarn/*
-.yarn/install-state.gz
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# npm run local files
+.npm run/*
+.npm run/install-state.gz
+!.npm run/plugins
+!.npm run/releases
+!.npm run/versions
 
 # dotenv environment variables file
 .env

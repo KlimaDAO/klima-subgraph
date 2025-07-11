@@ -25,7 +25,7 @@ COPY .env .
 COPY ./deploy_graph.sh .
 
 # Install dependencies
-RUN cd ${SUBGRAPH_DIR} && yarn
+RUN cd ${SUBGRAPH_DIR} && npm run
 
 # Install Foundry
 RUN apt-get update && \

@@ -1,14 +1,14 @@
 {
   "name": "root",
+  "version": "1.0.0",
   "private": true,
-  "packageManager": "yarn@3.4.1",
+  "packageManager": "npm@10.0.0",
   "workspaces": [
     "bonds",
     "carbonmark",
     "celo-bridged-carbon",
     "ethereum-bridged-carbon",
     "pairs",
-    "polygon-bridged-carbon",
     "polygon-digital-carbon",
     "protocol-metrics",
     "user-carbon",
@@ -27,7 +27,7 @@
     "addCredits-amoy": "bun lib/projects/addCredits.ts --network amoy"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "0.56.0",
+    "@graphprotocol/graph-cli": "0.71.0",
     "@graphprotocol/graph-ts": "0.31.0",
     "matchstick-as": "0.6.0",
     "prettier": "2.7.1",

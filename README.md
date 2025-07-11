@@ -13,19 +13,19 @@ For information on getting started with a Graph Node see this link: https://gith
 Install any needed packages.
 
 ```
-yarn
+npm run
 ```
 
 Navigate to the desired subgraph deployment folder. Then create the subgraph instance
 
 ```
-yarn create-local
+npm run create-local
 ```
 
 Finally run codegen and deploy the subgraph and start indexing.
 
 ```
-yarn codegen && yarn deploy-local
+npm run codegen && npm run deploy-local
 ```
 
 ## Local Navigation and Querying
@@ -54,8 +54,8 @@ Adding credits definitions normally requires updating the `lib/projects/Projects
 This process is not optimal because the subgraphs deployments are tedious and long.
 
 Projects can be added on the fly (without redeploying the contracts) by updating the CreditManager contract.
+
 - update the `lib/projects/Projects.ts` file with the new project's definitions
 - set your `ALCHEMY_API_KEY` environment variable
 - set your `PRIVATE_KEY` environment variable
 - execute `npm run addCredits-polygon <creditId>`
-

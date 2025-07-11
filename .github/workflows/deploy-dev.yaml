@@ -29,11 +29,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '16'
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
-        working-directory: '${{ matrix.value }}'
-
+          node-version: '18'
+      - name: Install root dependencies
+        run: npm install
+      - name: Install workspace dependencies  
+        run: npm install
+        working-directory: ${{ matrix.value }}
       # Generate code and check for uncommitted changes
       # https://github.com/marketplace/actions/check-uncommitted-changes
       - name: Generate Subgraph Code

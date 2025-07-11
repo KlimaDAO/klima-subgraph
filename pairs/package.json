@@ -18,10 +18,5 @@
     "version:prepatch": "npm version prepatch",
     "version:preminor": "npm version preminor",
     "version:premajor": "npm version premajor"
-  },
-  "devDependencies": {
-    "@graphprotocol/graph-cli": "0.56.0",
-    "@graphprotocol/graph-ts": "0.31.0",
-    "prettier": "2.7.1"
   }
 }

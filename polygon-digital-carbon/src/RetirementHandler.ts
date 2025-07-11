@@ -36,7 +36,7 @@ import { C3RetirementMetadata as C3RetirementMetadataTemplate } from '../generat
 import { extractIpfsHash } from '../utils/ipfs'
 import { returnedPoccID } from '../generated/Coorest/Coorest'
 
-const testCounter = 0;
+const testCounter = 1;
 
 export function saveToucanRetirement(event: Retired): void {
   // Disregard events with zero amount

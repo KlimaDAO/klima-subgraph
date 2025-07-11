@@ -2,7 +2,7 @@
   "name": "root",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "npm@10.0.0",
+  "packageManager": "npm@9.0.0",
   "workspaces": [
     "bonds",
     "carbonmark",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.71.0",
-    "@graphprotocol/graph-ts": "0.31.0",
+    "@graphprotocol/graph-ts": "0.34.0",
     "matchstick-as": "0.6.0",
     "prettier": "2.7.1",
     "ts-node": "^10.9.2"

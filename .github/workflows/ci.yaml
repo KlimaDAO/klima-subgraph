@@ -10,7 +10,7 @@ jobs:
     name: Compile
     strategy:
       matrix:
-        value:
+        subgraph:
           [
             'bonds',
             'carbonmark',
@@ -33,17 +33,17 @@ jobs:
         run: npm install
       - name: Install workspace dependencies
         run: npm install
-        working-directory: '${{ matrix.value }}'
+        working-directory: '${{ matrix.subgraph }}'
 
       # Generate code and check for uncommitted changes
       # https://github.com/marketplace/actions/check-uncommitted-changes
       - name: Prepare Manifest
-        if: matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark'
+        if: matrix.subgraph == 'polygon-digital-carbon' || matrix.subgraph == 'carbonmark'
         run: npm run prepare-matic
-        working-directory: '${{ matrix.value }}'
+        working-directory: '${{ matrix.subgraph }}'
       - name: Generate Subgraph Code
         run: npm run codegen
-        working-directory: '${{ matrix.value }}'
+        working-directory: '${{ matrix.subgraph }}'
       - name: Check for uncommitted changes
         id: check-changes
         uses: mskri/check-uncommitted-changes-action@v1.0.1
@@ -53,8 +53,8 @@ jobs:
 
       - name: Build Subgraph
         run: npm run build
-        working-directory: '${{ matrix.value }}'
+        working-directory: '${{ matrix.subgraph }}'
       - name: Run Tests
-        if: matrix.value == 'polygon-digital-carbon'
+        if: matrix.subgraph == 'polygon-digital-carbon'
         run: npm run test -d
-        working-directory: '${{ matrix.value }}'
+        working-directory: '${{ matrix.subgraph }}'

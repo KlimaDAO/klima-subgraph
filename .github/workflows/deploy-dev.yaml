@@ -29,15 +29,16 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '16'
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
-        working-directory: '${{ matrix.value }}'
-
+          node-version: '18'
+      - name: Install root dependencies
+        run: npm install
+      - name: Install workspace dependencies  
+        run: npm install
+        working-directory: ${{ matrix.value }}
       # Generate code and check for uncommitted changes
       # https://github.com/marketplace/actions/check-uncommitted-changes
       - name: Generate Subgraph Code
-        run: yarn codegen
+        run: npm run codegen
         working-directory: '${{ matrix.value }}'
 
       - name: Check for uncommitted changes
@@ -49,7 +50,7 @@ jobs:
         run: echo "There are uncommitted changes - execute 'npm run codegen' locally and commit the generated files!"
 
       - name: Build Subgraph
-        run: yarn build
+        run: npm run build
         working-directory: '${{ matrix.value }}'
 
       - name: Create Subgraph Name

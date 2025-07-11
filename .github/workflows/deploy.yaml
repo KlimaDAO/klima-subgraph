@@ -9,7 +9,7 @@ name: Deployment
 
 on:
   push:
-    branches: [ main ]
+    branches: [main, faux-main]
 
 jobs:
   deploy:
@@ -29,112 +29,117 @@ jobs:
           - ethereum-bridged-carbon
 
     steps:
-    # ────────────────────────────────────────────────────────────────
-    # 0. Checkout
-    # ────────────────────────────────────────────────────────────────
-    - uses: actions/checkout@v4
-      with: { fetch-depth: 0 }
+      # ────────────────────────────────────────────────────────────────
+      # 0. Checkout
+      # ────────────────────────────────────────────────────────────────
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
 
-    # ────────────────────────────────────────────────────────────────
-    # 1. Read version from package.json & see if a tag already exists
-    # ────────────────────────────────────────────────────────────────
-    - name: Extract version + decide whether to deploy
-      id: version
-      env: { SG: ${{ matrix.subgraph }} }
-      shell: bash
-      run: |
-        VERSION=$(jq -r .version "$SG/package.json")
-        TAG="$SG-v$VERSION"
+      # ────────────────────────────────────────────────────────────────
+      # 1. Read version from package.json & see if a tag already exists
+      # ────────────────────────────────────────────────────────────────
+      - name: Extract version + decide whether to deploy
+        id: version
+        env:
+          SG: ${{ matrix.subgraph }}
+        shell: bash
+        run: |
+          VERSION=$(jq -r .version "$SG/package.json")
+          TAG="$SG-v$VERSION"
 
-        echo "version=$VERSION"   >> $GITHUB_OUTPUT
-        echo "tag_name=$TAG"      >> $GITHUB_OUTPUT
+          echo "version=$VERSION"   >> $GITHUB_OUTPUT
+          echo "tag_name=$TAG"      >> $GITHUB_OUTPUT
 
-        if git tag --list | grep -qx "$TAG"; then
-          echo "exist=true"       >> $GITHUB_OUTPUT
-          echo "Tag $TAG already exists – will skip build/deploy."
-        else
-          echo "exist=false"      >> $GITHUB_OUTPUT
-        fi
+          if git tag --list | grep -qx "$TAG"; then
+            echo "exist=true"       >> $GITHUB_OUTPUT
+            echo "Tag $TAG already exists – will skip build/deploy."
+          else
+            echo "exist=false"      >> $GITHUB_OUTPUT
+          fi
 
-    # ──────────────────────────────────────────
-    # 2. Install deps, build, deploy if new tag
-    # ──────────────────────────────────────────
-    - name: Setup Node
-      if: steps.version.outputs.exist == 'false'
-      uses: actions/setup-node@v3
-      with: { node-version: 18 }
+      # ──────────────────────────────────────────
+      # 2. Install deps, build, deploy if new tag
+      # ──────────────────────────────────────────
+      - name: Setup Node
+        if: steps.version.outputs.exist == 'false'
+        uses: actions/setup-node@v3
+        with: { node-version: 18 }
 
-    - name: Install dependencies
-      if: steps.version.outputs.exist == 'false'
-      run: yarn --frozen-lockfile
-      working-directory: ${{ matrix.subgraph }}
+      - name: Install root dependencies
+        if: steps.version.outputs.exist == 'false'
+        run: npm install
+      - name: Install workspace dependencies
+        if: steps.version.outputs.exist == 'false'
+        run: npm install
+        working-directory: ${{ matrix.subgraph }}
 
-    - name: Generate code
-      if: steps.version.outputs.exist == 'false'
-      run: yarn codegen
-      working-directory: ${{ matrix.subgraph }}
+      - name: Generate code
+        if: steps.version.outputs.exist == 'false'
+        run: npm run codegen
+        working-directory: ${{ matrix.subgraph }}
 
-    - name: Build subgraph
-      if: steps.version.outputs.exist == 'false'
-      run: yarn build
-      working-directory: ${{ matrix.subgraph }}
+      - name: Build subgraph
+        if: steps.version.outputs.exist == 'false'
+        run: npm run build
+        working-directory: ${{ matrix.subgraph }}
 
-    - name: Deploy to Subgraph Studio
-      if: steps.version.outputs.exist == 'false'
-      env:
-        DEPLOY_KEY: ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY }}
-      run: |
-        ../node_modules/.bin/graph deploy --studio \
-          --deploy-key "$DEPLOY_KEY" \
-          "${{ matrix.subgraph }}" \
-          --version-label "${{ steps.version.outputs.version }}"
-      working-directory: ${{ matrix.subgraph }}
+      - name: Deploy to Subgraph Studio
+        if: steps.version.outputs.exist == 'false'
+        env:
+          DEPLOY_KEY: ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY }}
+        run: |
+          ../node_modules/.bin/graph deploy --studio \
+            --deploy-key "$DEPLOY_KEY" \
+            "${{ matrix.subgraph }}" \
+            --version-label "${{ steps.version.outputs.version }}"
+        working-directory: ${{ matrix.subgraph }}
 
-    - name: Deploy to Alchemy Hosted Service
-      if: >
-        steps.version.outputs.exist == 'false' &&
-        ( matrix.subgraph == 'carbonmark' ||
-          matrix.subgraph == 'polygon-digital-carbon' ||
-          matrix.subgraph == 'pairs' ||
-          matrix.subgraph == 'ethereum-bridged-carbon' )
-      env:
-        DEPLOY_KEY: ${{ secrets.SUBGRAPH_ALCHEMY_HOSTED_SERVICE_DEPLOY_KEY }}
-      run: |
-        ../node_modules/.bin/graph deploy \
-          "${{ matrix.subgraph }}" \
-          --deploy-key "$DEPLOY_KEY" \
-          --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
-          --ipfs https://ipfs.satsuma.xyz \
-          --version-label "${{ steps.version.outputs.version }}"
-      working-directory: ${{ matrix.subgraph }}
+      - name: Deploy to Alchemy Hosted Service
+        if: >
+          steps.version.outputs.exist == 'false' &&
+          ( matrix.subgraph == 'carbonmark' ||
+            matrix.subgraph == 'polygon-digital-carbon' ||
+            matrix.subgraph == 'pairs' ||
+            matrix.subgraph == 'ethereum-bridged-carbon' )
+        env:
+          DEPLOY_KEY: ${{ secrets.SUBGRAPH_ALCHEMY_HOSTED_SERVICE_DEPLOY_KEY }}
+        run: |
+          ../node_modules/.bin/graph deploy \
+            "${{ matrix.subgraph }}" \
+            --deploy-key "$DEPLOY_KEY" \
+            --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
+            --ipfs https://ipfs.satsuma.xyz \
+            --version-label "${{ steps.version.outputs.version }}"
+        working-directory: ${{ matrix.subgraph }}
 
-    # ────────────────────────────────────────────────────────────────
-    # 3. Tag + draft release  (only if the tag was new)
-    # ────────────────────────────────────────────────────────────────
-    - name: Create Git tag
-      if: steps.version.outputs.exist == 'false'
-      env:
-        TAG: ${{ steps.version.outputs.tag_name }}
-      run: |
-        git tag -a "$TAG" -m "${{ matrix.subgraph }} release $TAG"
-        git push origin "$TAG"
+      # ────────────────────────────────────────────────────────────────
+      # 3. Tag + draft release  (only if the tag was new)
+      # ────────────────────────────────────────────────────────────────
+      - name: Create Git tag
+        if: steps.version.outputs.exist == 'false'
+        env:
+          TAG: ${{ steps.version.outputs.tag_name }}
+        run: |
+          git tag -a "$TAG" -m "${{ matrix.subgraph }} release $TAG"
+          git push origin "$TAG"
 
-    - name: Generate changelog
-      if: steps.version.outputs.exist == 'false'
-      id: changelog
-      run: |
-        LAST_TAG=$(git tag --list "${{ matrix.subgraph }}-v*" | sort -V | tail -n 2 | head -n 1)
-        NEW_TAG='${{ steps.version.outputs.tag_name }}'
+      - name: Generate changelog
+        if: steps.version.outputs.exist == 'false'
+        id: changelog
+        run: |
+          LAST_TAG=$(git tag --list "${{ matrix.subgraph }}-v*" | sort -V | tail -n 2 | head -n 1)
+          NEW_TAG='${{ steps.version.outputs.tag_name }}'
 
-        echo "Generating changelog from $LAST_TAG to $NEW_TAG"
-        node .github/actions-scripts/generateChangelog.mjs
+          echo "Generating changelog from $LAST_TAG to $NEW_TAG"
+          node .github/actions-scripts/generateChangelog.mjs
 
-    - name: Draft GitHub release
-      if: steps.version.outputs.exist == 'false'
-      uses: actions/create-release@v1
-      env: { GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
-      with:
-        tag_name:     ${{ steps.version.outputs.tag_name }}
-        release_name: ${{ steps.version.outputs.tag_name }}
-        body:         ${{ steps.changelog.outputs.changelog }}
-        draft:        true
+      - name: Draft GitHub release
+        if: steps.version.outputs.exist == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.tag_name }}
+          release_name: ${{ steps.version.outputs.tag_name }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: true

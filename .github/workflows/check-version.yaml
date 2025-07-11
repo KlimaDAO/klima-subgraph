@@ -1,8 +1,8 @@
 # .github/workflows/check-version-update.yml
 #
 # Fails a PR / push if:
-#   – any “core” file in a sub-graph folder changes AND
-#   – the version field in that sub-graph’s package.json stays the same
+#   – any “core” file in a subgraph folder changes AND
+#   – the version field in that subgraph’s package.json stays the same
 #
 # “Core” files = src/**, schema.graphql, subgraph.yaml(+template)
 
@@ -50,7 +50,7 @@ jobs:
         run: git fetch origin main:main
 
       # ────────────────────────────────────────────────────────────────
-      # 1. Detect changes inside the current sub-graph folder
+      # 1. Detect changes inside the current subgraph folder
       # ────────────────────────────────────────────────────────────────
       - name: Detect core / package changes in ${{ matrix.subgraph }}
         id: detect
@@ -110,7 +110,7 @@ jobs:
         run: |
           echo "🟢  Only ${{ matrix.subgraph }}/package.json changed — version bump not required."
 
-      - name: Skip – no changes in this sub-graph
+      - name: Skip – no changes in this subgraph
         if: env.core_changed == 'false' && env.pkg_changed == 'false'
         run: |
           echo "🟢  No changes in ${{ matrix.subgraph }} — nothing to check."

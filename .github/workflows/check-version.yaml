@@ -10,10 +10,11 @@ name: Check Version Update
 
 on:
   push:
-    branches: ['main', 'faux-main']
+    branches:
+      - '**'
   pull_request:
-    branches: ['main']
-
+    branches:
+      - '**'
 jobs:
   check-version-update:
     runs-on: ubuntu-latest

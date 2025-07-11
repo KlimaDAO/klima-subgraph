@@ -2,7 +2,6 @@
 logs
 *.log
 npm-debug.log*
-npm-error.log*
 
 # Runtime data
 pids
@@ -49,16 +48,6 @@ typings/
 
 # Output of 'npm pack'
 *.tgz
-
-# npm run Integrity file
-.npm run-integrity
-
-# npm run local files
-.npm run/*
-.npm run/install-state.gz
-!.npm run/plugins
-!.npm run/releases
-!.npm run/versions
 
 # dotenv environment variables file
 .env

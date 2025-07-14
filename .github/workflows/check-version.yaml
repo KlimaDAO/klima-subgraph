@@ -47,7 +47,7 @@ jobs:
           fi
 
       - name: Fetch main branch for comparison
-        run: git fetch origin main:main
+        run: git fetch origin main --tags
 
       # ────────────────────────────────────────────────────────────────
       # 1. Detect changes inside the current subgraph folder

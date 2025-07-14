@@ -48,7 +48,8 @@ async function generateChangelog() {
       // Handle if this is the first released of a versioned subgraph
       if (commitComparison.commits.length === 0) {
         console.log('No changes.')
-        return
+        setOutput('changelog', 'No changes.')
+        return []
       }
 
       const commits = commitComparison.commits

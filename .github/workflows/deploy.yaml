@@ -137,14 +137,22 @@ jobs:
           git tag -a "$TAG" -m "${{ matrix.subgraph }} release $TAG"
           git push origin "$TAG"
 
+      - name: Find previous tag
+        id: prev
+        run: |
+          LAST_TAG=$(git tag --list "${{ matrix.subgraph }}-v*" | sort -V | tail -n 2 | head -n 1)
+          echo "last_tag=${LAST_TAG:-0.0.0}" >> "$GITHUB_OUTPUT"
+
       - name: Generate changelog
         if: steps.version.outputs.exist == 'false'
         id: changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+          LAST_TAG: ${{ steps.prev.outputs.last_tag }}
+          SUBGRAPH_NAME: ${{ matrix.subgraph }}
+          NEW_PUBLISHED_VERSION: ${{ steps.version.outputs.version }}
         run: |
-          LAST_TAG=$(git tag --list "${{ matrix.subgraph }}-v*" | sort -V | tail -n 2 | head -n 1)
-          NEW_TAG="${{ steps.version.outputs.tag_name }}"
-
-          echo "Generating changelog from $LAST_TAG to $NEW_TAG"
+          echo "Generating changelog from $LAST_TAG to ${SUBGRAPH_NAME}-v${NEW_PUBLISHED_VERSION}"
           node .github/actions-scripts/generateChangelog.mjs
 
       - name: Draft GitHub release

@@ -55,6 +55,8 @@ jobs:
         run: npm run build
         working-directory: '${{ matrix.subgraph }}'
       - name: Run Tests
-        if: matrix.subgraph == 'polygon-digital-carbon'
+        if: matrix.subgraph == 'polygon-digital-carbon' || matrix.subgraph == 'carbonmark' || matrix.subgraph == 'pairs'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         run: npm run test -d
         working-directory: '${{ matrix.subgraph }}'

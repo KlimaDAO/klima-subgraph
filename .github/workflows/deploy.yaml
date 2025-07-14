@@ -29,10 +29,25 @@ jobs:
 
     steps:
       # ────────────────────────────────────────────────────────────────
-      # 0. Checkout
+      # 0. Checkout + Setup
       # ────────────────────────────────────────────────────────────────
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
+      - name: Configure Git author
+        run: |
+          git config --global user.name  "deploy-action"
+          git config --global user.email "deploy-action@carbonmark.com"
+      # Derive subgraph slug
+      - name: Derive subgraph slug
+        id: slug
+        run: |
+          if [[ "${{ matrix.subgraph }}" == "polygon-digital-carbon" || "${{ matrix.subgraph }}" == "celo-bridged-carbon" ]]; then
+            echo "slug=${{ matrix.subgraph }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "slug=klimadao-${{ matrix.subgraph }}" >> "$GITHUB_OUTPUT"
+          fi
 
       # ────────────────────────────────────────────────────────────────
       # 1. Read version from package.json & see if a tag already exists
@@ -89,7 +104,7 @@ jobs:
         run: |
           ../node_modules/.bin/graph deploy --studio \
             --deploy-key "$DEPLOY_KEY" \
-            "${{ matrix.subgraph }}" \
+            "${{ steps.slug.outputs.slug }}" \
             --version-label "${{ steps.version.outputs.version }}"
         working-directory: ${{ matrix.subgraph }}
 
@@ -104,7 +119,7 @@ jobs:
           DEPLOY_KEY: ${{ secrets.SUBGRAPH_ALCHEMY_HOSTED_SERVICE_DEPLOY_KEY }}
         run: |
           ../node_modules/.bin/graph deploy \
-            "${{ matrix.subgraph }}" \
+            "${{ steps.slug.outputs.slug }}" \
             --deploy-key "$DEPLOY_KEY" \
             --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
             --ipfs https://ipfs.satsuma.xyz \
@@ -127,7 +142,7 @@ jobs:
         id: changelog
         run: |
           LAST_TAG=$(git tag --list "${{ matrix.subgraph }}-v*" | sort -V | tail -n 2 | head -n 1)
-          NEW_TAG='${{ steps.version.outputs.tag_name }}'
+          NEW_TAG="${{ steps.version.outputs.tag_name }}"
 
           echo "Generating changelog from $LAST_TAG to $NEW_TAG"
           node .github/actions-scripts/generateChangelog.mjs
@@ -136,7 +151,7 @@ jobs:
         if: steps.version.outputs.exist == 'false'
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
         with:
           tag_name: ${{ steps.version.outputs.tag_name }}
           release_name: ${{ steps.version.outputs.tag_name }}

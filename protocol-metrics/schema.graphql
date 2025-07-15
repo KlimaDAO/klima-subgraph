@@ -1,4 +1,4 @@
-type ProtocolMetric @entity {
+type ProtocolMetric @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   klimaCirculatingSupply: BigDecimal!
@@ -26,7 +26,7 @@ type ProtocolMetric @entity {
   holders: BigInt!
 }
 
-type TreasuryAsset @entity {
+type TreasuryAsset @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   token: String!
@@ -37,12 +37,12 @@ type TreasuryAsset @entity {
   POL: BigDecimal!
 }
 
-type Aux @entity {
+type Aux @entity(immutable: false) {
   id: ID!
   value: BigInt!
 }
 
-type Transaction @entity {
+type Transaction @entity(immutable: true) {
   id: ID!
   timestamp: BigInt!
   blockNumber: BigInt!
@@ -50,7 +50,7 @@ type Transaction @entity {
   to: Bytes
 }
 
-type Epoch @entity {
+type Epoch @entity(immutable: false) {
   id: ID!
   epochNumber: BigInt!
   blockFrom: BigInt!

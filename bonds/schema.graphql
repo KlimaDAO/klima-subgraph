@@ -1,4 +1,4 @@
-type DailyBond @entity {
+type DailyBond @entity(immutable: false) {
   id: ID!
   bondVersion: String!
   timestamp: BigInt!
@@ -10,7 +10,7 @@ type DailyBond @entity {
   BCV: BigInt!
 }
 
-type Bonder @entity {
+type Bonder @entity(immutable: false) {
   id: ID!
   deposits: [Deposit!] @derivedFrom(field: "bonder")
   redeems: [Redemption!] @derivedFrom(field: "bonder")
@@ -19,7 +19,7 @@ type Bonder @entity {
   totalKlimaMintedForDao: BigDecimal!
 }
 
-type Deposit @entity {
+type Deposit @entity(immutable: true) {
   id: ID!
   bondVersion: String!
   token: String!
@@ -40,7 +40,7 @@ type Deposit @entity {
   timestamp: BigInt!
 }
 
-type Redemption @entity {
+type Redemption @entity(immutable: false) {
   id: ID!
   transaction: Transaction
   bonder: Bonder!
@@ -50,7 +50,7 @@ type Redemption @entity {
   timestamp: BigInt!
 }
 
-type Transaction @entity {
+type Transaction @entity(immutable: true) {
   id: ID!
   timestamp: BigInt!
   blockNumber: BigInt!
@@ -58,7 +58,7 @@ type Transaction @entity {
   to: Bytes
 }
 
-type Market @entity {
+type Market @entity(immutable: false) {
   id: ID!
   term: Term!
   baseToken: String!
@@ -72,7 +72,7 @@ type Market @entity {
   isActive: Boolean!
 }
 
-type Term @entity {
+type Term @entity(immutable: false) {
   id: ID!
   market: Market!
   isFixedTerm: Boolean!
@@ -81,7 +81,7 @@ type Term @entity {
   controlVariable: BigInt!
 }
 
-type DepositOwnershipChange @entity {
+type DepositOwnershipChange @entity(immutable: true) {
   id: ID!
   deposit: Deposit!
   fromAddress: Bytes!

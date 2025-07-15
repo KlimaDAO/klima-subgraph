@@ -1,4 +1,4 @@
-type Lock @entity {
+type Lock @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   token: String!
@@ -11,7 +11,7 @@ type Lock @entity {
   lockedAmount: BigDecimal!
 }
 
-type Unlock @entity {
+type Unlock @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   token: String!
@@ -22,7 +22,7 @@ type Unlock @entity {
   amount: BigDecimal!
 }
 
-type VestingMetric @entity {
+type VestingMetric @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   platform: String!
@@ -40,7 +40,7 @@ type VestingMetric @entity {
   inFuture: Boolean! #Returns if the given metric is for the future date or not
 }
 
-type SubgraphVersion @entity {
+type SubgraphVersion @entity(immutable: true) {
   id: ID!
   schemaVersion: String!
   publishedVersion: String!

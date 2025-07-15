@@ -2,6 +2,11 @@
 
 The main subgraph repo that houses all of the data associated with the KlimaDAO protocol (except the tokenized carbon subgraphs which live [here](https://github.com/klimadao/carbon-subgraph)).
 
+# Local development & testing
+
+1. `npm install` from root to fetch dependencies
+2. Review the [Unit Testing Guide](https://thegraph.com/docs/en/subgraphs/developing/creating/unit-testing-framework/) to get any missing deps for WSL/Linux/MacOS
+
 ## Local Installation
 
 First, deploy a Graph node locally. The most straightforward option is to use
@@ -12,20 +17,21 @@ For information on getting started with a Graph Node see this link: https://gith
 
 Install any needed packages.
 
-```
-npm run
+```sh
+# from root
+npm install
 ```
 
-Navigate to the desired subgraph deployment folder. Then create the subgraph instance
+Create the subgraph instance. Use `-w {workspace_name}`.
 
-```
-npm run create-local
+```sh
+npm run -w polygon-digital-carbon create-local
 ```
 
 Finally run codegen and deploy the subgraph and start indexing.
 
-```
-npm run codegen && npm run deploy-local
+```sh
+npm run -w polygon-digital-carbon codegen && npm run -w polygon-digital-carbon deploy-local
 ```
 
 ## Local Navigation and Querying
@@ -42,11 +48,6 @@ After the subgraph is deployed, navigate to http://127.0.01:8000/subgraphs/name/
 - Polygon Digital Carbon: [Staging](https://thegraph.com/hosted-service/subgraph/klimadao/staging-polygon-digital-carbon) | [Production](https://thegraph.com/hosted-service/subgraph/klimadao/polygon-digital-carbon)
 - Ethereum Bridged Carbon: [Staging](https://thegraph.com/hosted-service/subgraph/klimadao/staging-ethereum-bridged-carbon) | [Production](https://thegraph.com/hosted-service/subgraph/klimadao/ethereum-bridged-carbon)
 - Celo Bridged Carbon: [Staging](https://thegraph.com/hosted-service/subgraph/klimadao/staging-celo-bridged-carbon) | [Production](https://thegraph.com/hosted-service/subgraph/klimadao/celo-bridged-carbon)
-
-### Note for non Ubuntu linux developers
-
-A bug in Matchstick prevents the `npm run test` copmmand to run correctly.
-You can use the workaround described here: https://github.com/graphprotocol/graph-tooling/issues/1546#issuecomment-2182244898
 
 ### Add credits definitions on the fly
 

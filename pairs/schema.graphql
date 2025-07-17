@@ -22,7 +22,7 @@ type Token @entity(immutable: true) {
   decimals: Int!
 }
 
-type Swap @entity(immutable: true) {
+type Swap @entity(immutable: false) {
   id: ID! # PAIR_ADDR-TIMESTAMP
   open: BigDecimal!
   high: BigDecimal!

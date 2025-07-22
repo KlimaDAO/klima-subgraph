@@ -23,7 +23,7 @@ type User @entity {
 }
 
 type Project @entity {
- "Credit ID ({projectId}-{vintage})"
+  "Credit ID ({projectId}-{vintage})"
   id: ID!
 
   "Project ID ({registry Enum String}-{registry ProjectID})"
@@ -68,6 +68,12 @@ type Project @entity {
 
   "Source of the credit data"
   creditDataSource: CreditDataSource!
+}
+
+# Intermediate pointer to allow projects to be referenced by address and tokenId only
+type ProjectByToken @entity {
+  id: ID! # address-tokenId
+  project: Project!
 }
 
 type Country @entity {
@@ -134,10 +140,8 @@ type Purchase @entity {
 
 # Subgraph Versioning
 
-type SubgraphVersion @entity(immutable: true)  {
+type SubgraphVersion @entity(immutable: true) {
   id: ID!
   schemaVersion: String!
   publishedVersion: String!
 }
-
-

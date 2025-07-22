@@ -1,4 +1,4 @@
-import { Activity, Category, Country, Listing, Project, Purchase, User } from '../generated/schema'
+import { Activity, Category, Country, Listing, Project, ProjectByToken, Purchase, User } from '../generated/schema'
 import { ZERO_BI } from '../../lib/utils/Decimals'
 import { ZERO_ADDRESS } from '../../lib/utils/Constants'
 import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
@@ -10,8 +10,20 @@ export function loadOrCreateProject(token: Address, tokenId: BigInt): Project {
   let id = ''
   let registry = ''
   let projectIndex = 0
+
+  // check if project already in store by token address and tokenId (from updater tool)
+  let lookupId = tokenAddress.toLowerCase() + '-' + tokenId.toString()
+  let pbt = ProjectByToken.load(lookupId)
+  if (pbt != null) {
+    return Project.load(pbt.project) as Project
+  }
+
+  // if not, search for the project in the PROJECT_INFO array
   for (let i = 0; i < PROJECT_INFO.length; i++) {
-    if (tokenAddress.toLowerCase() == PROJECT_INFO[i].address.toLowerCase() && tokenId.toString() == PROJECT_INFO[i].tokenId) {
+    if (
+      tokenAddress.toLowerCase() == PROJECT_INFO[i].address.toLowerCase() &&
+      tokenId.toString() == PROJECT_INFO[i].tokenId
+    ) {
       id = PROJECT_INFO[i].projectId + '-' + PROJECT_INFO[i].vintage
       registry = PROJECT_INFO[i].projectId.split('-')[0]
       projectIndex = i

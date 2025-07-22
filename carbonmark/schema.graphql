@@ -87,6 +87,7 @@ type Category @entity {
 enum TokenStandard {
   ERC20
   ERC1155
+  UNKNOWN
 }
 
 type Listing @entity {

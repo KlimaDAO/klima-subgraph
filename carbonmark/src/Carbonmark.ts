@@ -38,7 +38,7 @@ export function handleListingCreated(event: ListingCreated): void {
     listing.tokenSymbol = project.id
   } else {
     log.error('Token does not implement ERC20 or ERC1155', [])
-    listing.tokenStandard = 'ERC20'
+    listing.tokenStandard = 'UNKNOWN'
     listing.tokenSymbol = 'Unknown'
   }
 

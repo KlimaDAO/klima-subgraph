@@ -1,6 +1,6 @@
 {
   "name": "carbonmark",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "repository": "https://github.com/KlimaDAO/klima-subgraphs/carbonmark",
   "license": "MIT",
   "scripts": {
@@ -22,12 +22,15 @@
     "deploy-args": "graph deploy --ipfs $npm_config_ipfs --node $npm_config_node carbonmark",
     "deploy-version": "graph deploy --ipfs $npm_config_ipfs --node $npm_config_node --version-label $npm_config_label carbonmark",
     "deploy-staging": "graph deploy --ipfs https://api.staging.thegraph.com/ipfs/ --node https://api.staging.thegraph.com/deploy/ carbonmark",
-    "deploy-hosted": "graph deploy --product hosted-service $npm_config_path",
+    "create-local": "graph create --node http://localhost:8020/ carbonmark",
+    "remove-local": "graph remove --node http://localhost:8020/ carbonmark",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 carbonmark",
     "deploy": "npm run prepare-local && npm run codegen && npm run build && npm run graph:remove && npm run graph:create && npm run graph:deploy",
     "set-version": "ts-node ../version-control/set-version.ts",
     "version:patch": "npm version patch",
     "version:minor": "npm version minor",
-    "version:major": "npm version major"
+    "version:major": "npm version major",
+    "local-send": "npm run remove-local && npm run create-local && npm run prepare-local && npm run codegen && npm run build && npm run deploy-local"
   },
   "devDependencies": {
     "@types/node": "20.12.7",

@@ -57,6 +57,6 @@ jobs:
       - name: Run Tests
         if: matrix.subgraph == 'polygon-digital-carbon' || matrix.subgraph == 'carbonmark' || matrix.subgraph == 'pairs'
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} 
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         run: npm run test -d
         working-directory: '${{ matrix.subgraph }}'

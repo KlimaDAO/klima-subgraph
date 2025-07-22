@@ -23,7 +23,7 @@ type User @entity {
 }
 
 type Project @entity {
- "Credit ID ({projectId}-{vintage})"
+  "Credit ID ({projectId}-{vintage})"
   id: ID!
 
   "Project ID ({registry Enum String}-{registry ProjectID})"
@@ -70,6 +70,12 @@ type Project @entity {
   creditDataSource: CreditDataSource!
 }
 
+# Intermediate pointer to allow projects to be referenced by address and tokenId only
+type ProjectByToken @entity {
+  id: ID! # address-tokenId
+  project: Project!
+}
+
 type Country @entity {
   id: String!
 }
@@ -81,6 +87,7 @@ type Category @entity {
 enum TokenStandard {
   ERC20
   ERC1155
+  UNKNOWN
 }
 
 type Listing @entity {
@@ -134,10 +141,8 @@ type Purchase @entity {
 
 # Subgraph Versioning
 
-type SubgraphVersion @entity(immutable: true)  {
+type SubgraphVersion @entity(immutable: true) {
   id: ID!
   schemaVersion: String!
   publishedVersion: String!
 }
-
-

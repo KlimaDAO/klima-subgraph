@@ -38,6 +38,8 @@ export function handleListingCreated(event: ListingCreated): void {
     listing.tokenSymbol = project.id
   } else {
     log.error('Token does not implement ERC20 or ERC1155', [])
+    listing.tokenStandard = 'ERC20'
+    listing.tokenSymbol = 'Unknown'
   }
 
   listing.totalAmountToSell = event.params.amount
@@ -165,7 +167,6 @@ export function handleListingUpdated(event: ListingUpdated): void {
     activity.save()
   }
   listing.save()
-
 }
 
 export function handleListingFilled(event: ListingFilled): void {
@@ -235,7 +236,6 @@ export function handleListingCancelled(event: ListingCancelled): void {
   activity.seller = listing.seller
   activity.save()
 }
-
 
 export function handleSetSubgraphVersion(block: ethereum.Block): void {
   let version = new SubgraphVersion('carbonmark')

@@ -11,14 +11,14 @@ export function loadOrCreateProject(token: Address, tokenId: BigInt): Project {
   let registry = ''
   let projectIndex = 0
 
-  // check if project already in store by token address and tokenId (from updater tool)
+  // check if project already in store by token address and tokenId (via CreditManager)
   let lookupId = tokenAddress.toLowerCase() + '-' + tokenId.toString()
   let pbt = ProjectByToken.load(lookupId)
   if (pbt != null) {
     return Project.load(pbt.project) as Project
   }
 
-  // if not, search for the project in the PROJECT_INFO array
+  // if null, search for the project in the PROJECT_INFO array
   for (let i = 0; i < PROJECT_INFO.length; i++) {
     if (
       tokenAddress.toLowerCase() == PROJECT_INFO[i].address.toLowerCase() &&

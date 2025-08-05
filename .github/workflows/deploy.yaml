@@ -102,7 +102,7 @@ jobs:
         env:
           DEPLOY_KEY: ${{ secrets.SUBGRAPH_STUDIO_DEPLOY_KEY }}
         run: |
-          ../node_modules/.bin/graph deploy --studio \
+          ../node_modules/.bin/graph deploy \
             --deploy-key "$DEPLOY_KEY" \
             "${{ steps.slug.outputs.slug }}" \
             --version-label "${{ steps.version.outputs.version }}"

@@ -47,6 +47,14 @@ export function getCreateToken(address: Address): Token {
   return token as Token
 }
 
+export function failCheck(address: Address): Token {
+  let token = Token.load(address.toHexString())
+  if (token == null) {
+    token = new Token(address.toHexString())
+  }
+  return token as Token
+}
+
 // Create or Load Pair
 export function getCreatePair(address: Address): Pair {
   let pair = Pair.load(address.toHexString())

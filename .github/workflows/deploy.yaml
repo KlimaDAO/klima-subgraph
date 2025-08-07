@@ -70,6 +70,7 @@ jobs:
             echo "Tag $TAG already exists – will skip build/deploy."
           else
             echo "exist=false"      >> $GITHUB_OUTPUT
+            echo "Tag $TAG does not exist – will build/deploy."
           fi
 
       # ──────────────────────────────────────────

@@ -62,29 +62,29 @@ jobs:
 
           # Flag if package.json changed
           if echo "$ALL_CHANGED" | grep -qx "$SG/package.json"; then
-            echo "pkg_changed=true" >> "$GITHUB_ENV"
+            echo "pkg_changed=true" >> "$GITHUB_OUTPUT"
           else
-            echo "pkg_changed=false" >> "$GITHUB_ENV"
+            echo "pkg_changed=false" >> "$GITHUB_OUTPUT"
           fi
 
           # Flag if any “core” file changed
           CORE_REGEX="^$SG/(src/|schema\.graphql$|subgraph\.yaml$|subgraph\.template\.yaml$)"
           if echo "$ALL_CHANGED" | grep -E "$CORE_REGEX" -q; then
-            echo "core_changed=true" >> "$GITHUB_ENV"
+            echo "core_changed=true" >> "$GITHUB_OUTPUT"
           else
-            echo "core_changed=false" >> "$GITHUB_ENV"
+            echo "core_changed=false" >> "$GITHUB_OUTPUT"
           fi
 
           # Persist full file list for optional debugging
-          echo "all_changed<<EOF"  >> "$GITHUB_ENV"
-          echo "$ALL_CHANGED"       >> "$GITHUB_ENV"
-          echo "EOF"                >> "$GITHUB_ENV"
+          echo "all_changed<<EOF"  >> "$GITHUB_OUTPUT"
+          echo "$ALL_CHANGED"       >> "$GITHUB_OUTPUT"
+          echo "EOF"                >> "$GITHUB_OUTPUT"
 
       # ────────────────────────────────────────────────────────────────
       # 2. Fail if core files changed but version didn’t bump
       # ────────────────────────────────────────────────────────────────
       - name: Enforce version bump
-        if: env.core_changed == 'true'
+        if: steps.detect.outputs.core_changed == 'true'
         env:
           SG: ${{ matrix.subgraph }}
         shell: bash
@@ -106,11 +106,11 @@ jobs:
       # 3. Skip messages
       # ────────────────────────────────────────────────────────────────
       - name: Skip – only package.json updated
-        if: env.core_changed == 'false' && env.pkg_changed == 'true'
+        if: steps.detect.outputs.core_changed == 'false' && steps.detect.outputs.pkg_changed == 'true'
         run: |
           echo "🟢  Only ${{ matrix.subgraph }}/package.json changed — version bump not required."
 
       - name: Skip – no changes in this subgraph
-        if: env.core_changed == 'false' && env.pkg_changed == 'false'
+        if: steps.detect.outputs.core_changed == 'false' && steps.detect.outputs.pkg_changed == 'false'
         run: |
           echo "🟢  No changes in ${{ matrix.subgraph }} — nothing to check."

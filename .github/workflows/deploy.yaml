@@ -34,6 +34,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
           token: ${{ secrets.GH_ACCESS_TOKEN }}
       - name: Configure Git author
         run: |
@@ -69,6 +70,7 @@ jobs:
             echo "Tag $TAG already exists – will skip build/deploy."
           else
             echo "exist=false"      >> $GITHUB_OUTPUT
+            echo "Tag $TAG does not exist – will build/deploy."
           fi
 
       # ──────────────────────────────────────────

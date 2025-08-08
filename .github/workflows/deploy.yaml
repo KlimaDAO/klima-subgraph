@@ -44,7 +44,7 @@ jobs:
       - name: Derive subgraph slug
         id: slug
         run: |
-          if [[ "${{ matrix.subgraph }}" == "polygon-digital-carbon" || "${{ matrix.subgraph }}" == "celo-bridged-carbon" ]]; then
+          if [[ "${{ matrix.subgraph }}" == "polygon-digital-carbon" || "${{ matrix.subgraph }}" == "celo-bridged-carbon" || "${{ matrix.subgraph }}" == "ethereum-bridged-carbon" ]]; then
             echo "slug=${{ matrix.subgraph }}" >> "$GITHUB_OUTPUT"
           else
             echo "slug=klimadao-${{ matrix.subgraph }}" >> "$GITHUB_OUTPUT"

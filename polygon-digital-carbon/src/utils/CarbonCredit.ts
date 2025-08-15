@@ -34,6 +34,9 @@ export function loadOrCreateCarbonCredit(tokenAddress: Address, bridge: string, 
 
     if (tokenId !== null) {
       credit.tokenId = tokenId
+      credit.tokenStandard = 'ERC1155'
+    } else {
+      credit.tokenStandard = 'ERC20'
     }
 
     credit.save()

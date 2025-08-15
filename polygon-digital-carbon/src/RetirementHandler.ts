@@ -330,6 +330,10 @@ export function saveICRRetirement(event: RetiredVintage): void {
     event.params.data.toString()
   )
 
+  let retire = loadRetire(sender.id.concatI32(sender.totalRetirements))
+  retire.retirementTokenId = event.params.nftTokenId
+  retire.save()
+
   incrementAccountRetirements(senderAddress)
 }
 

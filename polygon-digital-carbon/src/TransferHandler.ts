@@ -38,6 +38,10 @@ import { loadRetire } from './utils/Retire'
 import {
   RetirementRequested,
   RetirementFinalized,
+  RetirementReverted,
+  DetokenizationRequested,
+  DetokenizationFinalized,
+  DetokenizationReverted,
 } from '../generated/templates/ToucanPuroCarbonOffsets/ToucanPuroCarbonOffsets'
 import { loadOrCreateAsyncRetireRequest } from './utils/AsyncRetireRequest'
 import { AsyncRetireRequestStatus } from '../utils/enums'
@@ -124,13 +128,13 @@ export function handleToucanPuroRetirementFinalized(event: RetirementFinalized):
 
 // TODO:
 
-export function handleToucanPuroRetirementReverted(): void {}
+export function handleToucanPuroRetirementReverted(event: RetirementReverted): void {}
 
-export function handleToucanPuroDetokenizationRequested(): void {}
+export function handleToucanPuroDetokenizationRequested(event: DetokenizationRequested): void {}
 
-export function handleToucanPuroDetokenizationFinalized(): void {}
+export function handleToucanPuroDetokenizationFinalized(event: DetokenizationFinalized): void {}
 
-export function handleToucanPuroDetokenizationReverted(): void {}
+export function handleToucanPuroDetokenizationReverted(event: DetokenizationReverted): void {}
 
 export function handleCCO2Retired(event: burnedCO2Token): void {
   saveCCO2Retirement(event)

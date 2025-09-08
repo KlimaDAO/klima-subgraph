@@ -12650,7 +12650,18 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '0',
     false
   ),
-
+  new ProjectInfo(
+    '0xb0e45e4a22dd9fa36307a8b51386341cee33d07b',
+    'CMARK-3',
+    '2025',
+    'Urunday Afforestation Project',
+    'UNLP-CAPTURA-DE-CARBONO',
+    'Forestry',
+    'Argentina',
+    '',
+    '0',
+    false
+  ),
   new ProjectInfo(
     '0x023eb0b4f9b4dbff04a7026c085e6da6b4e93d4f',
     'TVER-0',

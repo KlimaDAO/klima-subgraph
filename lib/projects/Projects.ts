@@ -12663,6 +12663,18 @@ export const PROJECT_INFO: ProjectInfo[] = [
     false
   ),
   new ProjectInfo(
+    '0x6f4cdb7ba181ccf8cf5df5a6912eaf4cd7669ca8',
+    'CMARK-4',
+    '2022',
+    'Buriram Rubber Plantation Carbon Sequestration & GHG Emission Reduction Project',
+    'ETM-Carbon-Trade',
+    'Forestry',
+    'Thailand',
+    '',
+    '0',
+    false
+  ),
+  new ProjectInfo(
     '0x023eb0b4f9b4dbff04a7026c085e6da6b4e93d4f',
     'TVER-0',
     '9999',

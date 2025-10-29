@@ -12650,7 +12650,18 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '0',
     false
   ),
-
+  new ProjectInfo(
+    '0xe040077d044313d86e4d81ac451cba940a0fd790',
+    'CMARK-5',
+    '2025',
+    'XTokenz Plastics Recovery & Recycling Project',
+    'XVRR',
+    'Waste Disposal',
+    'Netherlands',
+    '',
+    '0',
+    false
+  ),
   new ProjectInfo(
     '0x023eb0b4f9b4dbff04a7026c085e6da6b4e93d4f',
     'TVER-0',

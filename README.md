@@ -63,10 +63,33 @@ Projects can be added on the fly (without redeploying the contracts) by updating
 
 ## Subgraph deployments
 
-To deploy a new version of a subgraph:
+### Deployment
+
+To deploy a new subgraph version:
 
 - Make the desired changes to the subgraph source files
 - Update the subgraph version with `npm version patch` for instance. The deployment script will not deployed subgraph whose version has not changed even if the source code was updated.
 - Make a pull request against the main branch
 - Once merged the github workflow will deploy the subgraph on both The Graph Studio and Goldsky
 See the deployment script: https://github.com/KlimaDAO/klima-subgraph/blob/main/.github/workflows/deploy.yaml
+
+### Promotion
+
+Once the new versions of the subgraph have been deployed and synced, you have to promote them
+
+### The Graph studio
+
+1. Connect to the Graph studio using the multisig wallet
+2. Select the subgraph
+3. Select the version
+4. Click on publish
+5. Confirm the publication
+6. HAve anothe signer confirm the transaction in the safe
+
+### Goldsky
+
+1. Connect to Golsky
+2. Select the subgraph
+3. Select the version
+4. Click on Add tag
+5. Add the tag 'latest'

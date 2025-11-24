@@ -37,6 +37,11 @@ enum CrossChainBridgeDirection {
   RECEIVED
 }
 
+enum TokenStandard {
+  ERC20
+  ERC1155
+}
+
 enum ProvenanceType {
   ORIGINATION
   TRANSFER
@@ -211,6 +216,10 @@ type CarbonCredit @entity {
 
   "Token ID for the credit vintage (if applicable)"
   tokenId: BigInt
+
+  "Token Standard i.e. ERC20 or ERC1155"
+
+  tokenStandard: TokenStandard!
 
   "Flag for if this credit is exAnte"
   isExAnte: Boolean

@@ -1,4 +1,4 @@
-type Pair @entity {
+type Pair @entity(immutable: false) {
   id: ID!
   token0: Token!
   token1: Token!
@@ -8,16 +8,21 @@ type Pair @entity {
   totalvolume: BigDecimal!
   lastupdate: String!
   swaps: [Swap!]! @derivedFrom(field: "pair")
+  reserve0: BigDecimal!
+  reserve1: BigDecimal!
+  reserve0Raw: BigInt!
+  reserve1Raw: BigInt!
+  reservesLastUpdate: String!
 }
 
-type Token @entity {
+type Token @entity(immutable: true) {
   id: ID!
   name: String!
   symbol: String!
   decimals: Int!
 }
 
-type Swap @entity {
+type Swap @entity(immutable: false) {
   id: ID! # PAIR_ADDR-TIMESTAMP
   open: BigDecimal!
   high: BigDecimal!

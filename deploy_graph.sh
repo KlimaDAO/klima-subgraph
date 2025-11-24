@@ -40,4 +40,4 @@ envsubst < $SUBGRAPH_NAME/networkConfig/localhost.json.template > $SUBGRAPH_NAME
 
 echo "Deploying $SUBGRAPH_NAME"
 
-cd $SUBGRAPH_NAME && yarn deploy
+cd $SUBGRAPH_NAME && npm run deploy

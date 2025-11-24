@@ -1,7 +1,7 @@
 import { Address, BigInt, Bytes, log, ethereum, BigDecimal, store } from '@graphprotocol/graph-ts'
 import { CarbonProject, Token } from '../../generated/schema'
 import { ERC20 } from '../../generated/ToucanFactory/ERC20'
-import { ICRProjectToken } from '../../generated/ICRCarbonContractRegistry/ICRProjectToken'
+import { ICRProjectContract } from '../../generated/ICRCarbonContractRegistry/ICRProjectContract'
 import { PuroIdMigration } from '../../generated/schema'
 import { PURO_ID_MIGRATION_BLOCK } from '../../../lib/utils/Constants'
 import { ProjectIdUpdated } from '../../generated/CarbonProjectsAddress/CarbonProjectsAddress'
@@ -45,10 +45,23 @@ export function createICRTokenID(tokenAddress: Address, tokenId: BigInt): Bytes 
   return tokenAddress.concatI32(tokenId.toI32())
 }
 
+export function createICRProjectId(serialization: string): string {
+  const serializationParts = serialization.split('-')
+  return 'ICR-' + serializationParts[3].toString()
+}
+
+export function createICRSymbolFromSerialization(serialization: string): string {
+  const serializationParts = serialization.split('-')
+
+  const symbol = createICRProjectId(serialization) + '-' + serializationParts[serializationParts.length - 1].toString()
+
+  return symbol
+}
+
 export function createICRTokenWithCall(tokenAddress: Address, tokenId: BigInt): void {
   log.info('Creating ICR Tokens for token address {}', [tokenAddress.toHexString()])
 
-  let tokenContract = ICRProjectToken.bind(tokenAddress)
+  let tokenContract = ICRProjectContract.bind(tokenAddress)
 
   const isExPost = tokenContract.isExPostToken(tokenId)
 
@@ -70,16 +83,9 @@ export function createICRTokenWithCall(tokenAddress: Address, tokenId: BigInt): 
     log.info('New ICR Token created with id {}', [id.toHexString()])
     token = new Token(id)
 
-    const mappingValues = tokenContract.exPostVintageMapping(exPostTokenId)
+    const serialization = tokenContract.exPostVintageMapping(exPostTokenId)
 
-    const serializationParts = mappingValues.value0.split('-')
-
-    const symbol =
-      'ICR' +
-      '-' +
-      serializationParts[3].toString() +
-      '-' +
-      serializationParts[serializationParts.length - 1].toString()
+    const symbol = createICRSymbolFromSerialization(serialization.value0)
 
     token.name = `ICR: ${symbol}`
     token.tokenAddress = tokenAddress
@@ -163,7 +169,11 @@ export function handlePuroIdMigration(event: ProjectIdUpdated): void {
     // retrieve new project attributes
     let attributes = carbonCreditContract.getAttributes()
     // create new project with updated Id
-    const updatedProject = loadOrCreateCarbonProject('PURO_EARTH', attributes.value0.projectId, projectAddress.toHexString())
+    const updatedProject = loadOrCreateCarbonProject(
+      'PURO_EARTH',
+      attributes.value0.projectId,
+      projectAddress.toHexString()
+    )
 
     // update credit
     carbonCredit.project = updatedProject.id

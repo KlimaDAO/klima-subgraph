@@ -15,7 +15,8 @@ import {
   RetiredVintage,
   ExPostCreated,
   ExAnteMinted,
-} from '../generated/templates/ICRProjectToken/ICRProjectToken'
+  ICRProjectContract,
+} from '../generated/templates/ICRProjectContract/ICRProjectContract'
 import { loadOrCreateHolding } from './utils/Holding'
 import { ZERO_BI, BIG_INT_1E18 } from '../../lib/utils/Decimals'
 import { loadOrCreateAccount } from './utils/Account'
@@ -32,16 +33,21 @@ import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/Carb
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
 import { recordProvenance } from './utils/Provenance'
-import { createICRTokenWithCall } from './utils/Token'
+import { createICRTokenWithCall, createICRProjectId } from './utils/Token'
 import { loadRetire } from './utils/Retire'
 import {
   RetirementRequested,
   RetirementFinalized,
+  RetirementReverted,
+  DetokenizationRequested,
+  DetokenizationFinalized,
+  DetokenizationReverted,
 } from '../generated/templates/ToucanPuroCarbonOffsets/ToucanPuroCarbonOffsets'
 import { loadOrCreateAsyncRetireRequest } from './utils/AsyncRetireRequest'
 import { AsyncRetireRequestStatus } from '../utils/enums'
 import { convertToAmountTonnes, createAsyncRetireRequestId } from '../utils/helpers'
 import { burnedCO2Token } from '../generated/CCO2/CCO2'
+import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 
 export function handleCreditTransfer(event: Transfer): void {
   recordTransfer(
@@ -122,13 +128,13 @@ export function handleToucanPuroRetirementFinalized(event: RetirementFinalized):
 
 // TODO:
 
-export function handleToucanPuroRetirementReverted(): void {}
+export function handleToucanPuroRetirementReverted(event: RetirementReverted): void {}
 
-export function handleToucanPuroDetokenizationRequested(): void {}
+export function handleToucanPuroDetokenizationRequested(event: DetokenizationRequested): void {}
 
-export function handleToucanPuroDetokenizationFinalized(): void {}
+export function handleToucanPuroDetokenizationFinalized(event: DetokenizationFinalized): void {}
 
-export function handleToucanPuroDetokenizationReverted(): void {}
+export function handleToucanPuroDetokenizationReverted(event: DetokenizationReverted): void {}
 
 export function handleCCO2Retired(event: burnedCO2Token): void {
   saveCCO2Retirement(event)
@@ -186,7 +192,22 @@ export function handleICRRetired(event: RetiredVintage): void {
 }
 
 export function handleExPostCreated(event: ExPostCreated): void {
-  updateICRCredit(event.address, event.params.tokenId, event.params.verificationPeriodStart)
+  let project = loadOrCreateCarbonProject(
+    'ICR',
+    createICRProjectId(event.params.serialization),
+    event.address.toHexString()
+  )
+  /* name is not available within ExPostCreated.
+   * If the name is NOT already set, call the projectName function to get the name.
+   */
+
+  if (project.name == '' || project.name == null) {
+    const projectName = ICRProjectContract.bind(event.address).projectName()
+
+    project.name = projectName
+    project.save()
+  }
+  updateICRCredit(event.address, event.params.tokenId, event.params.verificationPeriodStart, project.id)
   createICRTokenWithCall(event.address, event.params.tokenId)
 }
 

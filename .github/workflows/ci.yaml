@@ -10,7 +10,7 @@ jobs:
     name: Compile
     strategy:
       matrix:
-        value:
+        subgraph:
           [
             'bonds',
             'carbonmark',
@@ -24,36 +24,39 @@ jobs:
           ]
     steps:
       - name: Check out source repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      - name: Install dependencies
-        run: yarn --immutable
-        working-directory: '${{ matrix.value }}'
+          node-version: 20
+      - name: Install root dependencies
+        run: npm install
+      - name: Install workspace dependencies
+        run: npm install
+        working-directory: '${{ matrix.subgraph }}'
 
-        
       # Generate code and check for uncommitted changes
       # https://github.com/marketplace/actions/check-uncommitted-changes
       - name: Prepare Manifest
-        if: matrix.value == 'polygon-digital-carbon' || matrix.value == 'carbonmark'
-        run: yarn prepare-matic
-        working-directory: '${{ matrix.value }}'
+        if: matrix.subgraph == 'polygon-digital-carbon' || matrix.subgraph == 'carbonmark'
+        run: npm run prepare-matic
+        working-directory: '${{ matrix.subgraph }}'
       - name: Generate Subgraph Code
-        run: yarn codegen
-        working-directory: '${{ matrix.value }}'
+        run: npm run codegen
+        working-directory: '${{ matrix.subgraph }}'
       - name: Check for uncommitted changes
         id: check-changes
         uses: mskri/check-uncommitted-changes-action@v1.0.1
       - name: Evaluate if there are changes
         if: steps.check-changes.outputs.outcome == failure()
-        run: echo "There are uncommitted changes - execute 'yarn codegen' locally and commit the generated files!"
-        
+        run: echo "There are uncommitted changes - execute 'npm run codegen' locally and commit the generated files!"
+
       - name: Build Subgraph
-        run: yarn build
-        working-directory: '${{ matrix.value }}'
+        run: npm run build
+        working-directory: '${{ matrix.subgraph }}'
       - name: Run Tests
-        if: matrix.value == 'polygon-digital-carbon'
-        run: yarn test -d
-        working-directory: '${{ matrix.value }}'
+        if: matrix.subgraph == 'polygon-digital-carbon' || matrix.subgraph == 'carbonmark' || matrix.subgraph == 'pairs'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        run: npm run test -d
+        working-directory: '${{ matrix.subgraph }}'

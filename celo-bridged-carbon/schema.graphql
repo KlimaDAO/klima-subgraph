@@ -1,4 +1,4 @@
-type CarbonOffset @entity {
+type CarbonOffset @entity(immutable: false) {
   id: ID!
   name: String!
   tokenAddress: String!
@@ -30,7 +30,7 @@ type CarbonOffset @entity {
   lastUpdate: BigInt!
 }
 
-type Bridge @entity {
+type Bridge @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   transaction: Transaction!
@@ -43,7 +43,7 @@ type Bridge @entity {
 CrosschainBridge entity tracks pool bridges across different blockchains
 Currently used by Toucan
 """
-type CrosschainBridge @entity {
+type CrosschainBridge @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   transaction: Transaction!
@@ -58,7 +58,7 @@ enum BridgeDirection {
   Received
 }
 
-type Retire @entity {
+type Retire @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   transaction: Transaction!
@@ -68,7 +68,7 @@ type Retire @entity {
   retiree: String!
 }
 
-type Transaction @entity {
+type Transaction @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   blockNumber: BigInt!
@@ -80,7 +80,7 @@ type Transaction @entity {
   gasPrice: BigInt!
 }
 
-type CarbonMetric @entity {
+type CarbonMetric @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   bctSupply: BigDecimal!

@@ -1,8 +1,6 @@
-import { log,  BigInt } from '@graphprotocol/graph-ts'
-import {
-  CreditAdded as CreditAddedEvent,
-} from '../generated/CreditManager/CreditManager'
-import { Project } from '../generated/schema'
+import { log, BigInt } from '@graphprotocol/graph-ts'
+import { CreditAdded as CreditAddedEvent } from '../generated/CreditManager/CreditManager'
+import { Project, ProjectByToken } from '../generated/schema'
 import { createCategory, createCountry } from './Entities'
 
 export function handleCreditAdded(event: CreditAddedEvent): void {
@@ -12,7 +10,7 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
 
   const id = event.params.projectId + '-' + event.params.vintage
   let project = new Project(id)
-  project.key = event.params.projectId 
+  project.key = event.params.projectId
   project.name = event.params.name
   project.methodology = event.params.methodologies[0]
   project.isExAnte = event.params.isExAnte
@@ -24,6 +22,12 @@ export function handleCreditAdded(event: CreditAddedEvent): void {
   project.country = event.params.country
   project.creditDataSource = 'Event'
   project.save()
+
+  let lookupId = event.params.tokenAddress.toHexString().toLowerCase() + '-' + event.params.tokenId.toString()
+
+  let pbt = new ProjectByToken(lookupId)
+  pbt.project = project.id
+  pbt.save()
 
   createCountry(project.country)
   createCategory(project.category)

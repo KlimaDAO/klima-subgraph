@@ -17,7 +17,6 @@ enum RetireSource {
   OTHER
 }
 
-
 enum ProjectDataSource {
   CSV
   Event
@@ -52,7 +51,7 @@ enum AsyncRetireStatus {
   AWAITING
 }
 
-type ProvenanceRecord @entity {
+type ProvenanceRecord @entity(immutable: false) {
   "Token address - Holding address - increment"
   id: Bytes!
 
@@ -99,7 +98,7 @@ type ProvenanceRecord @entity {
   updatedAt: BigInt!
 }
 
-type Token @entity {
+type Token @entity(immutable: false) {
   "Ethereum contract address. for ERC1155s id address.concat(tokenId)"
   id: Bytes!
 
@@ -137,14 +136,14 @@ type Token @entity {
 #### Carbon Specific Data ####
 ##############################
 
-type Ecosystem @entity {
+type Ecosystem @entity(immutable: false) {
   id: ID!
 
   "Active credits with supply > 0"
   activeCredits: [Bytes!]!
 }
 
-type Epoch @entity {
+type Epoch @entity(immutable: false) {
   "sKLIMA epoch number"
   id: ID!
 
@@ -161,7 +160,7 @@ type Epoch @entity {
   creditSMA: BigInt!
 }
 
-type Methodology @entity {
+type Methodology @entity(immutable: false) {
   id: ID!
 
   scope: String
@@ -171,7 +170,7 @@ type Methodology @entity {
   currentVersion: String!
 }
 
-type CarbonProject @entity {
+type CarbonProject @entity(immutable: false) {
   "{Registry Enum String}-{Registry Project ID}"
   id: ID!
 
@@ -203,7 +202,7 @@ type CarbonProject @entity {
   projectDataSource: ProjectDataSource!
 }
 
-type CarbonCredit @entity {
+type CarbonCredit @entity(immutable: false) {
   "{tokenAddress}-{tokenId} concatenated. If no tokenId, then just the tokenAddress."
   id: Bytes!
 
@@ -263,7 +262,7 @@ type CarbonCredit @entity {
   puroBatchTokenId: BigInt
 }
 
-type CarbonCreditSnapshot @entity {
+type CarbonCreditSnapshot @entity(immutable: false) {
   # These are tracked by Klima rebase epochs. Currently set to be at least 11520 blocks apart.
 
   "{Token Address}-{Epoch ID}"
@@ -334,7 +333,7 @@ type CrossChainBridge @entity(immutable: true) {
   timestamp: BigInt!
 }
 
-type Retire @entity {
+type Retire @entity(immutable: false) {
   "{Account}-{Total Retirement Counter}"
   id: Bytes!
 
@@ -406,7 +405,7 @@ type Retire @entity {
   asyncRetireRequest: AsyncRetireRequest
 }
 
-type KlimaRetire @entity {
+type KlimaRetire @entity(immutable: false) {
   "{Account}-{Klima Retirement Index}"
   id: Bytes!
 
@@ -426,7 +425,7 @@ type KlimaRetire @entity {
   specific: Boolean!
 }
 
-type DailyKlimaRetireSnapshot @entity {
+type DailyKlimaRetireSnapshot @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   pool: Bytes!
@@ -435,7 +434,7 @@ type DailyKlimaRetireSnapshot @entity {
   feeAmount: BigDecimal!
 }
 
-type CarbonMetric @entity {
+type CarbonMetric @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   bctSupply: BigDecimal!
@@ -471,7 +470,7 @@ type CarbonMetric @entity {
 #### Bridge Specific Data ####
 ##############################
 
-type ToucanBatch @entity {
+type ToucanBatch @entity(immutable: false) {
   "Token ID"
   id: ID!
 
@@ -483,7 +482,7 @@ type ToucanBatch @entity {
 }
 
 # C3Project and C3RetirementMetadata are used for file datasources for C3 metadata
-type C3MetadataProject @entity {
+type C3MetadataProject @entity(immutable: false) {
   id: ID!
   name: String
   project_id: String
@@ -498,7 +497,7 @@ type C3MetadataProject @entity {
   uri: String
 }
 
-type C3RetirementMetadata @entity {
+type C3RetirementMetadata @entity(immutable: false) {
   id: ID!
   transferee: String
   reason: String
@@ -514,13 +513,13 @@ type C3RetirementMetadata @entity {
 }
 
 # id is always and only safeguard
-type TokenURISafeguard @entity {
+type TokenURISafeguard @entity(immutable: false) {
   "Token URI"
   id: ID!
   requestsWithoutURI: [C3RetireRequestDetails!]!
 }
 
-type AsyncRetireRequest @entity {
+type AsyncRetireRequest @entity(immutable: false) {
   "Request ID"
   id: Bytes!
   status: AsyncRetireStatus!
@@ -529,7 +528,7 @@ type AsyncRetireRequest @entity {
   c3RetireRequestDetails: C3RetireRequestDetails
 }
 
-type C3RetireRequestDetails @entity {
+type C3RetireRequestDetails @entity(immutable: false) {
   "Request ID"
   id: Bytes!
   index: BigInt!
@@ -542,7 +541,7 @@ type C3RetireRequestDetails @entity {
 ###### Carbon Pool Data ######
 ##############################
 
-type CarbonPool @entity {
+type CarbonPool @entity(immutable: false) {
   "Ethereum address of the pool contract"
   id: Bytes!
 
@@ -579,7 +578,7 @@ type CarbonPool @entity {
   redeems: [PoolRedeem!]! @derivedFrom(field: "pool")
 }
 
-type CarbonPoolDailySnapshot @entity {
+type CarbonPoolDailySnapshot @entity(immutable: false) {
   "Ethereum address of the pool contract"
   id: Bytes!
 
@@ -607,7 +606,7 @@ type CarbonPoolDailySnapshot @entity {
   lastUpdateBlockNumber: BigInt!
 }
 
-type CarbonPoolCreditBalance @entity {
+type CarbonPoolCreditBalance @entity(immutable: false) {
   "{Pool Address}-{Credit Address}"
   id: Bytes!
 
@@ -638,7 +637,7 @@ type CarbonPoolCreditBalance @entity {
   nextSnapshotDayID: Int!
 }
 
-type CarbonPoolCreditBalanceDailySnapshot @entity {
+type CarbonPoolCreditBalanceDailySnapshot @entity(immutable: false) {
   "{Pool Address}-{Credit Address}-{Day ID}"
   id: Bytes!
 
@@ -746,7 +745,7 @@ type PoolRedeem @entity(immutable: true) {
 ##### Account level data #####
 ##############################
 
-type Account @entity {
+type Account @entity(immutable: false) {
   "Ethereum address of the account"
   id: Bytes!
 
@@ -768,7 +767,7 @@ type Account @entity {
   holdingSnapshots: [HoldingDailySnapshot!]! @derivedFrom(field: "account")
 }
 
-type Holding @entity {
+type Holding @entity(immutable: false) {
   "{Account}-{Token}"
   id: Bytes!
 
@@ -795,7 +794,7 @@ type Holding @entity {
   lastUpdated: BigInt!
 }
 
-type HoldingDailySnapshot @entity {
+type HoldingDailySnapshot @entity(immutable: false) {
   "{Account}-{Token}-{Days since Unix epoch}"
   id: Bytes!
 
@@ -812,14 +811,16 @@ type HoldingDailySnapshot @entity {
   amount: BigInt!
 }
 
-type PuroIdMigration @entity {
+# Registry Specific Entities
+
+type PuroIdMigration @entity(immutable: false) {
   id: ID!
   tokenIds: [Bytes!]!
 }
 
 # Subgraph Versioning
 
-type SubgraphVersion @entity(immutable: true)  {
+type SubgraphVersion @entity(immutable: true) {
   id: ID!
   schemaVersion: String!
   publishedVersion: String!

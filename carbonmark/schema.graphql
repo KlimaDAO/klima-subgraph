@@ -14,7 +14,7 @@ enum CreditDataSource {
   Event
 }
 
-type User @entity {
+type User @entity(immutable: false) {
   #id is the user's address -> also the document key on firebase
   id: Bytes!
   listings: [Listing!] @derivedFrom(field: "seller")
@@ -22,7 +22,7 @@ type User @entity {
   purchases: [Purchase!] @derivedFrom(field: "user")
 }
 
-type Project @entity {
+type Project @entity(immutable: false) {
  "Credit ID ({projectId}-{vintage})"
   id: ID!
 
@@ -70,20 +70,27 @@ type Project @entity {
   creditDataSource: CreditDataSource!
 }
 
-type Country @entity {
+# Intermediate pointer to allow projects to be referenced by address and tokenId only
+type ProjectByToken @entity(immutable: false) {
+  id: ID! # address-tokenId
+  project: Project!
+}
+
+type Country @entity(immutable: false) {
   id: String!
 }
 
-type Category @entity {
+type Category @entity(immutable: false) {
   id: String!
 }
 
 enum TokenStandard {
   ERC20
   ERC1155
+  UNKNOWN
 }
 
-type Listing @entity {
+type Listing @entity(immutable: false) {
   id: ID!
   totalAmountToSell: BigInt!
   leftToSell: BigInt!
@@ -106,7 +113,7 @@ type Listing @entity {
   tokenStandard: TokenStandard!
 }
 
-type Activity @entity {
+type Activity @entity(immutable: false) {
   id: String!
   amount: BigInt
   previousAmount: BigInt
@@ -122,7 +129,7 @@ type Activity @entity {
   buyer: User
 }
 
-type Purchase @entity {
+type Purchase @entity(immutable: false) {
   id: Bytes!
   price: BigInt!
   amount: BigInt!
@@ -134,10 +141,8 @@ type Purchase @entity {
 
 # Subgraph Versioning
 
-type SubgraphVersion @entity(immutable: true)  {
+type SubgraphVersion @entity(immutable: true) {
   id: ID!
   schemaVersion: String!
   publishedVersion: String!
 }
-
-

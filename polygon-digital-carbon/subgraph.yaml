@@ -479,8 +479,8 @@ dataSources:
       abis:
         - name: ICRCarbonContractRegistry
           file: ../lib/abis/ICRCarbonContractRegistry.json
-        - name: ICRProjectToken
-          file: ../lib/abis/ICRProjectToken.json
+        - name: ICRProjectContract
+          file: ../lib/abis/ICRProjectContract.json
         - name: ERC1155
           file: ../lib/abis/ERC1155.json
       eventHandlers:
@@ -620,9 +620,9 @@ dataSources:
     name: CreditManager
     network: matic
     source:
-      address: '0x1247D7c744D0f4671E3053B4a513f6B1db221218'
+      address: '0x2dF21aaCAD1aBc83db34227C5aBadBE3aE0B3DF2'
       abi: CreditManager
-      startBlock: 72062243
+      startBlock: 71756166
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -734,20 +734,20 @@ templates:
         - event: Retired(uint256,indexed address,string,string,indexed string,indexed address,string)
           handler: handleCarbonmarkCreditRetirement
       file: ./src/templates/CarbonmarkCreditToken.ts
-  - name: ICRProjectToken
+  - name: ICRProjectContract
     kind: ethereum/contract
     network: matic
     source:
-      abi: ICRProjectToken
+      abi: ICRProjectContract
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - ICRProjectToken
+        - ICRProjectContract
       abis:
-        - name: ICRProjectToken
-          file: ../lib/abis/ICRProjectToken.json
+        - name: ICRProjectContract
+          file: ../lib/abis/ICRProjectContract.json
         - name: ERC1155
           file: ../lib/abis/ERC1155.json
       eventHandlers:
@@ -774,5 +774,5 @@ templates:
         - C3RetirementMetadata
         - C3MetadataProject
       abis:
-        - name: ICRProjectToken
-          file: ../lib/abis/ICRProjectToken.json
+        - name: ICRProjectContract
+          file: ../lib/abis/ICRProjectContract.json

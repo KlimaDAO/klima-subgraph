@@ -1,6 +1,6 @@
 {
-  "name": "polygon-carbon",
-  "version": "1.6.0",
+  "name": "polygon-digital-carbon",
+  "version": "1.7.2",
   "repository": "https://github.com/KlimaDAO/klima-subgraphs/polygon-carbon",
   "license": "MIT",
   "scripts": {
@@ -23,16 +23,11 @@
     "graph:create:local": "graph create --node http://127.0.0.1:8020 polygon-digital-carbon",
     "graph:remove:local": "graph remove --node http://127.0.0.1:8020 polygon-digital-carbon",
     "graph:deploy:local": "graph deploy --node http://127.0.0.1:8020 --ipfs http://127.0.0.1:5001 polygon-digital-carbon",
-    "deploy": "yarn prepare-local && yarn codegen && yarn build && yarn graph:remove:local && yarn graph:create:local && yarn graph:deploy:local",
+    "deploy": "npm run prepare-local && npm run codegen && npm run build && npm run graph:remove:local && npm run graph:create:local && npm run graph:deploy:local",
     "set-version": "ts-node ../version-control/set-version.ts",
     "version:prepatch": "npm version prepatch",
     "version:preminor": "npm version preminor",
     "version:premajor": "npm version premajor"
-  },
-  "devDependencies": {
-    "@graphprotocol/graph-cli": "0.69.1",
-    "@graphprotocol/graph-ts": "0.34.0",
-    "prettier": "2.7.1"
   },
   "private": true
 }

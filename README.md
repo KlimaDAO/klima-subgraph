@@ -60,3 +60,13 @@ Projects can be added on the fly (without redeploying the contracts) by updating
 - set your `ALCHEMY_API_KEY` environment variable
 - set your `PRIVATE_KEY` environment variable
 - execute `npm run addCredits-polygon <creditId>`
+
+## Subgraph deployments
+
+To deploy a new version of a subgraph:
+
+- Make the desired changes to the subgraph source files
+- Update the subgraph version with `npm version patch` for instance. The deployment script will not deployed subgraph whose version has not changed even if the source code was updated.
+- Make a pull request against the main branch
+- Once merged the github workflow will deploy the subgraph on both The Graph Studio and Goldsky
+See the deployment script: https://github.com/KlimaDAO/klima-subgraph/blob/main/.github/workflows/deploy.yaml

@@ -84,7 +84,7 @@ Once the new versions of the subgraph have been deployed and synced, you have to
 3. Select the version
 4. Click on publish
 5. Confirm the publication
-6. HAve anothe signer confirm the transaction in the safe
+6. Have another signer confirm the transaction in the safe
 
 ### Goldsky
 

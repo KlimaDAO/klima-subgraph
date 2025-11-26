@@ -110,22 +110,19 @@ jobs:
             --version-label "${{ steps.version.outputs.version }}"
         working-directory: ${{ matrix.subgraph }}
 
-      - name: Deploy to Alchemy Hosted Service
-        if: >
-          steps.version.outputs.exist == 'false' &&
-          ( matrix.subgraph == 'carbonmark' ||
-            matrix.subgraph == 'polygon-digital-carbon' ||
-            matrix.subgraph == 'pairs' ||
-            matrix.subgraph == 'ethereum-bridged-carbon' )
+      - name: Install Goldsky CLI
+        if: steps.version.outputs.exist == 'false'
+        run: curl https://goldsky.com | sh -s -- -f
+
+      - name: Deploy to Goldsky
+        if: steps.version.outputs.exist == 'false'
         env:
-          DEPLOY_KEY: ${{ secrets.SUBGRAPH_ALCHEMY_HOSTED_SERVICE_DEPLOY_KEY }}
+          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
         run: |
-          ../node_modules/.bin/graph deploy \
-            "${{ steps.slug.outputs.slug }}" \
-            --deploy-key "$DEPLOY_KEY" \
-            --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
-            --ipfs https://ipfs.satsuma.xyz \
-            --version-label "${{ steps.version.outputs.version }}"
+          goldsky subgraph deploy \
+            --token "$GOLDSKY_API_KEY" \
+            "${{ steps.slug.outputs.slug }}/${{ steps.version.outputs.version }}" \
+            --path .
         working-directory: ${{ matrix.subgraph }}
 
       # ────────────────────────────────────────────────────────────────

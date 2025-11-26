@@ -11,6 +11,7 @@ export function recordCarbonCreditSnapshot(
 ): Epoch {
   let credit = loadCarbonCredit(creditId)
 
+  /*
   let snapshot = new CarbonCreditSnapshot(creditId.concatI32(epochNumber.toI32()))
   snapshot.credit = creditId
   snapshot.epoch = epochNumber
@@ -20,6 +21,7 @@ export function recordCarbonCreditSnapshot(
   snapshot.crossChainSupply = credit.crossChainSupply
   snapshot.createdAt = timestamp
   snapshot.save()
+  */
 
   if (credit.tokenAddress != MCO2_ERC20_CONTRACT) {
     epoch.creditSupply = epoch.creditSupply.plus(credit.currentSupply).plus(credit.crossChainSupply)

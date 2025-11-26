@@ -88,7 +88,7 @@ Once the new versions of the subgraph have been deployed and synced, you have to
 
 ### Goldsky
 
-1. Connect to Golsky
+1. Connect to Goldsky
 2. Select the subgraph
 3. Select the version
 4. Click on Add tag

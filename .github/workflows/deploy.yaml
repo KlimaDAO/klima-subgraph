@@ -8,7 +8,7 @@ name: Deployment
 
 on:
   push:
-    branches: [main]
+    branches: [main,bwano/fix/carbonmark_token_standard]
 
 jobs:
   deploy:

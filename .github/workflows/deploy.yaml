@@ -9,6 +9,8 @@ name: Deployment
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [bwano/fix/carbonmark_token_standard]
 
 jobs:
   deploy:

@@ -423,6 +423,10 @@ type KlimaRetire @entity(immutable: false) {
 
   "Selective retirement"
   specific: Boolean!
+
+  "Timestamp of the block where the retirement was made"
+  timestamp: BigInt!
+
 }
 
 type DailyKlimaRetireSnapshot @entity(immutable: false) {

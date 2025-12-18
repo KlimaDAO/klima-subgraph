@@ -7,7 +7,8 @@ export function saveKlimaRetire(
   retire: Bytes,
   index: BigInt,
   feeAmount: BigInt,
-  specific: boolean
+  specific: boolean,
+  timestamp: BigInt
 ): KlimaRetire {
   let id = account.concatI32(index.toI32())
   let klimaRetire = KlimaRetire.load(id)
@@ -18,6 +19,7 @@ export function saveKlimaRetire(
     klimaRetire.feeAmount = feeAmount
     klimaRetire.feeAmountTonnes = toDecimal(feeAmount)
     klimaRetire.specific = specific
+    klimaRetire.timestamp = timestamp
     klimaRetire.save()
   }
   return klimaRetire as KlimaRetire

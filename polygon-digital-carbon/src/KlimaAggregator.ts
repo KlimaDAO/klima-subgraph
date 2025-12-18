@@ -47,7 +47,8 @@ function processRetirement(
     retire.id,
     beneficiary.klimaRetirementsIndex,
     retiredAmount.div(BigInt.fromI32(100)), // hard-coded 1% fee
-    false
+    false,
+    timestamp
   )
 
   // increment the klima retirements index for beneficiary

@@ -3,7 +3,7 @@ dotenv.config()
 
 export const networkConfig = {
   polygon: {
-    rpcUrl: `https://polygon-rpc.com/`,
+    rpcUrl: `https://polygon.drpc.org/`,
     addresses: {
       marketplace: {
         address: '0xD973F90a4C49607EABeFdb2C45d4F39436c7e7fA',

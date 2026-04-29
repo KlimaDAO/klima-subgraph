@@ -16,6 +16,11 @@ import { SubgraphVersion } from '../generated/schema'
 import { SCHEMA_VERSION, PUBLISHED_VERSION } from './utils/version'
 
 export function handleListingCreated(event: ListingCreated): void {
+  log.info('handleListingCreated tx={} block={} id={}', [
+    event.transaction.hash.toHexString(),
+    event.block.number.toString(),
+    event.params.id.toHexString(),
+  ])
   let blockNumber = event.block.number
   // Ensure the user entity exists
   loadOrCreateUser(event.params.account)
@@ -71,6 +76,11 @@ export function handleListingCreated(event: ListingCreated): void {
 }
 
 export function handleListingUpdated(event: ListingUpdated): void {
+  log.info('handleListingUpdated tx={} block={} id={}', [
+    event.transaction.hash.toHexString(),
+    event.block.number.toString(),
+    event.params.id.toHexString(),
+  ])
   let blockNumber = event.block.number
   // User should already exist from creating the listing.
 
@@ -170,6 +180,11 @@ export function handleListingUpdated(event: ListingUpdated): void {
 }
 
 export function handleListingFilled(event: ListingFilled): void {
+  log.info('handleListingFilled tx={} block={} id={}', [
+    event.transaction.hash.toHexString(),
+    event.block.number.toString(),
+    event.params.id.toHexString(),
+  ])
   let blockNumber = event.block.number
   // Ensure the buyer user entity exists
   loadOrCreateUser(event.transaction.from)
@@ -219,6 +234,11 @@ export function handleListingFilled(event: ListingFilled): void {
 }
 
 export function handleListingCancelled(event: ListingCancelled): void {
+  log.info('handleListingCancelled tx={} block={} id={}', [
+    event.transaction.hash.toHexString(),
+    event.block.number.toString(),
+    event.params.id.toHexString(),
+  ])
   let listing = loadOrCreateListing(event.params.id.toHexString())
 
   listing.active = false
@@ -238,6 +258,7 @@ export function handleListingCancelled(event: ListingCancelled): void {
 }
 
 export function handleSetSubgraphVersion(block: ethereum.Block): void {
+  log.info('handleSetSubgraphVersion block={}', [block.number.toString()])
   let version = new SubgraphVersion('carbonmark')
   version.schemaVersion = SCHEMA_VERSION
   version.publishedVersion = PUBLISHED_VERSION

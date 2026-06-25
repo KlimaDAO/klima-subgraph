@@ -403,6 +403,9 @@ type Retire @entity(immutable: false) {
 
   "Additional data for async retirements. Currently C3 retires, ECO & J-Credit, and puro.earth"
   asyncRetireRequest: AsyncRetireRequest
+
+  "Retirement certificate/NFT id recovered at async finalization (e.g. Toucan). Set separately from retirementTokenId, which is populated synchronously by registries like ICR."
+  certificate: RetirementCertificate @derivedFrom(field: "retire")
 }
 
 type KlimaRetire @entity(immutable: false) {
@@ -535,6 +538,15 @@ type C3RetireRequestDetails @entity(immutable: false) {
   c3OffsetNftIndex: BigInt!
   tokenURI: String!
   retirementMetadata: C3RetirementMetadata
+}
+
+"On-chain retirement certificate/NFT id for an async (request/finalize) retirement. Created at finalization once the certificate is minted, keyed by the parent Retire's id. Kept separate from Retire.retirementTokenId so the synchronous ICR path is unaffected."
+type RetirementCertificate @entity(immutable: true) {
+  "Same id as the parent Retire"
+  id: Bytes!
+  retire: Retire!
+  "The retirement NFT id, emitted in the CertificateMinted event"
+  retirementTokenId: BigInt!
 }
 
 ##############################

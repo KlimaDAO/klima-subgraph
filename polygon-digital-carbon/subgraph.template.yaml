@@ -689,6 +689,7 @@ templates:
           handler: handleToucanPuroRetirementRequested
         - event: RetirementFinalized(indexed uint256)
           handler: handleToucanPuroRetirementFinalized
+          receipt: true
         - event: RetirementReverted(indexed uint256)
           handler: handleToucanPuroRetirementReverted
         - event: Transfer(indexed address,indexed address,uint256)

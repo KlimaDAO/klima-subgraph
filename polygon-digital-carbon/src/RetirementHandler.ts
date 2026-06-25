@@ -28,7 +28,7 @@ import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 import { loadRetire, saveRetire } from './utils/Retire'
 import { Bytes, log } from '@graphprotocol/graph-ts'
 import { loadOrCreateC3RetireRequestDetails, loadC3RetireRequestDetails } from './utils/C3'
-import { Token, TokenURISafeguard } from '../generated/schema'
+import { RetirementCertificate, Token, TokenURISafeguard } from '../generated/schema'
 import { createAsyncRetireRequestId } from '../utils/helpers'
 import { AsyncRetireRequestStatus } from '../utils/enums'
 import { loadAsyncRetireRequest, loadOrCreateAsyncRetireRequest } from './utils/AsyncRetireRequest'
@@ -293,6 +293,15 @@ export function handleReturnedPoccID(event: returnedPoccID): void {
   let retire = loadRetire(sender.id.concatI32(sender.totalRetirements - 1))
   retire.retirementTokenId = event.params.poccID
   retire.save()
+
+  // save on retirementCertificate entity
+  let retirementCertificate = RetirementCertificate.load(retire.id)
+  if (retirementCertificate == null) {
+    retirementCertificate = new RetirementCertificate(retire.id)
+    retirementCertificate.retire = retire.id
+    retirementCertificate.retirementTokenId = event.params.poccID
+    retirementCertificate.save()
+  }
 }
 
 export function saveICRRetirement(event: RetiredVintage): void {
@@ -333,6 +342,14 @@ export function saveICRRetirement(event: RetiredVintage): void {
   let retire = loadRetire(sender.id.concatI32(sender.totalRetirements))
   retire.retirementTokenId = event.params.nftTokenId
   retire.save()
+
+  let retirementCertificate = RetirementCertificate.load(retire.id)
+  if (retirementCertificate == null) {
+    retirementCertificate = new RetirementCertificate(retire.id)
+    retirementCertificate.retire = retire.id
+    retirementCertificate.retirementTokenId = event.params.nftTokenId
+    retirementCertificate.save()
+  }
 
   incrementAccountRetirements(senderAddress)
 }

@@ -28,7 +28,8 @@ import { loadOrCreateCarbonProject } from './utils/CarbonProject'
 import { loadRetire, saveRetire } from './utils/Retire'
 import { Bytes, log } from '@graphprotocol/graph-ts'
 import { loadOrCreateC3RetireRequestDetails, loadC3RetireRequestDetails } from './utils/C3'
-import { RetirementCertificate, Token, TokenURISafeguard } from '../generated/schema'
+import { Token, TokenURISafeguard } from '../generated/schema'
+import { findMintedCertificateId, saveRetirementCertificate } from './utils/Certificate'
 import { createAsyncRetireRequestId } from '../utils/helpers'
 import { AsyncRetireRequestStatus } from '../utils/enums'
 import { loadAsyncRetireRequest, loadOrCreateAsyncRetireRequest } from './utils/AsyncRetireRequest'
@@ -89,8 +90,10 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
   let senderAddress = event.transaction.from
   loadOrCreateAccount(event.params.sender) // Beneficiary address
 
+  let retireId = sender.id.concatI32(sender.totalRetirements)
+
   saveRetire(
-    sender.id.concatI32(sender.totalRetirements),
+    retireId,
     credit.id,
     credit.tokenAddress,
     ZERO_ADDRESS,
@@ -104,6 +107,13 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
     event.transaction.hash,
     event.params.eventId.toString()
   )
+
+  // The synchronous TCO2 retire optionally mints a certificate nft id in the same tx.
+  // Record if one was minted
+  let retirementNftId = findMintedCertificateId(event.receipt, null)
+  if (retirementNftId.gt(ZERO_BI)) {
+    saveRetirementCertificate(retireId, retirementNftId)
+  }
 
   incrementAccountRetirements(senderAddress)
 }
@@ -294,14 +304,7 @@ export function handleReturnedPoccID(event: returnedPoccID): void {
   retire.retirementTokenId = event.params.poccID
   retire.save()
 
-  // save on retirementCertificate entity
-  let retirementCertificate = RetirementCertificate.load(retire.id)
-  if (retirementCertificate == null) {
-    retirementCertificate = new RetirementCertificate(retire.id)
-    retirementCertificate.retire = retire.id
-    retirementCertificate.retirementTokenId = event.params.poccID
-    retirementCertificate.save()
-  }
+  saveRetirementCertificate(retire.id, event.params.poccID)
 }
 
 export function saveICRRetirement(event: RetiredVintage): void {
@@ -343,13 +346,7 @@ export function saveICRRetirement(event: RetiredVintage): void {
   retire.retirementTokenId = event.params.nftTokenId
   retire.save()
 
-  let retirementCertificate = RetirementCertificate.load(retire.id)
-  if (retirementCertificate == null) {
-    retirementCertificate = new RetirementCertificate(retire.id)
-    retirementCertificate.retire = retire.id
-    retirementCertificate.retirementTokenId = event.params.nftTokenId
-    retirementCertificate.save()
-  }
+  saveRetirementCertificate(retire.id, event.params.nftTokenId)
 
   incrementAccountRetirements(senderAddress)
 }

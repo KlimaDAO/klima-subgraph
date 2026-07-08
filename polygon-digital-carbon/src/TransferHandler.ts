@@ -28,7 +28,7 @@ import {
   saveToucanRetirement_1_4_0,
 } from './RetirementHandler'
 import { saveBridge } from './utils/Bridge'
-import { CarbonCredit, CrossChainBridge, RetirementCertificate } from '../generated/schema'
+import { CarbonCredit, CrossChainBridge } from '../generated/schema'
 import { checkForCarbonPoolSnapshot, loadOrCreateCarbonPool } from './utils/CarbonPool'
 import { checkForCarbonPoolCreditSnapshot } from './utils/CarbonPoolCreditBalance'
 import { loadOrCreateEcosystem } from './utils/Ecosystem'
@@ -44,6 +44,7 @@ import {
   DetokenizationReverted,
 } from '../generated/templates/ToucanPuroCarbonOffsets/ToucanPuroCarbonOffsets'
 import { loadOrCreateAsyncRetireRequest } from './utils/AsyncRetireRequest'
+import { findMintedCertificateId, saveRetirementCertificate } from './utils/Certificate'
 import { AsyncRetireRequestStatus } from '../utils/enums'
 import { convertToAmountTonnes, createAsyncRetireRequestId } from '../utils/helpers'
 import { burnedCO2Token } from '../generated/CCO2/CCO2'
@@ -112,31 +113,6 @@ export function handleToucanPuroRetirementRequested(event: RetirementRequested):
   saveToucanPuroRetirementRequest(event)
 }
 
-// keccak256("CertificateMinted(uint256)") emitted by the Toucan RetirementCertificates contract.
-// The retirement NFT tokenId is not part of the RetirementFinalized event, so we recover it from the receipt.
-const CERTIFICATE_MINTED_TOPIC0 = Bytes.fromHexString(
-  '0x54b249c3cd4a5f80e81d2ad036b251d58d8f5482a926f25d12eabec192cf1ecd'
-)
-
-// Finalization mints the retirement certificate NFT (CertificateMinted) in the same transaction,
-// immediately before RetirementFinalized. Walk the receipt logs backward to find the nearest
-// preceding CertificateMinted and decode its non-indexed uint256 tokenId. Returns zero when unavailable.
-function findRetirementNftId(event: RetirementFinalized): BigInt {
-  let receipt = event.receipt
-  if (receipt == null) return ZERO_BI
-
-  let logs = receipt.logs
-  for (let i = logs.length - 1; i >= 0; i--) {
-    let txLog = logs[i]
-    if (txLog.logIndex.ge(event.logIndex)) continue // only logs before this one
-    if (txLog.topics.length > 0 && txLog.topics[0].equals(CERTIFICATE_MINTED_TOPIC0)) {
-      let decoded = ethereum.decode('uint256', txLog.data)
-      if (decoded) return decoded.toBigInt()
-    }
-  }
-  return ZERO_BI
-}
-
 export function handleToucanPuroRetirementFinalized(event: RetirementFinalized): void {
   let requestId = createAsyncRetireRequestId(event.address, event.params.requestId)
 
@@ -151,12 +127,10 @@ export function handleToucanPuroRetirementFinalized(event: RetirementFinalized):
 
     // Record the minted certificate id in a sidecar entity keyed by the Retire id,
     // leaving retire.retirementTokenId (used by the synchronous ICR path) untouched.
-    let retirementNftId = findRetirementNftId(event)
+    // CertificateMinted is emitted immediately before RetirementFinalized in this tx.
+    let retirementNftId = findMintedCertificateId(event.receipt, event.logIndex)
     if (retirementNftId.gt(ZERO_BI)) {
-      let certificate = new RetirementCertificate(retire.id)
-      certificate.retire = retire.id
-      certificate.retirementTokenId = retirementNftId
-      certificate.save()
+      saveRetirementCertificate(retire.id, retirementNftId)
     }
   }
 }

@@ -659,6 +659,7 @@ templates:
           handler: handleToucanRetired
         - event: Retired(address,uint256,uint256)
           handler: handleToucanRetired_1_4_0
+          receipt: true
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleCreditTransfer
       file: ./src/TransferHandler.ts

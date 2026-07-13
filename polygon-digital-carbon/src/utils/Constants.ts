@@ -1,3 +1,5 @@
+import { Bytes } from '@graphprotocol/graph-ts'
+
 //Token Addresses
 export const BCT_TOKEN: string = 'BCT'
 export const BCT_ERC20_CONTRACT: string = '0x2f800db0fdb5223b3c3f354886d907a671414a7f'
@@ -18,3 +20,20 @@ export const KLIMA_INFINITY_DIAMOND = '0x8cE54d9625371fb2a068986d32C85De8E6e995f
 
 //Metrics init timestamp - 10th of Oct 2021 (Day of BCT ERC20 contract creation)
 export const METRICS_INIT_TIMESTAMP = '1633824000'
+
+// Event topic0 signatures for certificates
+
+// CertificateMinted(uint256): Toucan RetirementCertificates
+export const CERTIFICATE_MINTED_TOPIC0 = Bytes.fromHexString(
+  '0x54b249c3cd4a5f80e81d2ad036b251d58d8f5482a926f25d12eabec192cf1ecd'
+)
+
+// Retired(address,uint256,uint256): TCO2 1.4.0
+export const RETIRED_1_4_0_TOPIC0 = Bytes.fromHexString(
+  '0xb3775f672e1adf43bf7834b692675bfee4db72f83e42da8cff694ca295a89eca'
+)
+
+// Retired(address,uint256): legacy TCO2
+export const RETIRED_LEGACY_TOPIC0 = Bytes.fromHexString(
+  '0x8dc4b87efb3c82876c566fb305749c81faf4459424134a0470fee3f604048de7'
+)

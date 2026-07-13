@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, Bytes, ethereum, store } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt, Bytes, store } from '@graphprotocol/graph-ts'
 import {
   CCO2_ERC20_CONTRACT,
   ICR_MIGRATION_BLOCK,
@@ -44,7 +44,7 @@ import {
   DetokenizationReverted,
 } from '../generated/templates/ToucanPuroCarbonOffsets/ToucanPuroCarbonOffsets'
 import { loadOrCreateAsyncRetireRequest } from './utils/AsyncRetireRequest'
-import { findMintedCertificateId, saveRetirementCertificate } from './utils/Certificate'
+import { findMintedCertificateIdBefore, saveRetirementCertificate } from './utils/Certificate'
 import { AsyncRetireRequestStatus } from '../utils/enums'
 import { convertToAmountTonnes, createAsyncRetireRequestId } from '../utils/helpers'
 import { burnedCO2Token } from '../generated/CCO2/CCO2'
@@ -125,10 +125,10 @@ export function handleToucanPuroRetirementFinalized(event: RetirementFinalized):
     retire.asyncRetireStatus = AsyncRetireRequestStatus.FINALIZED
     retire.save()
 
-    // Record the minted certificate id in a sidecar entity keyed by the Retire id,
+    // Record the minted certificate id in an additional entity keyed by the Retire id,
     // leaving retire.retirementTokenId (used by the synchronous ICR path) untouched.
     // CertificateMinted is emitted immediately before RetirementFinalized in this tx.
-    let retirementNftId = findMintedCertificateId(event.receipt, event.logIndex)
+    let retirementNftId = findMintedCertificateIdBefore(event.receipt, event.logIndex)
     if (retirementNftId.gt(ZERO_BI)) {
       saveRetirementCertificate(retire.id, retirementNftId)
     }

@@ -29,7 +29,7 @@ import { loadRetire, saveRetire } from './utils/Retire'
 import { Bytes, log } from '@graphprotocol/graph-ts'
 import { loadOrCreateC3RetireRequestDetails, loadC3RetireRequestDetails } from './utils/C3'
 import { Token, TokenURISafeguard } from '../generated/schema'
-import { findMintedCertificateId, saveRetirementCertificate } from './utils/Certificate'
+import { findMintedCertificateIdAfter, saveRetirementCertificate } from './utils/Certificate'
 import { createAsyncRetireRequestId } from '../utils/helpers'
 import { AsyncRetireRequestStatus } from '../utils/enums'
 import { loadAsyncRetireRequest, loadOrCreateAsyncRetireRequest } from './utils/AsyncRetireRequest'
@@ -108,9 +108,9 @@ export function saveToucanRetirement_1_4_0(event: Retired_1_4_0): void {
     event.params.eventId.toString()
   )
 
-  // The synchronous TCO2 retire optionally mints a certificate nft id in the same tx.
-  // Record if one was minted
-  let retirementNftId = findMintedCertificateId(event.receipt, null)
+  // The synchronous TCO2 retire optionally mints a certificate nft id in the same tx, emitted AFTER the Retired event.
+  // Only the nearest following CertificateMinted event belongs to this one.
+  let retirementNftId = findMintedCertificateIdAfter(event.receipt, event.logIndex)
   if (retirementNftId.gt(ZERO_BI)) {
     saveRetirementCertificate(retireId, retirementNftId)
   }

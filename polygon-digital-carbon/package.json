@@ -1,6 +1,6 @@
 {
   "name": "polygon-digital-carbon",
-  "version": "1.7.6",
+  "version": "1.7.7",
   "repository": "https://github.com/KlimaDAO/klima-subgraphs/polygon-carbon",
   "license": "MIT",
   "scripts": {

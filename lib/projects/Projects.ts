@@ -12650,7 +12650,18 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '0',
     false
   ),
-
+  new ProjectInfo(
+    '0x883ed8Ea60a73d185f24788d01e0aa3e4CB80994',
+    'CMARK-6',
+    '2025',
+    'Gaïago Soil Revitalization Project for Cropland',
+    'SC-ISO-14064-2',
+    'Agriculture',
+    'France',
+    '',
+    '0',
+    false
+  ),
   new ProjectInfo(
     '0x023eb0b4f9b4dbff04a7026c085e6da6b4e93d4f',
     'TVER-0',

@@ -12135,6 +12135,138 @@ export const PROJECT_INFO: ProjectInfo[] = [
     false
   ),
   new ProjectInfo(
+    '0x6c0034573d922aab60d4410e79fd4f02f0e74419',
+    'ICR-91',
+    '2023',
+    'Sea Cave® True Blue Carbon® Project',
+    'ISO-14064-2',
+    'Blue Carbon',
+    'Mexico',
+    '',
+    '1',
+    false
+  ),
+  new ProjectInfo(
+    '0x6c0034573d922aab60d4410e79fd4f02f0e74419',
+    'ICR-91',
+    '2024',
+    'Sea Cave® True Blue Carbon® Project',
+    'ISO-14064-2',
+    'Blue Carbon',
+    'Mexico',
+    '',
+    '2',
+    false
+  ),
+  new ProjectInfo(
+    '0x6c0034573d922aab60d4410e79fd4f02f0e74419',
+    'ICR-91',
+    '2025',
+    'Sea Cave® True Blue Carbon® Project',
+    'ISO-14064-2',
+    'Blue Carbon',
+    'Mexico',
+    '',
+    '3',
+    false
+  ),
+  new ProjectInfo(
+    '0x6c0034573d922aab60d4410e79fd4f02f0e74419',
+    'ICR-91',
+    '2026',
+    'Sea Cave® True Blue Carbon® Project',
+    'ISO-14064-2',
+    'Blue Carbon',
+    'Mexico',
+    '',
+    '4',
+    false
+  ),
+  new ProjectInfo(
+    '0x6c0034573d922aab60d4410e79fd4f02f0e74419',
+    'ICR-91',
+    '2027',
+    'Sea Cave® True Blue Carbon® Project',
+    'ISO-14064-2',
+    'Blue Carbon',
+    'Mexico',
+    '',
+    '5',
+    false
+  ),
+  new ProjectInfo(
+    '0x6c0034573d922aab60d4410e79fd4f02f0e74419',
+    'ICR-91',
+    '2028',
+    'Sea Cave® True Blue Carbon® Project',
+    'ISO-14064-2',
+    'Blue Carbon',
+    'Mexico',
+    '',
+    '6',
+    false
+  ),
+  new ProjectInfo(
+    '0x6c0034573d922aab60d4410e79fd4f02f0e74419',
+    'ICR-91',
+    '2029',
+    'Sea Cave® True Blue Carbon® Project',
+    'ISO-14064-2',
+    'Blue Carbon',
+    'Mexico',
+    '',
+    '7',
+    false
+  ),
+  new ProjectInfo(
+    '0x6c0034573d922aab60d4410e79fd4f02f0e74419',
+    'ICR-91',
+    '2030',
+    'Sea Cave® True Blue Carbon® Project',
+    'ISO-14064-2',
+    'Blue Carbon',
+    'Mexico',
+    '',
+    '8',
+    false
+  ),
+  new ProjectInfo(
+    '0x6c0034573d922aab60d4410e79fd4f02f0e74419',
+    'ICR-91',
+    '2031',
+    'Sea Cave® True Blue Carbon® Project',
+    'ISO-14064-2',
+    'Blue Carbon',
+    'Mexico',
+    '',
+    '9',
+    false
+  ),
+  new ProjectInfo(
+    '0x6c0034573d922aab60d4410e79fd4f02f0e74419',
+    'ICR-91',
+    '2032',
+    'Sea Cave® True Blue Carbon® Project',
+    'ISO-14064-2',
+    'Blue Carbon',
+    'Mexico',
+    '',
+    '10',
+    false
+  ),
+  new ProjectInfo(
+    '0x6c0034573d922aab60d4410e79fd4f02f0e74419',
+    'ICR-91',
+    '2033',
+    'Sea Cave® True Blue Carbon® Project',
+    'ISO-14064-2',
+    'Blue Carbon',
+    'Mexico',
+    '',
+    '11',
+    false
+  ),
+  new ProjectInfo(
     '0x5557cf0e9f4c47b1e536aac2ac4bd2c50f9090bb',
     'JCS-19011',
     '2016',
@@ -12194,6 +12326,7 @@ export const PROJECT_INFO: ProjectInfo[] = [
     '0',
     false
   ),
+
   new ProjectInfo(
     '0x56f70487da3ee9a1989fab93a42718d925ae4215',
     'PUR-133206',

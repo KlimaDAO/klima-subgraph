@@ -9,6 +9,9 @@ name: Deployment
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: "*"
+
 
 jobs:
   deploy:
@@ -35,7 +38,6 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
-          token: ${{ secrets.GH_ACCESS_TOKEN }}
       - name: Configure Git author
         run: |
           git config --global user.name  "deploy-action"
